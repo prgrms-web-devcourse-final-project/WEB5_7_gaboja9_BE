@@ -9,5 +9,4 @@ public class MockStockApplication {
     public static void main(String[] args) {
         SpringApplication.run(MockStockApplication.class, args);
     }
-
 }
