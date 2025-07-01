@@ -1,4 +1,4 @@
-package io.gaboja9.mockstock.global;
+package io.gaboja9.mockstock.global.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
