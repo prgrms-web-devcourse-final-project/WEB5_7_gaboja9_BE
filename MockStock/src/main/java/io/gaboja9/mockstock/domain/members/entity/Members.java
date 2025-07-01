@@ -1,11 +1,11 @@
 package io.gaboja9.mockstock.domain.members.entity;
 
 import io.gaboja9.mockstock.global.common.BaseEntity;
+
 import jakarta.persistence.*;
+
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-
-import java.util.List;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -26,5 +26,4 @@ public class Members extends BaseEntity {
     private Long cashBalance;
 
     private int bankruptcyCnt;
-
 }
