@@ -16,7 +16,7 @@ public class SecurityConfig {
                         .anyRequest().permitAll()
                 )
                 .formLogin(form -> form.disable())
-                .csrf(csrf -> csrf.disable()) // deprecated된 방식 대신 람다로 처리
+                .csrf(csrf -> csrf.disable()) 
                 .build();
     }
 }
