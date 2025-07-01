@@ -2,11 +2,11 @@ package io.gaboja9.mockstock.domain.favorites.entity;
 
 import io.gaboja9.mockstock.domain.members.entity.Members;
 import io.gaboja9.mockstock.global.common.BaseEntity;
+
 import jakarta.persistence.*;
+
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-
-import java.lang.reflect.Member;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
