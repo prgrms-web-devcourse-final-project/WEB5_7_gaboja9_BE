@@ -1,0 +1,54 @@
+name : MockStock
+
+services:
+
+  MockStock-web:
+    container_name: grepp-web
+    image: grepp-web
+    ports:
+      - "80:80"
+      - "443:443"
+    networks:
+      - net_1
+
+  MockStock-db:
+    image: mysql
+    container_name: MockStock_db
+    environment:
+      - MYSQL_ALLOW_EMPTY_PASSWORD=true
+      - MYSQL_USER=grepp_app_1
+      - MYSQL_PASSWORD=grepp_app_1!
+      - MYSQL_DATABASE=grepp_exb_db
+    networks:
+      - net_1
+
+
+  MockStock-app:
+    #    image: grepp-app:0.2
+    image: ghcr.io/eddie1031/2025_grepp_infra_back:latest
+    container_name: MockStock-app
+    ports:
+      - "8080:8080"
+    networks:
+      - net_1
+    depends_on:
+      - MockStock-db
+
+  nginx:
+    image: nginx:alpine
+    container_name: nginx-proxy
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+    depends_on:
+      - app
+    networks:
+      - net_1
+
+
+networks:
+  net_1:
+    name: net_1
+    driver: bridge
