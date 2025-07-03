@@ -1,0 +1,6 @@
+spring:
+  application:
+    name: MockStock
+
+  profiles:
+    default: local
