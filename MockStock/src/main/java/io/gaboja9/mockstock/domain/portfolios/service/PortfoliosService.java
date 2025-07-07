@@ -24,7 +24,7 @@ public class PortfoliosService {
     private final PortfoliosMapper portfoliosMapper;
     private final MembersRepository membersRepository;
 
-    @Transactional
+    @Transactional(readOnly = true)
     public PortfoliosResponseDto getPortfolios(Long memberId) {
         List<Portfolios> portfoliosList = portfoliosRepository.findByMembersId(memberId);
 
