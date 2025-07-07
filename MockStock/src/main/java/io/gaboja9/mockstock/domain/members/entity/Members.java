@@ -5,8 +5,12 @@ import io.gaboja9.mockstock.global.common.BaseEntity;
 import jakarta.persistence.*;
 
 import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
+@Getter
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Members extends BaseEntity {
@@ -23,7 +27,20 @@ public class Members extends BaseEntity {
 
     private String profileImage;
 
-    private Long cashBalance;
+    private int cashBalance;
 
     private int bankruptcyCnt;
+
+    // 테스트용 생성자
+    public Members(Long id, String email, String nickname, String provider, String profileImage,
+                   int cashBalance, int bankruptcyCnt, LocalDateTime createdAt) {
+        this.id = id;
+        this.email = email;
+        this.nickname = nickname;
+        this.provider = provider;
+        this.profileImage = profileImage;
+        this.cashBalance = cashBalance;
+        this.bankruptcyCnt = bankruptcyCnt;
+        this.setCreatedAt(createdAt);
+    }
 }
