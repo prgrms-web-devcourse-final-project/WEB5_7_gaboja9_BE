@@ -1,10 +1,11 @@
 package io.gaboja9.mockstock.global.config;
 
-
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import io.gaboja9.mockstock.global.websocket.KoreaInvestmentWebSocketHandler;
 import io.gaboja9.mockstock.global.websocket.MyWebSocketConnectionManager;
 import io.gaboja9.mockstock.global.websocket.WebSocketEventService;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
@@ -53,10 +54,7 @@ public class WebSocketConfig implements WebSocketConfigurer {
             RestTemplate restTemplate,
             WebSocketEventService webSocketEventService) {
         return new KoreaInvestmentWebSocketHandler(
-                objectMapper,
-                restTemplate,
-                webSocketEventService
-        );
+                objectMapper, restTemplate, webSocketEventService);
     }
 
     // MyWebSocketConnectionManager 빈 생성
@@ -68,14 +66,12 @@ public class WebSocketConfig implements WebSocketConfigurer {
 
         // KoreaInvestmentWebSocketHandler를 ApplicationContext에서 가져오는 대신
         // 클래스를 생성한 후 주입
-        KoreaInvestmentWebSocketHandler handler = applicationContext.getBean(KoreaInvestmentWebSocketHandler.class);
+        KoreaInvestmentWebSocketHandler handler =
+                applicationContext.getBean(KoreaInvestmentWebSocketHandler.class);
 
-        MyWebSocketConnectionManager connectionManager = new MyWebSocketConnectionManager(
-                webSocketClient,
-                handler,
-                websocketUri,
-                webSocketEventService
-        );
+        MyWebSocketConnectionManager connectionManager =
+                new MyWebSocketConnectionManager(
+                        webSocketClient, handler, websocketUri, webSocketEventService);
 
         // 자동 시작 비활성화 (서비스 레이어에서 명시적으로 시작)
         connectionManager.setAutoStartup(false);
@@ -84,7 +80,8 @@ public class WebSocketConfig implements WebSocketConfigurer {
 
     // 초기화 로직을 위한 빈
     @Bean(initMethod = "startConnection", destroyMethod = "stopConnection")
-    public ConnectionInitializer connectionInitializer(MyWebSocketConnectionManager connectionManager) {
+    public ConnectionInitializer connectionInitializer(
+            MyWebSocketConnectionManager connectionManager) {
         return new ConnectionInitializer(connectionManager);
     }
 

@@ -4,9 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 public class StockDataParserUtil {
 
-    /**
-     * 문자열 배열 데이터를 간단한 StockPriceData로 파싱
-     */
+    /** 문자열 배열 데이터를 간단한 StockPriceData로 파싱 */
     public static StockPriceData parseStockPriceData(String[] fields) {
         return StockPriceData.builder()
                 .stockCode(fields[0])
@@ -15,9 +13,7 @@ public class StockDataParserUtil {
                 .build();
     }
 
-    /**
-     * JSON 노드를 간단한 StockPriceData로 파싱
-     */
+    /** JSON 노드를 간단한 StockPriceData로 파싱 */
     public static StockPriceData parseStockPriceData(JsonNode output) {
         if (output.isTextual()) {
             String[] fields = output.asText().split("\\^");
