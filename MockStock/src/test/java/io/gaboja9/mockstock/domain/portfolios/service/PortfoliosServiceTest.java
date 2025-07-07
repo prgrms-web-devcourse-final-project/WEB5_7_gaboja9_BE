@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 
 import io.gaboja9.mockstock.domain.members.entity.Members;
+import io.gaboja9.mockstock.domain.members.exception.NotFoundMemberException;
 import io.gaboja9.mockstock.domain.members.repository.MembersRepository;
 import io.gaboja9.mockstock.domain.portfolios.dto.response.PortfolioResponseDto;
 import io.gaboja9.mockstock.domain.portfolios.dto.response.PortfoliosResponseDto;
@@ -108,6 +109,6 @@ class PortfoliosServiceTest {
         given(portfoliosRepository.findByMembersId(memberId)).willReturn(List.of());
 
         org.junit.jupiter.api.Assertions.assertThrows(
-                RuntimeException.class, () -> portfoliosService.getPortfolios(memberId));
+                NotFoundMemberException.class, () -> portfoliosService.getPortfolios(memberId));
     }
 }
