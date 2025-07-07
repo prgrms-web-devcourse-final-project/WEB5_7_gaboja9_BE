@@ -2,7 +2,9 @@ package io.gaboja9.mockstock.domain.mails.entity;
 
 import io.gaboja9.mockstock.domain.members.entity.Members;
 import io.gaboja9.mockstock.global.common.BaseEntity;
+
 import jakarta.persistence.*;
+
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
