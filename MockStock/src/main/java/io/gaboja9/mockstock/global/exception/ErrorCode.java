@@ -2,6 +2,7 @@ package io.gaboja9.mockstock.global.exception;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.http.HttpStatus;
 
 @Getter
@@ -9,7 +10,7 @@ import org.springframework.http.HttpStatus;
 public enum ErrorCode {
 
     // 공통 에러
-    INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR,"GLOBAL-001", "서버 내부 오류가 발생했습니다." ),
+    INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "GLOBAL-001", "서버 내부 오류가 발생했습니다."),
     INVALID_INPUT_VALUE(HttpStatus.BAD_REQUEST, "GLOBAL-002", "잘못된 입력값입니다."),
 
     // 사용자 관련 에러,
@@ -19,5 +20,4 @@ public enum ErrorCode {
     private final HttpStatus status;
     private final String code;
     private final String message;
-
 }
