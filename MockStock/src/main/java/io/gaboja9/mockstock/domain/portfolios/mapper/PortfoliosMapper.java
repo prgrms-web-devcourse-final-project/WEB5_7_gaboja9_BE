@@ -3,7 +3,9 @@ package io.gaboja9.mockstock.domain.portfolios.mapper;
 import io.gaboja9.mockstock.domain.portfolios.dto.response.PortfolioResponseDto;
 import io.gaboja9.mockstock.domain.portfolios.entity.Portfolios;
 import io.gaboja9.mockstock.global.Influx.InfluxQueryService;
+
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.stereotype.Component;
 
 @Component
@@ -20,9 +22,10 @@ public class PortfoliosMapper {
         int evaluationAmount = currentPrice * quantity;
         int profit = (currentPrice - avgPrice) * quantity;
         int investment = avgPrice * quantity;
-        double profitRate = (
-                investment == 0 ? 0.00 : Math.round((double) profit / investment * 100 * 100) / 100.0
-        );
+        double profitRate =
+                (investment == 0
+                        ? 0.00
+                        : Math.round((double) profit / investment * 100 * 100) / 100.0);
 
         return PortfolioResponseDto.builder()
                 .stockCode(p.getStockCode())

@@ -3,7 +3,9 @@ package io.gaboja9.mockstock.global.Influx;
 import com.influxdb.client.InfluxDBClient;
 import com.influxdb.query.FluxRecord;
 import com.influxdb.query.FluxTable;
+
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -15,12 +17,15 @@ public class InfluxQueryService {
     private final InfluxDBClient influxDBClient;
 
     public int getCurrentPrice(String stockCode) {
-        String flux = String.format("""
-            from(bucket: "stocks")
-              |> range(start: -10m)
-              |> filter(fn: (r) => r._measurement == "stock_price" and r.stockCode == "%s" and r._field == "price")
-              |> last()
-        """, stockCode);
+        String flux =
+                String.format(
+                        """
+                            from(bucket: "stocks")
+                              |> range(start: -10m)
+                              |> filter(fn: (r) => r._measurement == "stock_price" and r.stockCode == "%s" and r._field == "price")
+                              |> last()
+                        """,
+                        stockCode);
 
         List<FluxTable> tables = influxDBClient.getQueryApi().query(flux);
 

@@ -1,5 +1,8 @@
 package io.gaboja9.mockstock.domain.portfolios.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.BDDMockito.given;
+
 import io.gaboja9.mockstock.domain.members.entity.Members;
 import io.gaboja9.mockstock.domain.members.repository.MembersRepository;
 import io.gaboja9.mockstock.domain.portfolios.dto.response.PortfolioResponseDto;
@@ -7,6 +10,7 @@ import io.gaboja9.mockstock.domain.portfolios.dto.response.PortfoliosResponseDto
 import io.gaboja9.mockstock.domain.portfolios.entity.Portfolios;
 import io.gaboja9.mockstock.domain.portfolios.mapper.PortfoliosMapper;
 import io.gaboja9.mockstock.domain.portfolios.repository.PortfoliosRepository;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -18,56 +22,62 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.BDDMockito.given;
-
 @ExtendWith(MockitoExtension.class)
 class PortfoliosServiceTest {
 
-    @InjectMocks
-    private PortfoliosService portfoliosService;
+    @InjectMocks private PortfoliosService portfoliosService;
 
-    @Mock
-    private PortfoliosRepository portfoliosRepository;
+    @Mock private PortfoliosRepository portfoliosRepository;
 
-    @Mock
-    private PortfoliosMapper portfoliosMapper;
+    @Mock private PortfoliosMapper portfoliosMapper;
 
-    @Mock
-    private MembersRepository membersRepository;
+    @Mock private MembersRepository membersRepository;
 
     @Test
     void getPortfolios_정상작동() {
         Long memberId = 1L;
 
         // Members 생성자 직접 사용 (빌더 없음)
-        Members member = new Members(
-                memberId,
-                "test@example.com",
-                "testUser",
-                "google",
-                "test.png",
-                5000,
-                0,
-                LocalDateTime.now().minusDays(15)  // createdAt 포함
-        );
+        Members member =
+                new Members(
+                        memberId,
+                        "test@example.com",
+                        "testUser",
+                        "google",
+                        "test.png",
+                        5000,
+                        0,
+                        LocalDateTime.now().minusDays(15) // createdAt 포함
+                        );
 
-        Portfolios p1 = new Portfolios(1L,"AAPL", "애플", 10, 150);
+        Portfolios p1 = new Portfolios(1L, "AAPL", "애플", 10, 150);
         Portfolios p2 = new Portfolios(2L, "TSLA", "테슬라", 5, 200);
 
         List<Portfolios> portfoliosList = Arrays.asList(p1, p2);
 
-        PortfolioResponseDto dto1 = PortfolioResponseDto.builder()
-                .stockCode("AAPL").stockName("애플")
-                .quantity(10).avgPrice(150).currentPrice(160)
-                .evaluationAmount(1600).profit(100).profitRate(6.666666666666667)
-                .build();
+        PortfolioResponseDto dto1 =
+                PortfolioResponseDto.builder()
+                        .stockCode("AAPL")
+                        .stockName("애플")
+                        .quantity(10)
+                        .avgPrice(150)
+                        .currentPrice(160)
+                        .evaluationAmount(1600)
+                        .profit(100)
+                        .profitRate(6.666666666666667)
+                        .build();
 
-        PortfolioResponseDto dto2 = PortfolioResponseDto.builder()
-                .stockCode("TSLA").stockName("테슬라")
-                .quantity(5).avgPrice(200).currentPrice(220)
-                .evaluationAmount(1100).profit(100).profitRate(10.0)
-                .build();
+        PortfolioResponseDto dto2 =
+                PortfolioResponseDto.builder()
+                        .stockCode("TSLA")
+                        .stockName("테슬라")
+                        .quantity(5)
+                        .avgPrice(200)
+                        .currentPrice(220)
+                        .evaluationAmount(1100)
+                        .profit(100)
+                        .profitRate(10.0)
+                        .build();
 
         given(portfoliosRepository.findByMembersId(memberId)).willReturn(portfoliosList);
         given(portfoliosMapper.toDto(p1)).willReturn(dto1);
@@ -76,7 +86,9 @@ class PortfoliosServiceTest {
 
         int totalEvaluationAmount = dto1.getEvaluationAmount() + dto2.getEvaluationAmount(); // 2700
         int totalProfit = dto1.getProfit() + dto2.getProfit(); // 200
-        int totalInvestment = dto1.getAvgPrice() * dto1.getQuantity() + dto2.getAvgPrice() * dto2.getQuantity(); // 2750
+        int totalInvestment =
+                dto1.getAvgPrice() * dto1.getQuantity()
+                        + dto2.getAvgPrice() * dto2.getQuantity(); // 2750
         double totalProfitRate = (double) totalProfit / totalInvestment * 100;
 
         PortfoliosResponseDto result = portfoliosService.getPortfolios(memberId);
@@ -95,7 +107,7 @@ class PortfoliosServiceTest {
         given(membersRepository.findById(memberId)).willReturn(Optional.empty());
         given(portfoliosRepository.findByMembersId(memberId)).willReturn(List.of());
 
-        org.junit.jupiter.api.Assertions.assertThrows(RuntimeException.class,
-                () -> portfoliosService.getPortfolios(memberId));
+        org.junit.jupiter.api.Assertions.assertThrows(
+                RuntimeException.class, () -> portfoliosService.getPortfolios(memberId));
     }
 }

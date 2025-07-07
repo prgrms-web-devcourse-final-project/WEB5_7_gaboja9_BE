@@ -12,5 +12,4 @@ public class PortfoliosSummary {
     private final int totalProfit;
 
     private final double totalProfitRate;
-
 }

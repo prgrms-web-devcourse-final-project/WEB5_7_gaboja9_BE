@@ -7,7 +7,9 @@ import io.gaboja9.mockstock.domain.portfolios.dto.response.PortfoliosResponseDto
 import io.gaboja9.mockstock.domain.portfolios.entity.Portfolios;
 import io.gaboja9.mockstock.domain.portfolios.mapper.PortfoliosMapper;
 import io.gaboja9.mockstock.domain.portfolios.repository.PortfoliosRepository;
+
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,9 +35,11 @@ public class PortfoliosService {
 
         PortfoliosSummary summary = calculateSummary(dtoList);
 
-        int cashBalance = membersRepository.findById(memberId)
-                .orElseThrow(() -> new RuntimeException("유저 없음"))
-                .getCashBalance();
+        int cashBalance =
+                membersRepository
+                        .findById(memberId)
+                        .orElseThrow(() -> new RuntimeException("유저 없음"))
+                        .getCashBalance();
 
         return PortfoliosResponseDto.builder()
                 .cashBalance(cashBalance)
@@ -57,7 +61,8 @@ public class PortfoliosService {
             totalInvestment += dto.getAvgPrice() * dto.getQuantity();
         }
 
-        double totalProfitRate = totalInvestment == 0 ? 0.0 : (double) totalProfit / totalInvestment * 100;
+        double totalProfitRate =
+                totalInvestment == 0 ? 0.0 : (double) totalProfit / totalInvestment * 100;
 
         return PortfoliosSummary.builder()
                 .totalEvaluationAmount(totalEvaluationAmount)

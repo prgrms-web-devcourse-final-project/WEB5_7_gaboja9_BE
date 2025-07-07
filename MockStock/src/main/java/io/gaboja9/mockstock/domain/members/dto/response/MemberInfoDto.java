@@ -20,5 +20,4 @@ public class MemberInfoDto {
     private int ranking;
 
     private int period;
-
 }

@@ -1,11 +1,13 @@
 package io.gaboja9.mockstock.domain.members.controller;
 
 import io.gaboja9.mockstock.domain.members.dto.response.MemberInfoDto;
+import io.gaboja9.mockstock.domain.members.dto.response.MyPageResponseDto;
 import io.gaboja9.mockstock.domain.members.service.MembersService;
 import io.gaboja9.mockstock.domain.portfolios.dto.response.PortfoliosResponseDto;
 import io.gaboja9.mockstock.domain.portfolios.service.PortfoliosService;
-import io.gaboja9.mockstock.domain.members.dto.response.MyPageResponseDto;
+
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;

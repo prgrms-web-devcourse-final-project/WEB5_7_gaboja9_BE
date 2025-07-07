@@ -32,8 +32,15 @@ public class Members extends BaseEntity {
     private int bankruptcyCnt;
 
     // 테스트용 생성자
-    public Members(Long id, String email, String nickname, String provider, String profileImage,
-                   int cashBalance, int bankruptcyCnt, LocalDateTime createdAt) {
+    public Members(
+            Long id,
+            String email,
+            String nickname,
+            String provider,
+            String profileImage,
+            int cashBalance,
+            int bankruptcyCnt,
+            LocalDateTime createdAt) {
         this.id = id;
         this.email = email;
         this.nickname = nickname;

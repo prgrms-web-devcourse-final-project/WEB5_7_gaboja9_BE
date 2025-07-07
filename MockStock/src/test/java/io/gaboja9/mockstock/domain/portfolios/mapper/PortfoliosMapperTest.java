@@ -1,26 +1,25 @@
 package io.gaboja9.mockstock.domain.portfolios.mapper;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.BDDMockito.given;
+
 import io.gaboja9.mockstock.domain.portfolios.dto.response.PortfolioResponseDto;
 import io.gaboja9.mockstock.domain.portfolios.entity.Portfolios;
 import io.gaboja9.mockstock.global.Influx.InfluxQueryService;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.BDDMockito.given;
-
 @ExtendWith(MockitoExtension.class)
 class PortfoliosMapperTest {
 
-    @InjectMocks
-    private PortfoliosMapper portfoliosMapper;
+    @InjectMocks private PortfoliosMapper portfoliosMapper;
 
-    @Mock
-    private InfluxQueryService influxQueryService;
+    @Mock private InfluxQueryService influxQueryService;
 
     @Test
     void toDto_정상작동() {
@@ -40,7 +39,7 @@ class PortfoliosMapperTest {
         assertThat(result.getAvgPrice()).isEqualTo(150);
         assertThat(result.getCurrentPrice()).isEqualTo(160);
         assertThat(result.getEvaluationAmount()).isEqualTo(1600); // 160 * 10
-        assertThat(result.getProfit()).isEqualTo(100);            // (160 - 150) * 10
+        assertThat(result.getProfit()).isEqualTo(100); // (160 - 150) * 10
         assertThat(result.getProfitRate()).isEqualTo(6.67); // (100 / 1500) * 100
     }
 
@@ -63,7 +62,8 @@ class PortfoliosMapperTest {
     void toDto_에러발생() {
         // given
         Portfolios p = new Portfolios(2L, "TSLA", "테슬라", 0, 0);
-        given(influxQueryService.getCurrentPrice("TSLA")).willThrow(new RuntimeException("Influx error"));
+        given(influxQueryService.getCurrentPrice("TSLA"))
+                .willThrow(new RuntimeException("Influx error"));
 
         // when & then
         assertThatThrownBy(() -> portfoliosMapper.toDto(p))

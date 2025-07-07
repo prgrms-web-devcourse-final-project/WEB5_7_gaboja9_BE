@@ -21,4 +21,3 @@ public class PortfoliosResponseDto {
 
     private List<PortfolioResponseDto> portfolios;
 }
-

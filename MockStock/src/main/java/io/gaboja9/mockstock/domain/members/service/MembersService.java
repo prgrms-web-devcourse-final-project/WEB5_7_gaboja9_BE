@@ -4,10 +4,11 @@ import io.gaboja9.mockstock.domain.members.dto.response.MemberInfoDto;
 import io.gaboja9.mockstock.domain.members.entity.Members;
 import io.gaboja9.mockstock.domain.members.repository.MembersRepository;
 import io.gaboja9.mockstock.domain.portfolios.dto.response.PortfoliosResponseDto;
-import io.gaboja9.mockstock.domain.portfolios.service.PortfoliosService;
 import io.gaboja9.mockstock.domain.ranks.service.RanksService;
 import io.gaboja9.mockstock.domain.trades.repository.TradesRepository;
+
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -22,12 +23,15 @@ public class MembersService {
     private final RanksService ranksService;
 
     public MemberInfoDto getMemberInfoDto(Long memberId, PortfoliosResponseDto portfolios) {
-        Members member = membersRepository.findById(memberId)
-                .orElseThrow(() -> new RuntimeException("유저 없음"));
+        Members member =
+                membersRepository
+                        .findById(memberId)
+                        .orElseThrow(() -> new RuntimeException("유저 없음"));
 
         int tradeCnt = tradesRepository.countByMembersId(memberId);
-        //int ranking = ranksService.getRankByMemberId(memberId); // TODO : 랭킹 로직 개발되면 추가
-        int period = (int) ChronoUnit.DAYS.between(member.getCreatedAt().toLocalDate(), LocalDate.now());
+        // int ranking = ranksService.getRankByMemberId(memberId); // TODO : 랭킹 로직 개발되면 추가
+        int period =
+                (int) ChronoUnit.DAYS.between(member.getCreatedAt().toLocalDate(), LocalDate.now());
 
         return MemberInfoDto.builder()
                 .nickname(member.getNickname())
@@ -35,7 +39,7 @@ public class MembersService {
                 .totalProfit(portfolios.getTotalProfit())
                 .totalEvaluationAmount(portfolios.getTotalEvaluationAmount())
                 .tradeCnt(tradeCnt)
-                //.ranking(ranking)
+                // .ranking(ranking)
                 .period(period)
                 .build();
     }
