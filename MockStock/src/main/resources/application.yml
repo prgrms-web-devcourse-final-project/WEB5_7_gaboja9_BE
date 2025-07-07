@@ -1,17 +1,3 @@
-spring:
-  application:
-    name: MockStock
-
-  datasource:
-    url: ${DB_URL}
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    username: ${DB_USERNAME}
-    password: ${DB_PASSWORD}
-
-  jpa:
-    hibernate:
-      ddl-auto: create
-
 
 springdoc:
   api-docs:
@@ -36,3 +22,10 @@ springdoc:
 
   springdoc:
     show-actuator: true
+
+  profiles:
+    default: local
+
+spring:
+  application:
+    name: MockStock
