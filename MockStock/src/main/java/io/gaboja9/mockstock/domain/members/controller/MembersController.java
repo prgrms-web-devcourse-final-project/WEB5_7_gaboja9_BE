@@ -25,7 +25,6 @@ public class MembersController {
         // TODO : Security 도입되면 현재 로그인한 유저 id를 불러오는 것으로 수정
         Long currentId = 1L;
 
-
         PortfoliosResponseDto portfolios = portfoliosService.getPortfolios(currentId);
 
         MemberInfoDto memberInfoDto = membersService.getMemberInfoDto(currentId, portfolios);
