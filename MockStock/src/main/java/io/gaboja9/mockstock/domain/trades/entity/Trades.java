@@ -6,8 +6,10 @@ import io.gaboja9.mockstock.global.common.BaseEntity;
 import jakarta.persistence.*;
 
 import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+@Getter
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Trades extends BaseEntity {
@@ -18,14 +20,16 @@ public class Trades extends BaseEntity {
 
     private String stockCode;
 
+    private String stockName;
+
     @Enumerated(EnumType.STRING)
     private TradeType tradeType;
 
     private int quantity;
 
-    private Long price;
+    private int price;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "members_id")
     private Members members;
 }
