@@ -5,7 +5,9 @@ import io.gaboja9.mockstock.domain.trades.dto.response.TradesResponseDto;
 import io.gaboja9.mockstock.domain.trades.entity.Trades;
 import io.gaboja9.mockstock.domain.trades.mapper.TradesMapper;
 import io.gaboja9.mockstock.domain.trades.repository.TradesRepository;
+
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,7 +32,9 @@ public class TradesService {
         LocalDateTime startDateTime = startDate.atStartOfDay();
         LocalDateTime endDateTime = endDate.atTime(23, 59, 59, 999_999_999);
 
-        List<Trades> tradesList = tradesRepository.findByStockCodeOrStockNameAndCreatedAtBetween(stockCode, stockName, startDateTime, endDateTime, membersId);
+        List<Trades> tradesList =
+                tradesRepository.findByStockCodeOrStockNameAndCreatedAtBetween(
+                        stockCode, stockName, startDateTime, endDateTime, membersId);
         List<TradesResponseDto> dtoList = new ArrayList<>();
 
         for (Trades t : tradesList) {

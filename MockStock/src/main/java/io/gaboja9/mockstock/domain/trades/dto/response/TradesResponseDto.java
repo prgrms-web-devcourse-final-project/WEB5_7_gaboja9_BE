@@ -1,6 +1,7 @@
 package io.gaboja9.mockstock.domain.trades.dto.response;
 
 import io.gaboja9.mockstock.domain.trades.entity.TradeType;
+
 import lombok.Builder;
 import lombok.Getter;
 

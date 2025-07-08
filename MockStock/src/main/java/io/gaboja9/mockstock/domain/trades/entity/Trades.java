@@ -34,7 +34,13 @@ public class Trades extends BaseEntity {
     private Members members;
 
     // 테스트용 생성자
-    public Trades(String stockCode, String stockName, TradeType tradeType, int quantity, int price, Members members) {
+    public Trades(
+            String stockCode,
+            String stockName,
+            TradeType tradeType,
+            int quantity,
+            int price,
+            Members members) {
         this.stockCode = stockCode;
         this.stockName = stockName;
         this.tradeType = tradeType;

@@ -5,13 +5,14 @@ import io.gaboja9.mockstock.domain.members.dto.response.MyPageResponseDto;
 import io.gaboja9.mockstock.domain.members.service.MembersService;
 import io.gaboja9.mockstock.domain.portfolios.dto.response.PortfoliosResponseDto;
 import io.gaboja9.mockstock.domain.portfolios.service.PortfoliosService;
-
 import io.gaboja9.mockstock.domain.trades.dto.request.TradesRequestDto;
 import io.gaboja9.mockstock.domain.trades.dto.response.TradesResponseDto;
 import io.gaboja9.mockstock.domain.trades.service.TradesService;
 import io.gaboja9.mockstock.global.exception.BaseException;
 import io.gaboja9.mockstock.global.exception.ErrorCode;
+
 import jakarta.validation.Valid;
+
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.http.ResponseEntity;
@@ -43,8 +44,7 @@ public class MembersController {
                 MyPageResponseDto.<PortfoliosResponseDto>builder()
                         .memberInfoDto(memberInfoDto)
                         .data(portfolios)
-                        .build()
-        );
+                        .build());
     }
 
     @GetMapping("/trades")
@@ -63,8 +63,7 @@ public class MembersController {
                 MyPageResponseDto.<List<TradesResponseDto>>builder()
                         .memberInfoDto(memberInfoDto)
                         .data(trades)
-                        .build()
-        );
+                        .build());
     }
 
     @GetMapping("/trades/search")
@@ -73,9 +72,10 @@ public class MembersController {
         // TODO : Security 도입되면 현재 로그인한 유저 id를 불러오는 것으로 수정
         Long currentId = 1L;
 
-        if ((dto.getStockCode() == null || dto.getStockCode().isBlank()) &&
-                (dto.getStockName() == null || dto.getStockName().isBlank())) {
-            throw new BaseException(ErrorCode.INVALID_INPUT_VALUE, "stockCode 또는 stockName 중 하나는 필수입니다.");
+        if ((dto.getStockCode() == null || dto.getStockCode().isBlank())
+                && (dto.getStockName() == null || dto.getStockName().isBlank())) {
+            throw new BaseException(
+                    ErrorCode.INVALID_INPUT_VALUE, "stockCode 또는 stockName 중 하나는 필수입니다.");
         }
 
         PortfoliosResponseDto portfolios = portfoliosService.getPortfolios(currentId);
@@ -88,7 +88,6 @@ public class MembersController {
                 MyPageResponseDto.<List<TradesResponseDto>>builder()
                         .memberInfoDto(memberInfoDto)
                         .data(trades)
-                        .build()
-        );
+                        .build());
     }
 }

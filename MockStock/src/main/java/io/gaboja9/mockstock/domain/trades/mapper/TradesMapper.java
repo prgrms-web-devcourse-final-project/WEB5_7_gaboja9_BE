@@ -2,6 +2,7 @@ package io.gaboja9.mockstock.domain.trades.mapper;
 
 import io.gaboja9.mockstock.domain.trades.dto.response.TradesResponseDto;
 import io.gaboja9.mockstock.domain.trades.entity.Trades;
+
 import org.springframework.stereotype.Component;
 
 @Component

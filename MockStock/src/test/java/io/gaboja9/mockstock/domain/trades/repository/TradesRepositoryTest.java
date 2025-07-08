@@ -1,9 +1,13 @@
 package io.gaboja9.mockstock.domain.trades.repository;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import io.gaboja9.mockstock.domain.members.entity.Members;
 import io.gaboja9.mockstock.domain.trades.entity.TradeType;
 import io.gaboja9.mockstock.domain.trades.entity.Trades;
+
 import jakarta.persistence.EntityManager;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,31 +17,27 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 @DataJpaTest
 class TradesRepositoryTest {
 
-    @Autowired
-    private TradesRepository tradesRepository;
+    @Autowired private TradesRepository tradesRepository;
 
-    @Autowired
-    private EntityManager em;
+    @Autowired private EntityManager em;
 
     @Test
     @DisplayName("기간 내 거래만 조회되는지 확인")
     void findByStockCodeOrStockNameAndCreatedAtBetween() {
         // given
-        Members member = new Members(
-                null,
-                "test@example.com",
-                "testUser",
-                "google",
-                "test.png",
-                5000,
-                0,
-                LocalDateTime.now()
-        );
+        Members member =
+                new Members(
+                        null,
+                        "test@example.com",
+                        "testUser",
+                        "google",
+                        "test.png",
+                        5000,
+                        0,
+                        LocalDateTime.now());
         em.persist(member);
         em.flush();
 
@@ -60,13 +60,9 @@ class TradesRepositoryTest {
         LocalDateTime start = LocalDate.of(2025, 7, 1).atStartOfDay();
         LocalDateTime end = LocalDate.of(2025, 7, 8).atTime(23, 59, 59);
 
-        List<Trades> result = tradesRepository.findByStockCodeOrStockNameAndCreatedAtBetween(
-                "005930",
-                "삼성전자",
-                start,
-                end,
-                memberId
-        );
+        List<Trades> result =
+                tradesRepository.findByStockCodeOrStockNameAndCreatedAtBetween(
+                        "005930", "삼성전자", start, end, memberId);
 
         // then
         assertThat(result).hasSize(1);
@@ -74,4 +70,3 @@ class TradesRepositoryTest {
         assertThat(result.get(0).getCreatedAt()).isEqualTo(trade2.getCreatedAt());
     }
 }
-
