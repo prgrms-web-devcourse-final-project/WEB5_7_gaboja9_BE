@@ -1,5 +1,6 @@
 package io.gaboja9.mockstock.domain.trades.dto.request;
 
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Getter;
@@ -17,11 +18,11 @@ public class TradesRequestDto {
 
     private String stockName;
 
-    @NotNull
+    @NotBlank
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private LocalDate startDate;
 
-    @NotNull
+    @NotBlank
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private LocalDate endDate;
 
