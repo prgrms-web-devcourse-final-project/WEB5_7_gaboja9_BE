@@ -7,7 +7,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: prgrms-web-devcourse-final-project/web5_7_gaboja9_be
+  IMAGE_NAME: ${{ github.repository }}
 
 jobs:
 
