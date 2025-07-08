@@ -15,9 +15,6 @@ public interface TradesRepository extends CrudRepository<Trades, Long> {
 
     int countByMembersId(Long memberId);
 
-    /**
-     * 과연 Distinct로 중복제거가 완벽하게 될까?
-     */
     @Query("SELECT DISTINCT t FROM Trades t WHERE " +
             "(t.stockCode = :stockCode OR t.stockName = :stockName) " +
             "AND t.createdAt BETWEEN :startDateTime AND :endDateTime " +

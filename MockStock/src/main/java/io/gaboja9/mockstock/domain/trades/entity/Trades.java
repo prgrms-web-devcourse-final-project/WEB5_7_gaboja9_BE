@@ -32,4 +32,14 @@ public class Trades extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "members_id")
     private Members members;
+
+    // 테스트용 생성자
+    public Trades(String stockCode, String stockName, TradeType tradeType, int quantity, int price, Members members) {
+        this.stockCode = stockCode;
+        this.stockName = stockName;
+        this.tradeType = tradeType;
+        this.quantity = quantity;
+        this.price = price;
+        this.members = members;
+    }
 }
