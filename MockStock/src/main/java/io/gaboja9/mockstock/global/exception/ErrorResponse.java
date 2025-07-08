@@ -37,7 +37,7 @@ public class ErrorResponse {
         return ErrorResponse.builder().code(code).message(message).status(status).build();
     }
 
-    // 에러 필드가 있는 경우 (예: 유횽성 검사 실패)
+    // 에러 필드가 있는 경우 (예: 유효성 검사 실패)
     public static ErrorResponse of(
             String code, String message, int status, List<FieldError> errors) {
         return ErrorResponse.builder()
