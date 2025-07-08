@@ -5,6 +5,7 @@ import static org.mockito.BDDMockito.given;
 
 import io.gaboja9.mockstock.domain.members.dto.response.MemberInfoDto;
 import io.gaboja9.mockstock.domain.members.entity.Members;
+import io.gaboja9.mockstock.domain.members.exception.NotFoundMemberException;
 import io.gaboja9.mockstock.domain.members.repository.MembersRepository;
 import io.gaboja9.mockstock.domain.portfolios.dto.response.PortfoliosResponseDto;
 import io.gaboja9.mockstock.domain.ranks.service.RanksService;
@@ -85,7 +86,7 @@ class MembersServiceTest {
 
         // when & then
         org.junit.jupiter.api.Assertions.assertThrows(
-                RuntimeException.class,
+                NotFoundMemberException.class,
                 () -> membersService.getMemberInfoDto(memberId, dummyPortfolios));
     }
 }

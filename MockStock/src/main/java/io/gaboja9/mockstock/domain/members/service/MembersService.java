@@ -2,6 +2,7 @@ package io.gaboja9.mockstock.domain.members.service;
 
 import io.gaboja9.mockstock.domain.members.dto.response.MemberInfoDto;
 import io.gaboja9.mockstock.domain.members.entity.Members;
+import io.gaboja9.mockstock.domain.members.exception.NotFoundMemberException;
 import io.gaboja9.mockstock.domain.members.repository.MembersRepository;
 import io.gaboja9.mockstock.domain.portfolios.dto.response.PortfoliosResponseDto;
 import io.gaboja9.mockstock.domain.ranks.service.RanksService;
@@ -26,7 +27,7 @@ public class MembersService {
         Members member =
                 membersRepository
                         .findById(memberId)
-                        .orElseThrow(() -> new RuntimeException("유저 없음"));
+                        .orElseThrow(() -> new NotFoundMemberException(memberId));
 
         int tradeCnt = tradesRepository.countByMembersId(memberId);
         // int ranking = ranksService.getRankByMemberId(memberId); // TODO : 랭킹 로직 개발되면 추가
