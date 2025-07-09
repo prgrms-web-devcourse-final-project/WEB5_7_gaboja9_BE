@@ -159,7 +159,7 @@ class MembersServiceTest {
         membersService.createMemo(memberId, dto);
         String memo = membersService.getMemo(memberId);
 
-        //then
+        // then
         assertThat(dto.getMemo()).isEqualTo(memo);
         then(membersRepository).should(times(2)).findById(memberId);
     }

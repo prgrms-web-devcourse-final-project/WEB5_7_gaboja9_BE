@@ -51,9 +51,10 @@ public class MembersService {
     @Transactional
     public void createMemo(Long membersId, MemosCreateRequestDto dto) {
 
-        Members findMember = membersRepository
-                .findById(membersId)
-                .orElseThrow(() -> new NotFoundMemberException(membersId));
+        Members findMember =
+                membersRepository
+                        .findById(membersId)
+                        .orElseThrow(() -> new NotFoundMemberException(membersId));
 
         findMember.setMemo(dto.getMemo());
     }
@@ -61,11 +62,11 @@ public class MembersService {
     @Transactional(readOnly = true)
     public String getMemo(Long memberId) {
 
-        Members findMember = membersRepository.
-                findById(memberId)
-                .orElseThrow(() -> new NotFoundMemberException(memberId));
+        Members findMember =
+                membersRepository
+                        .findById(memberId)
+                        .orElseThrow(() -> new NotFoundMemberException(memberId));
 
         return findMember.getMemo();
-
     }
 }

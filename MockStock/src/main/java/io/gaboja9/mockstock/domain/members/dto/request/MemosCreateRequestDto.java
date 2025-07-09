@@ -2,6 +2,7 @@ package io.gaboja9.mockstock.domain.members.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+
 import lombok.Builder;
 import lombok.Getter;
 
