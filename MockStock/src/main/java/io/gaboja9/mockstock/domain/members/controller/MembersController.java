@@ -3,6 +3,9 @@ package io.gaboja9.mockstock.domain.members.controller;
 import io.gaboja9.mockstock.domain.members.dto.request.MemosCreateRequestDto;
 import io.gaboja9.mockstock.domain.members.dto.response.MemberInfoDto;
 import io.gaboja9.mockstock.domain.members.dto.response.MyPageResponseDto;
+import io.gaboja9.mockstock.domain.members.entity.Members;
+import io.gaboja9.mockstock.domain.members.exception.NotFoundMemberException;
+import io.gaboja9.mockstock.domain.members.repository.MembersRepository;
 import io.gaboja9.mockstock.domain.members.service.MembersService;
 import io.gaboja9.mockstock.domain.portfolios.dto.response.PortfoliosResponseDto;
 import io.gaboja9.mockstock.domain.portfolios.service.PortfoliosService;
@@ -48,4 +51,14 @@ public class MembersController {
         return ResponseEntity.status(HttpStatus.CREATED).body("메모 저장 완료");
     }
 
+    @GetMapping("/memos")
+    public ResponseEntity<?> getMemos() {
+
+        // TODO : Security 도입되면 현재 로그인한 유저 id를 불러오는 것으로 수정
+        Long currentId = 1L;
+
+        String memo = membersService.getMemo(currentId);
+
+        return ResponseEntity.ok(memo);
+    }
 }

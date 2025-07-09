@@ -57,4 +57,15 @@ public class MembersService {
 
         findMember.setMemo(dto.getMemo());
     }
+
+    @Transactional(readOnly = true)
+    public String getMemo(Long memberId) {
+
+        Members findMember = membersRepository.
+                findById(memberId)
+                .orElseThrow(() -> new NotFoundMemberException(memberId));
+
+        return findMember.getMemo();
+
+    }
 }
