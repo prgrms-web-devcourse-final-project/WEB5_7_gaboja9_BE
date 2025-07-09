@@ -47,7 +47,6 @@ public class MembersController {
         membersService.processBankruptcy(currentId);
 
         return ResponseEntity.status(HttpStatus.CREATED).body("파산 신청 완료");
-
     }
 
     @GetMapping("/bankruptcy")

@@ -28,11 +28,9 @@ public class Members extends BaseEntity {
 
     private String profileImage;
 
-    @Setter
-    private int cashBalance = 30_000_000;
+    @Setter private int cashBalance = 30_000_000;
 
-    @Setter
-    private int bankruptcyCnt;
+    @Setter private int bankruptcyCnt;
 
     // 테스트용 생성자
     public Members(

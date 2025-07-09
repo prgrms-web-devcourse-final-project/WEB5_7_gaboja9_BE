@@ -76,12 +76,11 @@ public class PortfoliosService {
     @Transactional
     public void remove(Long memberId) {
 
-        Members findMember = membersRepository
-                .findById(memberId)
-                .orElseThrow(() -> new NotFoundMemberException(memberId));
+        Members findMember =
+                membersRepository
+                        .findById(memberId)
+                        .orElseThrow(() -> new NotFoundMemberException(memberId));
 
         portfoliosRepository.deleteByMembersId(findMember.getId());
-
-
     }
 }

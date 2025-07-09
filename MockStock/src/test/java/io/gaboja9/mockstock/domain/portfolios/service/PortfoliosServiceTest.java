@@ -51,8 +51,7 @@ class PortfoliosServiceTest {
                         "test.png",
                         5000,
                         0,
-                        LocalDateTime.now().minusDays(15)
-                        );
+                        LocalDateTime.now().minusDays(15));
 
         Portfolios p1 = new Portfolios(1L, "AAPL", "애플", 10, 150);
         Portfolios p2 = new Portfolios(2L, "TSLA", "테슬라", 5, 200);
@@ -119,16 +118,16 @@ class PortfoliosServiceTest {
     void remove_정상동작() {
         // given
         Long memberId = 1L;
-        Members member = new Members(
-                memberId,
-                "test@example.com",
-                "testUser",
-                "google",
-                "profile.png",
-                30_000_000,
-                0,
-                LocalDateTime.now().minusDays(10)
-        );
+        Members member =
+                new Members(
+                        memberId,
+                        "test@example.com",
+                        "testUser",
+                        "google",
+                        "profile.png",
+                        30_000_000,
+                        0,
+                        LocalDateTime.now().minusDays(10));
 
         given(membersRepository.findById(memberId)).willReturn(Optional.of(member));
 
@@ -147,10 +146,7 @@ class PortfoliosServiceTest {
         given(membersRepository.findById(memberId)).willReturn(Optional.empty());
 
         // when & then
-        assertThrows(
-                NotFoundMemberException.class,
-                () -> portfoliosService.remove(memberId)
-        );
+        assertThrows(NotFoundMemberException.class, () -> portfoliosService.remove(memberId));
 
         verify(portfoliosRepository, never()).deleteByMembersId(any());
     }

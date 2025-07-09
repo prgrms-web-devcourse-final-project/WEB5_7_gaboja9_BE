@@ -102,16 +102,16 @@ class MembersServiceTest {
         // given
         Long memberId = 1L;
 
-        Members member = new Members(
-                memberId,
-                "test@example.com",
-                "nickname",
-                "google",
-                "profile.png",
-                50_000_000,
-                2,
-                LocalDateTime.now().minusDays(30)
-        );
+        Members member =
+                new Members(
+                        memberId,
+                        "test@example.com",
+                        "nickname",
+                        "google",
+                        "profile.png",
+                        50_000_000,
+                        2,
+                        LocalDateTime.now().minusDays(30));
 
         given(membersRepository.findById(memberId)).willReturn(Optional.of(member));
 
@@ -133,9 +133,7 @@ class MembersServiceTest {
 
         // when & then
         assertThrows(
-                NotFoundMemberException.class,
-                () -> membersService.processBankruptcy(memberId)
-        );
+                NotFoundMemberException.class, () -> membersService.processBankruptcy(memberId));
 
         verify(portfoliosService, never()).remove(any());
     }
@@ -144,16 +142,16 @@ class MembersServiceTest {
     void getBankruptcyCnt_정상조회() {
         // given
         Long memberId = 1L;
-        Members member = new Members(
-                memberId,
-                "test@example.com",
-                "nickname",
-                "google",
-                "profile.png",
-                30_000_000,
-                2,
-                LocalDateTime.now()
-        );
+        Members member =
+                new Members(
+                        memberId,
+                        "test@example.com",
+                        "nickname",
+                        "google",
+                        "profile.png",
+                        30_000_000,
+                        2,
+                        LocalDateTime.now());
 
         given(membersRepository.findById(memberId)).willReturn(Optional.of(member));
 
@@ -172,8 +170,6 @@ class MembersServiceTest {
 
         // when & then
         assertThrows(
-                NotFoundMemberException.class,
-                () -> membersService.getBankruptcyCnt(memberId)
-        );
+                NotFoundMemberException.class, () -> membersService.getBankruptcyCnt(memberId));
     }
 }
