@@ -11,4 +11,6 @@ import java.util.List;
 public interface PortfoliosRepository extends JpaRepository<Portfolios, Long> {
 
     List<Portfolios> findByMembersId(Long memberId);
+
+    void deleteByMembersId(Long memberId);
 }

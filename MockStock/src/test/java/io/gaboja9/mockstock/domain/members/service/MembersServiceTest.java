@@ -1,13 +1,18 @@
 package io.gaboja9.mockstock.domain.members.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 
 import io.gaboja9.mockstock.domain.members.dto.response.MemberInfoDto;
 import io.gaboja9.mockstock.domain.members.entity.Members;
 import io.gaboja9.mockstock.domain.members.exception.NotFoundMemberException;
 import io.gaboja9.mockstock.domain.members.repository.MembersRepository;
 import io.gaboja9.mockstock.domain.portfolios.dto.response.PortfoliosResponseDto;
+import io.gaboja9.mockstock.domain.portfolios.service.PortfoliosService;
 import io.gaboja9.mockstock.domain.ranks.service.RanksService;
 import io.gaboja9.mockstock.domain.trades.repository.TradesRepository;
 
@@ -30,6 +35,8 @@ class MembersServiceTest {
     @Mock private TradesRepository tradesRepository;
 
     @Mock private RanksService ranksService;
+
+    @Mock private PortfoliosService portfoliosService;
 
     @Test
     void getMemberInfoDto_정상() {
@@ -85,8 +92,51 @@ class MembersServiceTest {
         given(membersRepository.findById(memberId)).willReturn(Optional.empty());
 
         // when & then
-        org.junit.jupiter.api.Assertions.assertThrows(
+        assertThrows(
                 NotFoundMemberException.class,
                 () -> membersService.getMemberInfoDto(memberId, dummyPortfolios));
+    }
+
+    @Test
+    void processBankruptcy_정상작동() {
+        // given
+        Long memberId = 1L;
+
+        Members member = new Members(
+                memberId,
+                "test@example.com",
+                "nickname",
+                "google",
+                "profile.png",
+                50_000_000,
+                2,
+                LocalDateTime.now().minusDays(30)
+        );
+
+        given(membersRepository.findById(memberId)).willReturn(Optional.of(member));
+
+        // when
+        membersService.processBankruptcy(memberId);
+
+        // then
+        verify(membersRepository).findById(memberId);
+        verify(portfoliosService).remove(memberId);
+        assertThat(member.getCashBalance()).isEqualTo(30_000_000);
+        assertThat(member.getBankruptcyCnt()).isEqualTo(3);
+    }
+
+    @Test
+    void processBankruptcy_없는회원_예외발생() {
+        // given
+        Long memberId = 999L;
+        given(membersRepository.findById(memberId)).willReturn(Optional.empty());
+
+        // when & then
+        assertThrows(
+                NotFoundMemberException.class,
+                () -> membersService.processBankruptcy(memberId)
+        );
+
+        verify(portfoliosService, never()).remove(any());
     }
 }

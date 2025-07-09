@@ -1,5 +1,6 @@
 package io.gaboja9.mockstock.domain.portfolios.service;
 
+import io.gaboja9.mockstock.domain.members.entity.Members;
 import io.gaboja9.mockstock.domain.members.exception.NotFoundMemberException;
 import io.gaboja9.mockstock.domain.members.repository.MembersRepository;
 import io.gaboja9.mockstock.domain.portfolios.dto.PortfoliosSummary;
@@ -70,5 +71,17 @@ public class PortfoliosService {
                 .totalProfit(totalProfit)
                 .totalProfitRate(totalProfitRate)
                 .build();
+    }
+
+    @Transactional
+    public void remove(Long memberId) {
+
+        Members findMember = membersRepository
+                .findById(memberId)
+                .orElseThrow(() -> new NotFoundMemberException(memberId));
+
+        portfoliosRepository.deleteByMembersId(findMember.getId());
+
+
     }
 }
