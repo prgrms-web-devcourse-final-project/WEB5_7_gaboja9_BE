@@ -1,8 +1,11 @@
 package io.gaboja9.mockstock.domain.members.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.then;
 
+import io.gaboja9.mockstock.domain.members.dto.request.MemosCreateRequestDto;
 import io.gaboja9.mockstock.domain.members.dto.response.MemberInfoDto;
 import io.gaboja9.mockstock.domain.members.entity.Members;
 import io.gaboja9.mockstock.domain.members.exception.NotFoundMemberException;
@@ -89,4 +92,46 @@ class MembersServiceTest {
                 NotFoundMemberException.class,
                 () -> membersService.getMemberInfoDto(memberId, dummyPortfolios));
     }
+
+    @Test
+    public void createMemo_정상() {
+        // given
+        Long memberId = 1L;
+
+        Members member =
+                new Members(
+                        memberId,
+                        "test@example.com",
+                        "testUser",
+                        "google",
+                        "test.png",
+                        5000,
+                        0,
+                        LocalDateTime.now());
+
+        MemosCreateRequestDto dto = MemosCreateRequestDto.builder().memo("테스트 메모").build();
+
+        given(membersRepository.findById(memberId)).willReturn(Optional.of(member));
+
+        // when
+        membersService.createMemo(memberId, dto);
+
+        // then
+        assertThat(member.getMemo()).isEqualTo("테스트 메모");
+        then(membersRepository).should().findById(memberId);
+    }
+
+    @Test
+    public void createMemo_유저없음예외() {
+        // given
+        Long memberId = 1L;
+        MemosCreateRequestDto dto = MemosCreateRequestDto.builder().memo("테스트 메모").build();
+        given(membersRepository.findById(memberId)).willReturn(Optional.empty());
+
+        // when & then
+        assertThatThrownBy(() -> membersService.createMemo(memberId, dto))
+                .isInstanceOf(NotFoundMemberException.class)
+                .hasMessageContaining(memberId.toString());
+    }
+
 }

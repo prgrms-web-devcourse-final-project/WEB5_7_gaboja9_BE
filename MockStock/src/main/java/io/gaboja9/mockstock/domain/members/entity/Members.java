@@ -7,6 +7,7 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 
@@ -30,6 +31,9 @@ public class Members extends BaseEntity {
     private int cashBalance;
 
     private int bankruptcyCnt;
+
+    @Setter
+    private String memo;
 
     // 테스트용 생성자
     public Members(
