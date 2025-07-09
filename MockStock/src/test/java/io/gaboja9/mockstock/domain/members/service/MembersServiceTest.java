@@ -139,4 +139,41 @@ class MembersServiceTest {
 
         verify(portfoliosService, never()).remove(any());
     }
+
+    @Test
+    void getBankruptcyCnt_정상조회() {
+        // given
+        Long memberId = 1L;
+        Members member = new Members(
+                memberId,
+                "test@example.com",
+                "nickname",
+                "google",
+                "profile.png",
+                30_000_000,
+                2,
+                LocalDateTime.now()
+        );
+
+        given(membersRepository.findById(memberId)).willReturn(Optional.of(member));
+
+        // when
+        int result = membersService.getBankruptcyCnt(memberId);
+
+        // then
+        assertThat(result).isEqualTo(2);
+    }
+
+    @Test
+    void getBankruptcyCnt_회원없음_예외발생() {
+        // given
+        Long memberId = 999L;
+        given(membersRepository.findById(memberId)).willReturn(Optional.empty());
+
+        // when & then
+        assertThrows(
+                NotFoundMemberException.class,
+                () -> membersService.getBankruptcyCnt(memberId)
+        );
+    }
 }
