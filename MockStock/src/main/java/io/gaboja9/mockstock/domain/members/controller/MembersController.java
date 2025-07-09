@@ -3,9 +3,6 @@ package io.gaboja9.mockstock.domain.members.controller;
 import io.gaboja9.mockstock.domain.members.dto.request.MemosCreateRequestDto;
 import io.gaboja9.mockstock.domain.members.dto.response.MemberInfoDto;
 import io.gaboja9.mockstock.domain.members.dto.response.MyPageResponseDto;
-import io.gaboja9.mockstock.domain.members.entity.Members;
-import io.gaboja9.mockstock.domain.members.exception.NotFoundMemberException;
-import io.gaboja9.mockstock.domain.members.repository.MembersRepository;
 import io.gaboja9.mockstock.domain.members.service.MembersService;
 import io.gaboja9.mockstock.domain.portfolios.dto.response.PortfoliosResponseDto;
 import io.gaboja9.mockstock.domain.portfolios.service.PortfoliosService;
@@ -40,7 +37,7 @@ public class MembersController {
                 .build();
     }
 
-    @PostMapping("/memos") // 와이어 프레임 13페이지 body 상단 nickname 우측 빈공간에 메모조회, 저장, 파산 버튼
+    @PostMapping("/memos")
     public ResponseEntity<?> createMemos(@Valid @RequestBody MemosCreateRequestDto dto) {
 
         // TODO : Security 도입되면 현재 로그인한 유저 id를 불러오는 것으로 수정
