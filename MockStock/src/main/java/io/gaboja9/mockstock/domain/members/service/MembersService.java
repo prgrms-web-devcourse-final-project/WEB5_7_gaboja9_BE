@@ -16,7 +16,7 @@ import java.time.temporal.ChronoUnit;
 
 @Service
 @RequiredArgsConstructor
-public class MembersService {
+public class MembersService{
 
     private final MembersRepository membersRepository;
     private final TradesRepository tradesRepository;
