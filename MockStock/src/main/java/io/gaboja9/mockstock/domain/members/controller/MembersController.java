@@ -1,7 +1,6 @@
 package io.gaboja9.mockstock.domain.members.controller;
 
 import io.gaboja9.mockstock.domain.members.dto.response.MemberInfoDto;
-import io.gaboja9.mockstock.domain.members.dto.response.MyPageResponseDto;
 import io.gaboja9.mockstock.domain.members.service.MembersService;
 import io.gaboja9.mockstock.domain.portfolios.dto.response.PortfoliosResponseDto;
 import io.gaboja9.mockstock.domain.portfolios.service.PortfoliosService;
@@ -31,6 +30,17 @@ public class MembersController {
     private final MembersService membersService;
     private final TradesService tradesService;
 
+    @GetMapping("/info")
+    public ResponseEntity<MemberInfoDto> getMemberInfo() {
+        Long currentId = 1L; // TODO: Security 도입 시 현재 로그인한 유저 ID 사용
+
+        PortfoliosResponseDto portfolios = portfoliosService.getPortfolios(currentId);
+
+        MemberInfoDto memberInfoDto = membersService.getMemberInfoDto(currentId, portfolios);
+
+        return ResponseEntity.ok(memberInfoDto);
+    }
+
     @GetMapping("/portfolios")
     public ResponseEntity<?> getPortfolios() {
         // TODO : Security 도입되면 현재 로그인한 유저 id를 불러오는 것으로 수정
@@ -38,13 +48,7 @@ public class MembersController {
 
         PortfoliosResponseDto portfolios = portfoliosService.getPortfolios(currentId);
 
-        MemberInfoDto memberInfoDto = membersService.getMemberInfoDto(currentId, portfolios);
-
-        return ResponseEntity.ok(
-                MyPageResponseDto.<PortfoliosResponseDto>builder()
-                        .memberInfoDto(memberInfoDto)
-                        .data(portfolios)
-                        .build());
+        return ResponseEntity.ok(portfolios);
     }
 
     @GetMapping("/trades")
@@ -53,17 +57,9 @@ public class MembersController {
         // TODO : Security 도입되면 현재 로그인한 유저 id를 불러오는 것으로 수정
         Long currentId = 1L;
 
-        PortfoliosResponseDto portfolios = portfoliosService.getPortfolios(currentId);
-
-        MemberInfoDto memberInfoDto = membersService.getMemberInfoDto(currentId, portfolios);
-
         List<TradesResponseDto> trades = tradesService.getTrades(currentId);
 
-        return ResponseEntity.ok(
-                MyPageResponseDto.<List<TradesResponseDto>>builder()
-                        .memberInfoDto(memberInfoDto)
-                        .data(trades)
-                        .build());
+        return ResponseEntity.ok(trades);
     }
 
     @GetMapping("/trades/search")
@@ -78,16 +74,8 @@ public class MembersController {
                     ErrorCode.INVALID_INPUT_VALUE, "stockCode 또는 stockName 중 하나는 필수입니다.");
         }
 
-        PortfoliosResponseDto portfolios = portfoliosService.getPortfolios(currentId);
-
-        MemberInfoDto memberInfoDto = membersService.getMemberInfoDto(currentId, portfolios);
-
         List<TradesResponseDto> trades = tradesService.getTradesWithOption(currentId, dto);
 
-        return ResponseEntity.ok(
-                MyPageResponseDto.<List<TradesResponseDto>>builder()
-                        .memberInfoDto(memberInfoDto)
-                        .data(trades)
-                        .build());
+        return ResponseEntity.ok(trades);
     }
 }
