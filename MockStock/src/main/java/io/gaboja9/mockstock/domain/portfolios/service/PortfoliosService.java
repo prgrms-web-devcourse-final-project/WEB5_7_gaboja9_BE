@@ -1,5 +1,6 @@
 package io.gaboja9.mockstock.domain.portfolios.service;
 
+import io.gaboja9.mockstock.domain.members.exception.NotFoundMemberException;
 import io.gaboja9.mockstock.domain.members.repository.MembersRepository;
 import io.gaboja9.mockstock.domain.portfolios.dto.PortfoliosSummary;
 import io.gaboja9.mockstock.domain.portfolios.dto.response.PortfolioResponseDto;
@@ -38,7 +39,7 @@ public class PortfoliosService {
         int cashBalance =
                 membersRepository
                         .findById(memberId)
-                        .orElseThrow(() -> new RuntimeException("유저 없음"))
+                        .orElseThrow(() -> new NotFoundMemberException(memberId))
                         .getCashBalance();
 
         return PortfoliosResponseDto.builder()
