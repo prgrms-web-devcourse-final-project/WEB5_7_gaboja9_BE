@@ -18,7 +18,6 @@
  import java.time.LocalDateTime;
  import java.util.List;
 
- @ActiveProfiles("test")
  @DataJpaTest
  class TradesRepositoryTest {
 
