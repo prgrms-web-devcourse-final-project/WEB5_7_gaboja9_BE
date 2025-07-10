@@ -164,8 +164,6 @@ public class DailyStockService {
      *
      * @return 유효한 액세스 토큰, 실패 시 null
      */
-
-
     private String getValidAccessToken() {
         // 1. 첫 번째 검사 (Lock 없이)
         // 토큰이 유효한 경우, 불필요한 동기화 없이 바로 반환하여 성능 향상
@@ -177,7 +175,8 @@ public class DailyStockService {
         synchronized (this) {
             // 3. 두 번째 검사 (Lock 상태에서)
             // 다른 스레드가 이미 토큰을 갱신했을 수 있으므로 다시 한번 확인
-            if (cachedAccessToken == null || System.currentTimeMillis() >= tokenExpirationTime - 60000) {
+            if (cachedAccessToken == null
+                    || System.currentTimeMillis() >= tokenExpirationTime - 60000) {
                 log.info("액세스 토큰이 없거나 만료되어 새로 발급합니다.");
                 if (!fetchNewAccessToken()) {
                     return null; // 토큰 발급 실패
