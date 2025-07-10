@@ -1,24 +1,24 @@
-//package io.gaboja9.mockstock.domain.trades.repository;
+// package io.gaboja9.mockstock.domain.trades.repository;
 //
-//import static org.assertj.core.api.Assertions.assertThat;
+// import static org.assertj.core.api.Assertions.assertThat;
 //
-//import io.gaboja9.mockstock.domain.members.entity.Members;
-//import io.gaboja9.mockstock.domain.trades.entity.TradeType;
-//import io.gaboja9.mockstock.domain.trades.entity.Trades;
+// import io.gaboja9.mockstock.domain.members.entity.Members;
+// import io.gaboja9.mockstock.domain.trades.entity.TradeType;
+// import io.gaboja9.mockstock.domain.trades.entity.Trades;
 //
-//import jakarta.persistence.EntityManager;
+// import jakarta.persistence.EntityManager;
 //
-//import org.junit.jupiter.api.DisplayName;
-//import org.junit.jupiter.api.Test;
-//import org.springframework.beans.factory.annotation.Autowired;
-//import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+// import org.junit.jupiter.api.DisplayName;
+// import org.junit.jupiter.api.Test;
+// import org.springframework.beans.factory.annotation.Autowired;
+// import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 //
-//import java.time.LocalDate;
-//import java.time.LocalDateTime;
-//import java.util.List;
+// import java.time.LocalDate;
+// import java.time.LocalDateTime;
+// import java.util.List;
 //
-//@DataJpaTest
-//class TradesRepositoryTest {
+// @DataJpaTest
+// class TradesRepositoryTest {
 //
 //    @Autowired private TradesRepository tradesRepository;
 //
@@ -69,4 +69,4 @@
 //        assertThat(result.get(0).getTradeType()).isEqualTo(TradeType.SELL);
 //        assertThat(result.get(0).getCreatedAt()).isEqualTo(trade2.getCreatedAt());
 //    }
-//}
+// }
