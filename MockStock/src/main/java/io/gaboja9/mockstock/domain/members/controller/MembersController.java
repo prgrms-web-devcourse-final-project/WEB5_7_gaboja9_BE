@@ -1,7 +1,6 @@
 package io.gaboja9.mockstock.domain.members.controller;
 
 import io.gaboja9.mockstock.domain.mails.dto.response.MailsResponseDto;
-import io.gaboja9.mockstock.domain.mails.entity.Mails;
 import io.gaboja9.mockstock.domain.mails.service.MailsService;
 import io.gaboja9.mockstock.domain.members.dto.request.MemosCreateRequestDto;
 import io.gaboja9.mockstock.domain.members.dto.response.MemberInfoDto;

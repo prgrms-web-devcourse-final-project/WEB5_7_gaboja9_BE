@@ -16,5 +16,4 @@ public class MailsResponseDto {
     private boolean readStatus;
 
     private LocalDateTime receivedAt;
-
 }

@@ -7,7 +7,9 @@ import io.gaboja9.mockstock.domain.mails.repository.MailsRepository;
 import io.gaboja9.mockstock.domain.members.entity.Members;
 import io.gaboja9.mockstock.domain.members.exception.NotFoundMemberException;
 import io.gaboja9.mockstock.domain.members.repository.MembersRepository;
+
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,7 +27,7 @@ public class MailsService {
 
     @Transactional(readOnly = true)
     public List<MailsResponseDto> getAllMails(Long memberId) {
-        
+
         Members findMember =
                 membersRepository
                         .findById(memberId)
@@ -34,7 +36,6 @@ public class MailsService {
         List<Mails> mailsList = mailsRepository.findByMembersId(findMember.getId());
 
         return mailsMapper.toDto(mailsList);
-
     }
 
     @Transactional(readOnly = true)
@@ -45,7 +46,8 @@ public class MailsService {
                         .findById(memberId)
                         .orElseThrow(() -> new NotFoundMemberException(memberId));
 
-        List<Mails> mailsList = mailsRepository.findByMembersIdAndReadStatus(findMember.getId(), readStatus);
+        List<Mails> mailsList =
+                mailsRepository.findByMembersIdAndReadStatus(findMember.getId(), readStatus);
 
         return mailsMapper.toDto(mailsList);
     }
