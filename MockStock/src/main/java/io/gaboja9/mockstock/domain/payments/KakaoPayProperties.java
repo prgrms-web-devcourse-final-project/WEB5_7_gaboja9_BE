@@ -1,6 +1,7 @@
 package io.gaboja9.mockstock.domain.payments;
 
 import lombok.Data;
+
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 

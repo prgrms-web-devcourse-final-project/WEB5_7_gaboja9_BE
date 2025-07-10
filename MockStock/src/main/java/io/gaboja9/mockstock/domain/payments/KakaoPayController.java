@@ -4,7 +4,9 @@ import io.gaboja9.mockstock.domain.payments.dto.KakaoPayApproveResponse;
 import io.gaboja9.mockstock.domain.payments.dto.KakaoPayReadyResponse;
 import io.gaboja9.mockstock.domain.payments.dto.PaymentRequest;
 import io.gaboja9.mockstock.domain.payments.dto.PaymentResponse;
+
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,7 +22,8 @@ public class KakaoPayController {
         try {
             Long memberId = 1L;
 
-            KakaoPayReadyResponse response = kakaoPayService.paymentReady(memberId, request.getChargeAmount());
+            KakaoPayReadyResponse response =
+                    kakaoPayService.paymentReady(memberId, request.getChargeAmount());
 
             return ResponseEntity.ok(PaymentResponse.success("결제 준비 완료", response));
         } catch (Exception e) {
@@ -30,8 +33,7 @@ public class KakaoPayController {
     }
 
     @GetMapping("/approve")
-    public ResponseEntity<String> paymentApprove(
-            @RequestParam("pg_token") String pgToken) {
+    public ResponseEntity<String> paymentApprove(@RequestParam("pg_token") String pgToken) {
 
         try {
             // TODO: JWT 도입시 헤더에서 추출
@@ -43,14 +45,12 @@ public class KakaoPayController {
             return ResponseEntity.ok("성공");
 
         } catch (Exception e) {
-            return ResponseEntity.badRequest()
-                    .body("결제 실패: " + e.getMessage());
+            return ResponseEntity.badRequest().body("결제 실패: " + e.getMessage());
         }
     }
 
     @GetMapping("/cancel")
-    public ResponseEntity<String> paymentCancel(
-            @RequestParam("tid") String tid) {
+    public ResponseEntity<String> paymentCancel(@RequestParam("tid") String tid) {
 
         try {
             // TODO: JWT 도입시 헤더에서 추출
@@ -60,14 +60,12 @@ public class KakaoPayController {
             return ResponseEntity.ok("결제 취소 성공");
 
         } catch (Exception e) {
-            return ResponseEntity.badRequest()
-                    .body("결제 취소 처리 실패" + e.getMessage());
+            return ResponseEntity.badRequest().body("결제 취소 처리 실패" + e.getMessage());
         }
     }
 
     @GetMapping("/fail")
-    public ResponseEntity<String> paymentFail(
-            @RequestParam("tid") String tid) {
+    public ResponseEntity<String> paymentFail(@RequestParam("tid") String tid) {
 
         try {
             Long userId = 1L;
@@ -76,9 +74,7 @@ public class KakaoPayController {
             return ResponseEntity.ok("결제 실패");
 
         } catch (Exception e) {
-            return ResponseEntity.badRequest()
-                    .body("결제 실패 처리 실패" + e.getMessage());
+            return ResponseEntity.badRequest().body("결제 실패 처리 실패" + e.getMessage());
         }
     }
-
 }

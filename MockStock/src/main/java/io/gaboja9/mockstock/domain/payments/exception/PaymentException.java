@@ -7,5 +7,4 @@ public class PaymentException extends BaseException {
     public PaymentException(ErrorCode errorCode) {
         super(errorCode);
     }
-
 }

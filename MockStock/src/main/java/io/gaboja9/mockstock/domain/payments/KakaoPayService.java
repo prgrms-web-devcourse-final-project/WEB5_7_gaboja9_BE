@@ -8,8 +8,10 @@ import io.gaboja9.mockstock.domain.payments.dto.KakaoPayReadyResponse;
 import io.gaboja9.mockstock.domain.payments.exception.PaymentException;
 import io.gaboja9.mockstock.domain.payments.exception.PaymentHistoryException;
 import io.gaboja9.mockstock.global.exception.ErrorCode;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
@@ -42,17 +44,20 @@ public class KakaoPayService {
             throw new PaymentException(ErrorCode.INVALID_PAYMENT_AMOUNT);
         }
 
-        Members member = membersRepository.findById(memberId)
-                .orElseThrow(() -> new NotFoundMemberException(memberId));
+        Members member =
+                membersRepository
+                        .findById(memberId)
+                        .orElseThrow(() -> new NotFoundMemberException(memberId));
 
         String partnerOrderId = generateOrderId();
 
-        PaymentHistory paymentHistory = PaymentHistory.builder()
-                .members(member)
-                .partnerOrderId(partnerOrderId)
-                .amount(amount)
-                .status(PaymentStatus.READY)
-                .build();
+        PaymentHistory paymentHistory =
+                PaymentHistory.builder()
+                        .members(member)
+                        .partnerOrderId(partnerOrderId)
+                        .amount(amount)
+                        .status(PaymentStatus.READY)
+                        .build();
 
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", "SECRET_KEY " + secretKey);
@@ -73,8 +78,12 @@ public class KakaoPayService {
         HttpEntity<Map<String, Object>> entity = new HttpEntity<>(params, headers);
 
         try {
-            ResponseEntity<KakaoPayReadyResponse> response = restTemplate.exchange(
-                    baseUrl + "/online/v1/payment/ready", HttpMethod.POST, entity, KakaoPayReadyResponse.class);
+            ResponseEntity<KakaoPayReadyResponse> response =
+                    restTemplate.exchange(
+                            baseUrl + "/online/v1/payment/ready",
+                            HttpMethod.POST,
+                            entity,
+                            KakaoPayReadyResponse.class);
 
             KakaoPayReadyResponse readyResponse = response.getBody();
 
@@ -97,8 +106,13 @@ public class KakaoPayService {
 
         String tid = getLatestReadyTid(memberId);
 
-        PaymentHistory paymentHistory = paymentHistoryRepository.findByTidAndMembersId(tid, memberId)
-                .orElseThrow(() -> new PaymentHistoryException(ErrorCode.PAYMENT_HISTORY_NOT_FOUND));
+        PaymentHistory paymentHistory =
+                paymentHistoryRepository
+                        .findByTidAndMembersId(tid, memberId)
+                        .orElseThrow(
+                                () ->
+                                        new PaymentHistoryException(
+                                                ErrorCode.PAYMENT_HISTORY_NOT_FOUND));
 
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", "SECRET_KEY " + secretKey);
@@ -114,8 +128,12 @@ public class KakaoPayService {
         HttpEntity<Map<String, Object>> entity = new HttpEntity<>(params, headers);
 
         try {
-            ResponseEntity<KakaoPayApproveResponse> response = restTemplate.exchange(
-                    baseUrl + "/online/v1/payment/approve", HttpMethod.POST, entity, KakaoPayApproveResponse.class);
+            ResponseEntity<KakaoPayApproveResponse> response =
+                    restTemplate.exchange(
+                            baseUrl + "/online/v1/payment/approve",
+                            HttpMethod.POST,
+                            entity,
+                            KakaoPayApproveResponse.class);
 
             KakaoPayApproveResponse approveResponse = response.getBody();
 
@@ -137,31 +155,34 @@ public class KakaoPayService {
         }
     }
 
-
     public void paymentCancel(String tid, Long membersId) {
-        PaymentHistory paymentHistory = paymentHistoryRepository.findByTidAndMembersId(tid, membersId)
-                .orElseThrow(() -> new RuntimeException("임시 오류"));
+        PaymentHistory paymentHistory =
+                paymentHistoryRepository
+                        .findByTidAndMembersId(tid, membersId)
+                        .orElseThrow(() -> new RuntimeException("임시 오류"));
 
         paymentHistory.setStatus(PaymentStatus.CANCELLED);
         paymentHistoryRepository.save(paymentHistory);
     }
 
     public void paymentFail(String tid, Long membersId) {
-        PaymentHistory paymentHistory = paymentHistoryRepository.findByTidAndMembersId(tid, membersId)
-                .orElseThrow(() -> new PaymentHistoryException(ErrorCode.PAYMENT_HISTORY_NOT_FOUND));
+        PaymentHistory paymentHistory =
+                paymentHistoryRepository
+                        .findByTidAndMembersId(tid, membersId)
+                        .orElseThrow(
+                                () ->
+                                        new PaymentHistoryException(
+                                                ErrorCode.PAYMENT_HISTORY_NOT_FOUND));
 
         paymentHistory.setStatus(PaymentStatus.FAILED);
         paymentHistoryRepository.save(paymentHistory);
     }
 
     private String generateOrderId() {
-        return "ORDER_" + System.currentTimeMillis() + "_" +
-                (int) (Math.random() * 1000);
+        return "ORDER_" + System.currentTimeMillis() + "_" + (int) (Math.random() * 1000);
     }
 
     public String getLatestReadyTid(Long memberId) {
-        return paymentHistoryRepository
-                .findLatestTidByMemberAndStatusReady(memberId)
-                .orElse(null);
+        return paymentHistoryRepository.findLatestTidByMemberAndStatusReady(memberId).orElse(null);
     }
 }
