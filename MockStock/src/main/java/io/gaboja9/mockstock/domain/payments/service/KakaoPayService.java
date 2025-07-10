@@ -1,12 +1,15 @@
-package io.gaboja9.mockstock.domain.payments;
+package io.gaboja9.mockstock.domain.payments.service;
 
 import io.gaboja9.mockstock.domain.members.entity.Members;
 import io.gaboja9.mockstock.domain.members.exception.NotFoundMemberException;
 import io.gaboja9.mockstock.domain.members.repository.MembersRepository;
 import io.gaboja9.mockstock.domain.payments.dto.KakaoPayApproveResponse;
 import io.gaboja9.mockstock.domain.payments.dto.KakaoPayReadyResponse;
+import io.gaboja9.mockstock.domain.payments.entity.PaymentHistory;
+import io.gaboja9.mockstock.domain.payments.entity.PaymentStatus;
 import io.gaboja9.mockstock.domain.payments.exception.PaymentException;
 import io.gaboja9.mockstock.domain.payments.exception.PaymentHistoryException;
+import io.gaboja9.mockstock.domain.payments.repository.PaymentHistoryRepository;
 import io.gaboja9.mockstock.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

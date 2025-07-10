@@ -1,4 +1,4 @@
-package io.gaboja9.mockstock.domain.payments;
+package io.gaboja9.mockstock.domain.payments.entity;
 
 public enum PaymentStatus {
     READY,

@@ -1,5 +1,6 @@
-package io.gaboja9.mockstock.domain.payments;
+package io.gaboja9.mockstock.domain.payments.controller;
 
+import io.gaboja9.mockstock.domain.payments.service.KakaoPayService;
 import io.gaboja9.mockstock.domain.payments.dto.KakaoPayApproveResponse;
 import io.gaboja9.mockstock.domain.payments.dto.KakaoPayReadyResponse;
 import io.gaboja9.mockstock.domain.payments.dto.PaymentRequest;

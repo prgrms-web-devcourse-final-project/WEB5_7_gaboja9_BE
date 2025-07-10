@@ -1,4 +1,4 @@
-package io.gaboja9.mockstock.domain.payments;
+package io.gaboja9.mockstock.domain.payments.entity;
 
 import io.gaboja9.mockstock.domain.members.entity.Members;
 import io.gaboja9.mockstock.global.common.BaseEntity;
