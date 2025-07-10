@@ -35,3 +35,11 @@ springdoc:
 
   springdoc:
     show-actuator: true
+
+kakaopay:
+  secret-key: ${KAKAO_SECRET_KEY}
+  base-url: https://open-api.kakaopay.com
+  ready-url: "https://kapi.kakao.com/v1/payment/ready"
+  approve-url: "https://kapi.kakao.com/v1/payment/approve"
+  cancel-url: "https://kapi.kakao.com/v1/payment/cancel"
+  cid: TC0ONETIME
