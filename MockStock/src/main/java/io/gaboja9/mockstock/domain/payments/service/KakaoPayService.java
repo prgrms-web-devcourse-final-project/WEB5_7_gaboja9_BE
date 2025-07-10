@@ -37,7 +37,7 @@ public class KakaoPayService {
     @Value("${kakaopay.cid}")
     private String cid;
 
-    private final RestTemplate restTemplate = new RestTemplate();
+    private final RestTemplate restTemplate;
     private final PaymentHistoryRepository paymentHistoryRepository;
     private final MembersRepository membersRepository;
 
