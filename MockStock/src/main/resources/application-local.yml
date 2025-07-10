@@ -49,10 +49,7 @@ springdoc:
   cache:
     disabled: true # 캐시 비활성화
 
-
   show-actuator: true
-  springdoc:
-    show-actuator: true
 
 kakaopay:
   secret-key: ${KAKAO_SECRET_KEY}
