@@ -17,7 +17,10 @@ import lombok.RequiredArgsConstructor;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
@@ -99,5 +102,27 @@ public class MembersController {
         String memo = membersService.getMemo(currentId);
 
         return ResponseEntity.ok(memo);
+    }
+
+    @PostMapping("/bankruptcy")
+    public ResponseEntity<?> declareBankruptcy() {
+
+        // TODO : Security 도입되면 현재 로그인한 유저 id를 불러오는 것으로 수정
+        Long currentId = 1L;
+
+        membersService.processBankruptcy(currentId);
+
+        return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/bankruptcy")
+    public ResponseEntity<?> getBankruptcy() {
+
+        // TODO : Security 도입되면 현재 로그인한 유저 id를 불러오는 것으로 수정
+        Long currentId = 1L;
+
+        int bankruptcyCnt = membersService.getBankruptcyCnt(currentId);
+
+        return ResponseEntity.ok(bankruptcyCnt);
     }
 }
