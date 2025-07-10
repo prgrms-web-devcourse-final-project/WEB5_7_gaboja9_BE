@@ -1,7 +1,9 @@
 package io.gaboja9.mockstock.domain.members.service;
 
+import io.gaboja9.mockstock.domain.members.dto.request.MemosCreateRequestDto;
 import io.gaboja9.mockstock.domain.members.dto.response.MemberInfoDto;
 import io.gaboja9.mockstock.domain.members.entity.Members;
+import io.gaboja9.mockstock.domain.members.exception.NotFoundMemberException;
 import io.gaboja9.mockstock.domain.members.repository.MembersRepository;
 import io.gaboja9.mockstock.domain.portfolios.dto.response.PortfoliosResponseDto;
 import io.gaboja9.mockstock.domain.ranks.service.RanksService;
@@ -10,6 +12,7 @@ import io.gaboja9.mockstock.domain.trades.repository.TradesRepository;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
@@ -22,11 +25,12 @@ public class MembersService {
     private final TradesRepository tradesRepository;
     private final RanksService ranksService;
 
+    @Transactional(readOnly = true)
     public MemberInfoDto getMemberInfoDto(Long memberId, PortfoliosResponseDto portfolios) {
         Members member =
                 membersRepository
                         .findById(memberId)
-                        .orElseThrow(() -> new RuntimeException("유저 없음"));
+                        .orElseThrow(() -> new NotFoundMemberException(memberId));
 
         int tradeCnt = tradesRepository.countByMembersId(memberId);
         // int ranking = ranksService.getRankByMemberId(memberId); // TODO : 랭킹 로직 개발되면 추가
@@ -42,5 +46,27 @@ public class MembersService {
                 // .ranking(ranking)
                 .period(period)
                 .build();
+    }
+
+    @Transactional
+    public void createMemo(Long membersId, MemosCreateRequestDto dto) {
+
+        Members findMember =
+                membersRepository
+                        .findById(membersId)
+                        .orElseThrow(() -> new NotFoundMemberException(membersId));
+
+        findMember.setMemo(dto.getMemo());
+    }
+
+    @Transactional(readOnly = true)
+    public String getMemo(Long memberId) {
+
+        Members findMember =
+                membersRepository
+                        .findById(memberId)
+                        .orElseThrow(() -> new NotFoundMemberException(memberId));
+
+        return findMember.getMemo();
     }
 }
