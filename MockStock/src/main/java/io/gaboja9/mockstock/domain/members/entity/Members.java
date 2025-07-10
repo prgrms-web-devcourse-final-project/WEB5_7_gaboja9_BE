@@ -28,6 +28,7 @@ public class Members extends BaseEntity {
 
     private String profileImage;
 
+    @Setter
     private int cashBalance;
 
     private int bankruptcyCnt;

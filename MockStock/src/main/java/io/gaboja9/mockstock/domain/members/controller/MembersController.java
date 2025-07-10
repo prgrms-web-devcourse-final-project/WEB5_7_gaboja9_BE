@@ -36,6 +36,7 @@ public class MembersController {
     public ResponseEntity<MemberInfoDto> getMemberInfo() {
         Long currentId = 1L; // TODO: Security 도입 시 현재 로그인한 유저 ID 사용
 
+
         PortfoliosResponseDto portfolios = portfoliosService.getPortfolios(currentId);
 
         MemberInfoDto memberInfoDto = membersService.getMemberInfoDto(currentId, portfolios);
