@@ -1,5 +1,8 @@
 package io.gaboja9.mockstock.domain.members.controller;
 
+import io.gaboja9.mockstock.domain.mails.dto.response.MailsResponseDto;
+import io.gaboja9.mockstock.domain.mails.entity.Mails;
+import io.gaboja9.mockstock.domain.mails.service.MailsService;
 import io.gaboja9.mockstock.domain.members.dto.request.MemosCreateRequestDto;
 import io.gaboja9.mockstock.domain.members.dto.response.MemberInfoDto;
 import io.gaboja9.mockstock.domain.members.service.MembersService;
@@ -17,9 +20,7 @@ import lombok.RequiredArgsConstructor;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -31,6 +32,7 @@ public class MembersController {
     private final PortfoliosService portfoliosService;
     private final MembersService membersService;
     private final TradesService tradesService;
+    private final MailsService mailsService;
 
     @GetMapping("/info")
     public ResponseEntity<MemberInfoDto> getMemberInfo() {
@@ -101,5 +103,21 @@ public class MembersController {
         String memo = membersService.getMemo(currentId);
 
         return ResponseEntity.ok(memo);
+    }
+
+    @GetMapping("/mails")
+    public ResponseEntity<?> getMails(@RequestParam(required = false) Boolean unread) {
+
+        // TODO : Security 도입되면 현재 로그인한 유저 id를 불러오는 것으로 수정
+        Long currentId = 1L;
+
+        if (unread == null) {
+            List<MailsResponseDto> allMails = mailsService.getAllMails(currentId);
+            return ResponseEntity.ok(allMails);
+        }
+
+        List<MailsResponseDto> allMails = mailsService.getMailsByReadStatus(currentId, unread);
+
+        return ResponseEntity.ok(allMails);
     }
 }
