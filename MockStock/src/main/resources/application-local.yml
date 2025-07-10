@@ -12,6 +12,22 @@ spring:
     hibernate:
       ddl-auto: update
 
+  influx:
+    url: http://localhost:8086
+    token: ${INFLUX_TOKEN}
+    org: your-org
+    bucket:
+      daily: stock_daily
+      minute: stock_minute
+
+  autoconfigure:
+    exclude: org.springframework.boot.actuate.autoconfigure.metrics.export.influx.InfluxMetricsExportAutoConfiguration
+
+hantu-openapi:
+  domain: https://openapivts.koreainvestment.com:29443
+  appkey: ${HANTU_APPKEY}
+  appsecret: ${HANTU_APPSECRET}
+
 springdoc:
   api-docs:
     enabled: true
@@ -33,6 +49,8 @@ springdoc:
   cache:
     disabled: true # 캐시 비활성화
 
+
+  show-actuator: true
   springdoc:
     show-actuator: true
 
