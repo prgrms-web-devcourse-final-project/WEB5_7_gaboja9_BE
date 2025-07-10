@@ -43,7 +43,7 @@ public class KakaoPayController {
             KakaoPayApproveResponse response = kakaoPayService.paymentApprove(pgToken, memberId);
 
             // 성공 페이지로 리다이렉트하거나 결과 반환
-            return ResponseEntity.ok("성공");
+            return ResponseEntity.ok("결제 성공");
 
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("결제 실패: " + e.getMessage());
@@ -72,7 +72,7 @@ public class KakaoPayController {
             Long userId = 1L;
             kakaoPayService.paymentFail(tid, userId);
 
-            return ResponseEntity.ok("결제 실패");
+            return ResponseEntity.ok("결제 실패 처리 성공");
 
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("결제 실패 처리 실패" + e.getMessage());
