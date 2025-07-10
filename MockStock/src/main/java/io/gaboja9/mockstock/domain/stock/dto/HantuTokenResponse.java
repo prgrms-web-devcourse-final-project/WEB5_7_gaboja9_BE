@@ -1,6 +1,7 @@
 package io.gaboja9.mockstock.domain.stock.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+
 import lombok.Getter;
 import lombok.Setter;
 

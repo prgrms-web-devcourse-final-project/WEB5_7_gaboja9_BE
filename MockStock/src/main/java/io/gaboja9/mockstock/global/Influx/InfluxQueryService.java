@@ -1,18 +1,18 @@
-//package io.gaboja9.mockstock.global.Influx;
+// package io.gaboja9.mockstock.global.Influx;
 //
-//import com.influxdb.client.InfluxDBClient;
-//import com.influxdb.query.FluxRecord;
-//import com.influxdb.query.FluxTable;
+// import com.influxdb.client.InfluxDBClient;
+// import com.influxdb.query.FluxRecord;
+// import com.influxdb.query.FluxTable;
 //
-//import lombok.RequiredArgsConstructor;
+// import lombok.RequiredArgsConstructor;
 //
-//import org.springframework.stereotype.Service;
+// import org.springframework.stereotype.Service;
 //
-//import java.util.List;
+// import java.util.List;
 //
-//@Service
-//@RequiredArgsConstructor
-//public class InfluxQueryService {
+// @Service
+// @RequiredArgsConstructor
+// public class InfluxQueryService {
 //
 //    private final InfluxDBClient influxDBClient;
 //
@@ -22,7 +22,8 @@
 //                        """
 //                            from(bucket: "stocks")
 //                              |> range(start: -10m)
-//                              |> filter(fn: (r) => r._measurement == "stock_price" and r.stockCode == "%s" and r._field == "price")
+//                              |> filter(fn: (r) => r._measurement == "stock_price" and r.stockCode
+// == "%s" and r._field == "price")
 //                              |> last()
 //                        """,
 //                        stockCode);
@@ -40,4 +41,4 @@
 //
 //        throw new RuntimeException("시세 없음: " + stockCode);
 //    }
-//}
+// }

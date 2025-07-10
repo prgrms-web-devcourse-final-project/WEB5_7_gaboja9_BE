@@ -5,9 +5,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.influxdb.client.InfluxDBClient;
 import com.influxdb.client.WriteApi;
 import com.influxdb.client.domain.WritePrecision;
+
 import io.gaboja9.mockstock.domain.stock.dto.HantuTokenResponse;
 import io.gaboja9.mockstock.domain.stock.measurement.DailyStockPrice;
+
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
@@ -15,7 +18,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
@@ -33,17 +35,15 @@ public class DailyStockService {
 
     @Value("${hantu-openapi.domain}")
     private String apiDomain;
+
     @Value("${hantu-openapi.appkey}")
     private String appKey;
+
     @Value("${hantu-openapi.appsecret}")
     private String appSecret;
 
-
-
     private String cachedAccessToken;
     private long tokenExpirationTime; // 토큰 만료 시간을 밀리초 단위로 저장
-
-
 
     public DailyStockService(
             RestTemplate restTemplate,
@@ -54,9 +54,7 @@ public class DailyStockService {
         this.dailyClient = dailyClient;
     }
 
-    /**
-     * 단일 종목의 일별 주식 데이터를 가져와 InfluxDB에 저장합니다.
-     */
+    /** 단일 종목의 일별 주식 데이터를 가져와 InfluxDB에 저장합니다. */
     public void fetchAndSaveDailyData(
             String marketCode,
             String stockCode,
@@ -66,8 +64,6 @@ public class DailyStockService {
 
         log.info("단일 종목 데이터 수집 시작 - 종목: {}, 기간: {} ~ {}", stockCode, startDate, endDate);
 
-
-
         // 매번 새 토큰을 발급받는 대신, 유효한 토큰을 가져오는 메소드 호출
         String accessToken = getValidAccessToken();
         if (accessToken == null) {
@@ -75,9 +71,9 @@ public class DailyStockService {
             return;
         }
 
-
-
-        String responseBody = getStockPriceData(marketCode, stockCode, startDate, endDate, periodCode, accessToken);
+        String responseBody =
+                getStockPriceData(
+                        marketCode, stockCode, startDate, endDate, periodCode, accessToken);
 
         if (responseBody != null) {
             saveDailyStockDataToInflux(responseBody, stockCode);
@@ -102,24 +98,23 @@ public class DailyStockService {
         headers.set("appsecret", appSecret);
         headers.set("tr_id", "FHKST03010100");
 
-        UriComponentsBuilder builder = UriComponentsBuilder
-                .fromHttpUrl(apiDomain + "/uapi/domestic-stock/v1/quotations/inquire-daily-itemchartprice")
-                .queryParam("FID_COND_MRKT_DIV_CODE", marketCode)
-                .queryParam("FID_INPUT_ISCD", stockCode)
-                .queryParam("FID_INPUT_DATE_1", startDate)
-                .queryParam("FID_INPUT_DATE_2", endDate)
-                .queryParam("FID_PERIOD_DIV_CODE", periodCode)
-                .queryParam("FID_ORG_ADJ_PRC", "0");
+        UriComponentsBuilder builder =
+                UriComponentsBuilder.fromHttpUrl(
+                                apiDomain
+                                        + "/uapi/domestic-stock/v1/quotations/inquire-daily-itemchartprice")
+                        .queryParam("FID_COND_MRKT_DIV_CODE", marketCode)
+                        .queryParam("FID_INPUT_ISCD", stockCode)
+                        .queryParam("FID_INPUT_DATE_1", startDate)
+                        .queryParam("FID_INPUT_DATE_2", endDate)
+                        .queryParam("FID_PERIOD_DIV_CODE", periodCode)
+                        .queryParam("FID_ORG_ADJ_PRC", "0");
 
         HttpEntity<?> entity = new HttpEntity<>(headers);
 
         try {
-            ResponseEntity<String> response = restTemplate.exchange(
-                    builder.toUriString(),
-                    HttpMethod.GET,
-                    entity,
-                    String.class
-            );
+            ResponseEntity<String> response =
+                    restTemplate.exchange(
+                            builder.toUriString(), HttpMethod.GET, entity, String.class);
             return response.getBody();
         } catch (Exception e) {
             log.error("API 요청 실패 - 종목: {}, URL: {}", stockCode, builder.toUriString(), e);
@@ -164,15 +159,15 @@ public class DailyStockService {
         }
     }
 
-
     /**
-     * 유효하고 만료되지 않은 토큰이 있는지 확인하고 반환합니다.
-     * 없거나 만료되었다면 새로 발급받습니다. 이 메소드는 동기화(thread-safe) 처리됩니다.
+     * 유효하고 만료되지 않은 토큰이 있는지 확인하고 반환합니다. 없거나 만료되었다면 새로 발급받습니다. 이 메소드는 동기화(thread-safe) 처리됩니다.
+     *
      * @return 유효한 액세스 토큰, 실패 시 null
      */
     private synchronized String getValidAccessToken() {
         // 토큰이 없거나, 만료 시간 60초 전에 해당하면 새로 발급 (안전 여유 시간)
-        if (cachedAccessToken == null || System.currentTimeMillis() >= tokenExpirationTime - 60000) {
+        if (cachedAccessToken == null
+                || System.currentTimeMillis() >= tokenExpirationTime - 60000) {
             log.info("액세스 토큰이 없거나 만료되어 새로 발급합니다.");
             if (!fetchNewAccessToken()) {
                 return null; // 토큰 발급 실패 시 null 반환
@@ -183,26 +178,27 @@ public class DailyStockService {
 
     /**
      * API로부터 새로운 액세스 토큰을 발급받아 캐시합니다.
+     *
      * @return 토큰 발급 및 캐시 성공 시 true, 실패 시 false
      */
     private boolean fetchNewAccessToken() {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
-        String requestBody = String.format(
-                "{\"grant_type\":\"client_credentials\",\"appkey\":\"%s\",\"appsecret\":\"%s\"}",
-                appKey, appSecret
-        );
+        String requestBody =
+                String.format(
+                        "{\"grant_type\":\"client_credentials\",\"appkey\":\"%s\",\"appsecret\":\"%s\"}",
+                        appKey, appSecret);
 
         HttpEntity<String> entity = new HttpEntity<>(requestBody, headers);
 
         try {
-            ResponseEntity<HantuTokenResponse> response = restTemplate.exchange(
-                    apiDomain + "/oauth2/tokenP",
-                    HttpMethod.POST,
-                    entity,
-                    HantuTokenResponse.class
-            );
+            ResponseEntity<HantuTokenResponse> response =
+                    restTemplate.exchange(
+                            apiDomain + "/oauth2/tokenP",
+                            HttpMethod.POST,
+                            entity,
+                            HantuTokenResponse.class);
 
             HantuTokenResponse tokenResponse = response.getBody();
             if (tokenResponse != null && tokenResponse.getAccessToken() != null) {
@@ -224,5 +220,4 @@ public class DailyStockService {
             return false;
         }
     }
-
 }

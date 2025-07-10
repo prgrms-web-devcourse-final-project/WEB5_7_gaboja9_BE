@@ -21,17 +21,18 @@ public class InfluxConfig {
     @Value("${spring.influx.org}")
     private String org;
 
-
     @Bean
     @Qualifier("dailyInfluxDBClient")
-    public InfluxDBClient dailyInfluxDBClient(@Value("${spring.influx.bucket.daily}") String dailyBucket) {
+    public InfluxDBClient dailyInfluxDBClient(
+            @Value("${spring.influx.bucket.daily}") String dailyBucket) {
         return InfluxDBClientFactory.create(url, token.toCharArray(), org, dailyBucket);
     }
 
     // Minute Bucket Client
     @Bean
     @Qualifier("minuteInfluxDBClient")
-    public InfluxDBClient minuteInfluxDBClient(@Value("${spring.influx.bucket.minute}") String minuteBucket) {
+    public InfluxDBClient minuteInfluxDBClient(
+            @Value("${spring.influx.bucket.minute}") String minuteBucket) {
         return InfluxDBClientFactory.create(url, token.toCharArray(), org, minuteBucket);
     }
 }

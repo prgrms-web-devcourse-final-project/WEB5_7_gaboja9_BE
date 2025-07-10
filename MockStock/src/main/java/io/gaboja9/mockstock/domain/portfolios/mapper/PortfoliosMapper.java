@@ -2,7 +2,7 @@ package io.gaboja9.mockstock.domain.portfolios.mapper;
 
 import io.gaboja9.mockstock.domain.portfolios.dto.response.PortfolioResponseDto;
 import io.gaboja9.mockstock.domain.portfolios.entity.Portfolios;
-//import io.gaboja9.mockstock.global.Influx.InfluxQueryService;
+// import io.gaboja9.mockstock.global.Influx.InfluxQueryService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -12,14 +12,13 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class PortfoliosMapper {
 
-//    private final InfluxQueryService influxQueryService;
+    //    private final InfluxQueryService influxQueryService;
 
     public PortfolioResponseDto toDto(Portfolios p) {
         int quantity = p.getQuantity();
         int avgPrice = p.getAvgPrice();
-//        int currentPrice = influxQueryService.getCurrentPrice(p.getStockCode());
+        //        int currentPrice = influxQueryService.getCurrentPrice(p.getStockCode());
         int currentPrice = 100;
-
 
         int evaluationAmount = currentPrice * quantity;
         int profit = (currentPrice - avgPrice) * quantity;
