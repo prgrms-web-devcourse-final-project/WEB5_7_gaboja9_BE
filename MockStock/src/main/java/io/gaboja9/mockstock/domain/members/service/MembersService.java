@@ -54,9 +54,9 @@ public class MembersService {
     public void processBankruptcy(Long memberId) {
 
         Members findMember =
-            membersRepository
-                    .findById(memberId)
-                    .orElseThrow(() -> new NotFoundMemberException(memberId));
+                membersRepository
+                        .findById(memberId)
+                        .orElseThrow(() -> new NotFoundMemberException(memberId));
 
         portfoliosService.remove(memberId);
         findMember.setCashBalance(30_000_000);
@@ -67,20 +67,20 @@ public class MembersService {
     public int getBankruptcyCnt(Long memberId) {
 
         Members findMember =
-            membersRepository
-                    .findById(memberId)
-                    .orElseThrow(() -> new NotFoundMemberException(memberId));
+                membersRepository
+                        .findById(memberId)
+                        .orElseThrow(() -> new NotFoundMemberException(memberId));
 
         return findMember.getBankruptcyCnt();
     }
-  
+
     @Transactional
     public void createMemo(Long membersId, MemosCreateRequestDto dto) {
 
         Members findMember =
-            membersRepository
-                    .findById(membersId)
-                    .orElseThrow(() -> new NotFoundMemberException(membersId));
+                membersRepository
+                        .findById(membersId)
+                        .orElseThrow(() -> new NotFoundMemberException(membersId));
 
         findMember.setMemo(dto.getMemo());
     }
@@ -89,9 +89,9 @@ public class MembersService {
     public String getMemo(Long memberId) {
 
         Members findMember =
-            membersRepository
-                    .findById(memberId)
-                    .orElseThrow(() -> new NotFoundMemberException(memberId));
+                membersRepository
+                        .findById(memberId)
+                        .orElseThrow(() -> new NotFoundMemberException(memberId));
 
         return findMember.getMemo();
     }
