@@ -2,6 +2,7 @@ package io.gaboja9.mockstock.domain.mails.mapper;
 
 import io.gaboja9.mockstock.domain.mails.dto.response.MailsResponseDto;
 import io.gaboja9.mockstock.domain.mails.entity.Mails;
+
 import org.springframework.stereotype.Component;
 
 import java.util.Collections;
@@ -17,12 +18,14 @@ public class MailsMapper {
         }
 
         return mailsList.stream()
-                .map(mail -> MailsResponseDto.builder()
-                        .subject(mail.getSubject())
-                        .content(mail.getContent())
-                        .readStatus(mail.isReadStatus())
-                        .receivedAt(mail.getCreatedAt())
-                        .build())
+                .map(
+                        mail ->
+                                MailsResponseDto.builder()
+                                        .subject(mail.getSubject())
+                                        .content(mail.getContent())
+                                        .readStatus(mail.isReadStatus())
+                                        .receivedAt(mail.getCreatedAt())
+                                        .build())
                 .toList();
     }
 }

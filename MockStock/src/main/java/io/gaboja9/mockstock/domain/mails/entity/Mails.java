@@ -33,7 +33,12 @@ public class Mails extends BaseEntity {
     private Members members;
 
     // 테스트용 생성자
-    public Mails(String subject, String content, boolean readStatus, LocalDateTime createdAt, Members members) {
+    public Mails(
+            String subject,
+            String content,
+            boolean readStatus,
+            LocalDateTime createdAt,
+            Members members) {
         this.subject = subject;
         this.content = content;
         this.readStatus = readStatus;
