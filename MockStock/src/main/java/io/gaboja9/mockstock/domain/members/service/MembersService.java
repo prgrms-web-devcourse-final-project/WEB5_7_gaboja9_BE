@@ -1,5 +1,6 @@
 package io.gaboja9.mockstock.domain.members.service;
 
+import io.gaboja9.mockstock.domain.members.dto.request.MemosCreateRequestDto;
 import io.gaboja9.mockstock.domain.members.dto.response.MemberInfoDto;
 import io.gaboja9.mockstock.domain.members.entity.Members;
 import io.gaboja9.mockstock.domain.members.exception.NotFoundMemberException;
@@ -26,6 +27,7 @@ public class MembersService {
     private final RanksService ranksService;
     private final PortfoliosService portfoliosService;
 
+    @Transactional(readOnly = true)
     public MemberInfoDto getMemberInfoDto(Long memberId, PortfoliosResponseDto portfolios) {
         Members member =
                 membersRepository
@@ -52,9 +54,9 @@ public class MembersService {
     public void processBankruptcy(Long memberId) {
 
         Members findMember =
-                membersRepository
-                        .findById(memberId)
-                        .orElseThrow(() -> new NotFoundMemberException(memberId));
+            membersRepository
+                    .findById(memberId)
+                    .orElseThrow(() -> new NotFoundMemberException(memberId));
 
         portfoliosService.remove(memberId);
         findMember.setCashBalance(30_000_000);
@@ -65,10 +67,32 @@ public class MembersService {
     public int getBankruptcyCnt(Long memberId) {
 
         Members findMember =
-                membersRepository
-                        .findById(memberId)
-                        .orElseThrow(() -> new NotFoundMemberException(memberId));
+            membersRepository
+                    .findById(memberId)
+                    .orElseThrow(() -> new NotFoundMemberException(memberId));
 
         return findMember.getBankruptcyCnt();
+    }
+  
+    @Transactional
+    public void createMemo(Long membersId, MemosCreateRequestDto dto) {
+
+        Members findMember =
+            membersRepository
+                    .findById(membersId)
+                    .orElseThrow(() -> new NotFoundMemberException(membersId));
+
+        findMember.setMemo(dto.getMemo());
+    }
+
+    @Transactional(readOnly = true)
+    public String getMemo(Long memberId) {
+
+        Members findMember =
+            membersRepository
+                    .findById(memberId)
+                    .orElseThrow(() -> new NotFoundMemberException(memberId));
+
+        return findMember.getMemo();
     }
 }

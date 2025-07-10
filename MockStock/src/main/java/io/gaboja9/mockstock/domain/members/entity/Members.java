@@ -32,6 +32,8 @@ public class Members extends BaseEntity {
 
     @Setter private int bankruptcyCnt;
 
+    @Setter private String memo;
+
     // 테스트용 생성자
     public Members(
             Long id,

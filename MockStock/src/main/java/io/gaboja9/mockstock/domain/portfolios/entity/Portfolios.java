@@ -26,7 +26,7 @@ public class Portfolios extends BaseEntity {
 
     private boolean deleted = false;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "members_id")
     private Members members;
 
