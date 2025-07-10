@@ -11,14 +11,14 @@ public interface PaymentHistoryRepository extends JpaRepository<PaymentHistory, 
 
     Optional<PaymentHistory> findByTidAndMembersId(String tid, Long membersId);
 
-    @Query("""
-        SELECT p.tid
-        FROM PaymentHistory p
-        WHERE p.members.id = :memberId
-          AND p.status = 'READY'
-        ORDER BY p.createdAt DESC
-        LIMIT 1
-        """)
+    @Query(
+            """
+            SELECT p.tid
+            FROM PaymentHistory p
+            WHERE p.members.id = :memberId
+              AND p.status = 'READY'
+            ORDER BY p.createdAt DESC
+            LIMIT 1
+            """)
     Optional<String> findLatestTidByMemberAndStatusReady(@Param("memberId") Long memberId);
-
 }
