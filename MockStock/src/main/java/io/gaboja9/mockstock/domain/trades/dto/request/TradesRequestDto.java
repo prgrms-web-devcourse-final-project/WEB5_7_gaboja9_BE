@@ -2,8 +2,7 @@ package io.gaboja9.mockstock.domain.trades.dto.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
-import jakarta.validation.constraints.NotBlank;
-
+import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -24,12 +23,12 @@ public class TradesRequestDto {
     private String stockName;
 
     @Schema(description = "검색 시작 날짜")
-    @NotBlank
+    @NotNull
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private LocalDate startDate;
 
     @Schema(description = "검색 종료 날짜")
-    @NotBlank
+    @NotNull
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private LocalDate endDate;
 }
