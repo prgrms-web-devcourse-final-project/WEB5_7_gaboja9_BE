@@ -1,8 +1,8 @@
 package io.gaboja9.mockstock.domain.trades.dto.response;
 
 import io.gaboja9.mockstock.domain.trades.entity.TradeType;
-
 import io.swagger.v3.oas.annotations.media.Schema;
+
 import lombok.Builder;
 import lombok.Getter;
 
