@@ -115,8 +115,27 @@ public class MembersController {
             return ResponseEntity.ok(allMails);
         }
 
-        List<MailsResponseDto> allMails = mailsService.getMailsByReadStatus(currentId, unread);
+        List<MailsResponseDto> mailsByStatus = mailsService.getMailsByReadStatus(currentId, unread);
+        return ResponseEntity.ok(mailsByStatus);
+    }
 
-        return ResponseEntity.ok(allMails);
+    @PostMapping("/bankruptcy")
+    public ResponseEntity<?> declareBankruptcy() {
+
+        // TODO : Security 도입되면 현재 로그인한 유저 id를 불러오는 것으로 수정
+        Long currentId = 1L;
+
+        membersService.processBankruptcy(currentId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/bankruptcy")
+    public ResponseEntity<?> getBankruptcy() {
+
+        // TODO : Security 도입되면 현재 로그인한 유저 id를 불러오는 것으로 수정
+        Long currentId = 1L;
+
+        int bankruptcyCnt = membersService.getBankruptcyCnt(currentId);
+        return ResponseEntity.ok(bankruptcyCnt);
     }
 }

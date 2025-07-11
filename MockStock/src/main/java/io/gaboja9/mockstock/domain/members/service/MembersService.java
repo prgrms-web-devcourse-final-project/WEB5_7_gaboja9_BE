@@ -6,6 +6,7 @@ import io.gaboja9.mockstock.domain.members.entity.Members;
 import io.gaboja9.mockstock.domain.members.exception.NotFoundMemberException;
 import io.gaboja9.mockstock.domain.members.repository.MembersRepository;
 import io.gaboja9.mockstock.domain.portfolios.dto.response.PortfoliosResponseDto;
+import io.gaboja9.mockstock.domain.portfolios.service.PortfoliosService;
 import io.gaboja9.mockstock.domain.ranks.service.RanksService;
 import io.gaboja9.mockstock.domain.trades.repository.TradesRepository;
 
@@ -24,6 +25,7 @@ public class MembersService {
     private final MembersRepository membersRepository;
     private final TradesRepository tradesRepository;
     private final RanksService ranksService;
+    private final PortfoliosService portfoliosService;
 
     @Transactional(readOnly = true)
     public MemberInfoDto getMemberInfoDto(Long memberId, PortfoliosResponseDto portfolios) {
@@ -46,6 +48,30 @@ public class MembersService {
                 // .ranking(ranking)
                 .period(period)
                 .build();
+    }
+
+    @Transactional
+    public void processBankruptcy(Long memberId) {
+
+        Members findMember =
+                membersRepository
+                        .findById(memberId)
+                        .orElseThrow(() -> new NotFoundMemberException(memberId));
+
+        portfoliosService.remove(memberId);
+        findMember.setCashBalance(30_000_000);
+        findMember.setBankruptcyCnt(findMember.getBankruptcyCnt() + 1);
+    }
+
+    @Transactional(readOnly = true)
+    public int getBankruptcyCnt(Long memberId) {
+
+        Members findMember =
+                membersRepository
+                        .findById(memberId)
+                        .orElseThrow(() -> new NotFoundMemberException(memberId));
+
+        return findMember.getBankruptcyCnt();
     }
 
     @Transactional
