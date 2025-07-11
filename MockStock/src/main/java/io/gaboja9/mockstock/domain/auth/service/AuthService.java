@@ -1,7 +1,14 @@
 package io.gaboja9.mockstock.domain.auth.service;
 
-import java.util.Map;
-import java.util.Optional;
+import io.gaboja9.mockstock.domain.auth.dto.MembersDetails;
+import io.gaboja9.mockstock.domain.members.entity.Members;
+import io.gaboja9.mockstock.domain.members.enums.Role;
+import io.gaboja9.mockstock.domain.members.repository.MembersRepository;
+
+import jakarta.transaction.Transactional;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
@@ -9,13 +16,7 @@ import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 
-import io.gaboja9.mockstock.domain.auth.dto.MembersDetails;
-import io.gaboja9.mockstock.domain.members.entity.Members;
-import io.gaboja9.mockstock.domain.members.enums.Role;
-import io.gaboja9.mockstock.domain.members.repository.MembersRepository;
-import jakarta.transaction.Transactional;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import java.util.Optional;
 
 @Slf4j
 @Service

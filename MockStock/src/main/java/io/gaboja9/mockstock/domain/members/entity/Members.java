@@ -38,8 +38,14 @@ public class Members extends BaseEntity {
     private int bankruptcyCnt;
 
     @Builder
-    public Members(String email, String nickname, Role role, String provider, String profileImage, int cashBalance,
-        int bankruptcyCnt) {
+    public Members(
+            String email,
+            String nickname,
+            Role role,
+            String provider,
+            String profileImage,
+            int cashBalance,
+            int bankruptcyCnt) {
         this.email = email;
         this.nickname = nickname;
         this.role = role;
