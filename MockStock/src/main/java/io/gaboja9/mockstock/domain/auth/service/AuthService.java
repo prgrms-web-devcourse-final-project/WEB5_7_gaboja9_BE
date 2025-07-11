@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import io.gaboja9.mockstock.domain.auth.dto.MembersDetails;
 import io.gaboja9.mockstock.domain.members.entity.Members;
+import io.gaboja9.mockstock.domain.members.enums.Role;
 import io.gaboja9.mockstock.domain.members.repository.MembersRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -22,43 +23,42 @@ import lombok.extern.slf4j.Slf4j;
 @Transactional
 public class AuthService extends DefaultOAuth2UserService {
 
-	private final MembersRepository membersRepository;
+    private final MembersRepository membersRepository;
 
-	@Override
-	public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
+    @Override
+    public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
 
-		OAuth2User oAuth2User = super.loadUser(userRequest);
-		log.info("oAuth2User = {}", oAuth2User);
+        OAuth2User oAuth2User = super.loadUser(userRequest);
+        log.info("oAuth2User = {}", oAuth2User);
 
-		Map<String, Object> attributes = oAuth2User.getAttributes();
+        String provider = userRequest.getClientRegistration().getRegistrationId().toUpperCase();
+        log.info("userRequest = {}", provider);
 
-		String findname = attributes.get("name").toString();
-		String findemail = attributes.get("email").toString();
-		String findprofileImage = attributes.get("picture").toString();
-		String registrationId = userRequest.getClientRegistration().getRegistrationId();
+        MembersDetails membersDetails = MembersDetailsFactory.membersDetails(provider, oAuth2User);
 
-		Optional<Members> membersOptional = membersRepository.findByEmail(findemail);
+        Optional<Members> membersOptional =
+                membersRepository.findByEmail(membersDetails.getEmail());
 
-		Members members = membersOptional.orElseGet(
-			() -> {
-				Members saved = Members.builder()
-					.nickname(findname)
-					.email(findemail)
-					.provider(registrationId)
-					.profileImage(findprofileImage)
-					.cashBalance(30000000)
-					.bankruptcyCnt(0)
-					.build();
-				return membersRepository.save(saved);
-			}
-		);
+        Members findMember =
+                membersOptional.orElseGet(
+                        () -> {
+                            Members saved =
+                                    Members.builder()
+                                            .nickname(membersDetails.getName())
+                                            .email(membersDetails.getEmail())
+                                            .provider(provider)
+                                            .role(Role.MEMBER)
+                                            .profileImage(membersDetails.getProfileImage())
+                                            .cashBalance(30000000)
+                                            .bankruptcyCnt(0)
+                                            .build();
+                            return membersRepository.save(saved);
+                        });
 
-		return MembersDetails.builder()
-			.memberId(members.getId())
-			.name(members.getNickname())
-			.role(members.getRole().name())
-			.attributes(attributes)
-			.build();
-	}
-
+        if (findMember.getProvider().equals(provider)) {
+            return membersDetails.setRole(findMember.getRole().name());
+        } else {
+            throw new RuntimeException();
+        }
+    }
 }

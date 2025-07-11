@@ -27,7 +27,7 @@ public class Members extends BaseEntity {
     private String nickname;
 
     @Enumerated(EnumType.STRING)
-    private Role role = Role.USER;
+    private Role role = Role.MEMBER;
 
     private String provider;
 
@@ -38,10 +38,11 @@ public class Members extends BaseEntity {
     private int bankruptcyCnt;
 
     @Builder
-    public Members(String email, String nickname, String provider, String profileImage, int cashBalance,
+    public Members(String email, String nickname, Role role, String provider, String profileImage, int cashBalance,
         int bankruptcyCnt) {
         this.email = email;
         this.nickname = nickname;
+        this.role = role;
         this.provider = provider;
         this.profileImage = profileImage;
         this.cashBalance = cashBalance;

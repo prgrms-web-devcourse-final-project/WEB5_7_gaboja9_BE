@@ -3,6 +3,7 @@ package io.gaboja9.mockstock.global.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 
 import io.gaboja9.mockstock.domain.auth.service.AuthService;
@@ -41,6 +42,11 @@ public class SecurityConfig {
             )
             .formLogin(form -> form.disable())
             .csrf(csrf -> csrf.disable())
+            .cors(cors -> cors.disable())
+            .sessionManagement(
+                session -> session.sessionCreationPolicy(
+                        SessionCreationPolicy.STATELESS
+                ))
             .build();
     }
 }
