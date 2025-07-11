@@ -35,7 +35,8 @@ public class KakaoPayController implements KakaoPayControllerSpec {
 
     @GetMapping("/approve")
     @Override
-    public ResponseEntity<PaymentResponse> paymentApprove(@RequestParam("pg_token") String pgToken) {
+    public ResponseEntity<PaymentResponse> paymentApprove(
+            @RequestParam("pg_token") String pgToken) {
         try {
             // TODO: JWT 도입시 헤더에서 추출
             Long memberId = 1L;
