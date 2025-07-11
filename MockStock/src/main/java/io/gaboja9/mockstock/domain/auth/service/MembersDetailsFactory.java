@@ -29,6 +29,18 @@ public class MembersDetailsFactory {
 					.attributes(attributes)
 					.build();
 			}
+			/*
+			properties={nickname=영민, profile_image=http://img1.kakaocdn.net/thumb/R640x640.q70/?fname=http://t1.kakaocdn.net/account_images/default_profile.jpeg, thumbnail_image=http://img1.kakaocdn.net/thumb/R110x110.q70/?fname=http://t1.kakaocdn.net/account_images/default_profile.jpeg}, kakao_account={profile_nickname_needs_agreement=false, profile_image_needs_agreement=false, profile={nickname=영민, thumbnail_image_url=http://img1.kakaocdn.net/thumb/R110x110.q70/?fname=http://t1.kakaocdn.net/account_images/default_profile.jpeg, profile_image_url=http://img1.kakaocdn.net/thumb/R640x640.q70/?fname=http://t1.kakaocdn.net/account_images/default_profile.jpeg, is_default_image=true, is_default_nickname=false}}}]
+			 */
+			case "KAKAO" -> {
+				Map<String, String> properties = (Map<String, String>) attributes.get("properties");
+				return MembersDetails.builder()
+						.name(properties.get("nickname"))
+						.email(attributes.get("id") + "@kakao.com")
+						.profileImage(properties.get("profile_image"))
+						.attributes(attributes)
+						.build();
+			}
 			default -> throw new IllegalArgumentException("지원하지 않는 제공자: " + provider);
 		}
 	}
