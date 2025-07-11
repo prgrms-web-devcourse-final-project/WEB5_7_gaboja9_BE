@@ -15,7 +15,7 @@ public class TradesMapper {
                 .quantity(t.getQuantity())
                 .price(t.getPrice())
                 .totalAmount(t.getPrice() * t.getQuantity())
-                .tradeDate(t.getCreatedAt())
+                .tradeDateTime(t.getCreatedAt())
                 .build();
     }
 }

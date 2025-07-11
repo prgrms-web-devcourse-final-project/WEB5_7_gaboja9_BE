@@ -67,7 +67,7 @@ class TradesServiceTest {
                         .price(70000)
                         .totalAmount(700000)
                         .tradeType(TradeType.BUY)
-                        .tradeDate(trade.getCreatedAt())
+                        .tradeDateTime(trade.getCreatedAt())
                         .build();
 
         List<Trades> tradesList = List.of(trade);
@@ -126,7 +126,7 @@ class TradesServiceTest {
                         .quantity(5)
                         .totalAmount(600000)
                         .tradeType(TradeType.SELL)
-                        .tradeDate(trade.getCreatedAt())
+                        .tradeDateTime(trade.getCreatedAt())
                         .build();
 
         when(tradesRepository.findByMembersId(memberId)).thenReturn(List.of(trade));

@@ -26,7 +26,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/members/me")
 @RequiredArgsConstructor
-public class MembersController {
+public class MembersController implements MembersControllerSpec {
 
     private final PortfoliosService portfoliosService;
     private final MembersService membersService;
@@ -45,7 +45,7 @@ public class MembersController {
     }
 
     @GetMapping("/portfolios")
-    public ResponseEntity<?> getPortfolios() {
+    public ResponseEntity<PortfoliosResponseDto> getPortfolios() {
         // TODO : Security 도입되면 현재 로그인한 유저 id를 불러오는 것으로 수정
         Long currentId = 1L;
 
@@ -55,7 +55,7 @@ public class MembersController {
     }
 
     @GetMapping("/trades")
-    public ResponseEntity<?> getTrades() {
+    public ResponseEntity<List<TradesResponseDto>> getTrades() {
 
         // TODO : Security 도입되면 현재 로그인한 유저 id를 불러오는 것으로 수정
         Long currentId = 1L;
@@ -66,7 +66,7 @@ public class MembersController {
     }
 
     @GetMapping("/trades/search")
-    public ResponseEntity<?> getTradesWithOption(@Valid TradesRequestDto dto) {
+    public ResponseEntity<List<TradesResponseDto>> getTradesWithOption(@Valid TradesRequestDto dto) {
 
         // TODO : Security 도입되면 현재 로그인한 유저 id를 불러오는 것으로 수정
         Long currentId = 1L;
@@ -83,7 +83,7 @@ public class MembersController {
     }
 
     @PostMapping("/memos")
-    public ResponseEntity<?> createMemos(@Valid @RequestBody MemosCreateRequestDto dto) {
+    public ResponseEntity<String> createMemos(@Valid @RequestBody MemosCreateRequestDto dto) {
 
         // TODO : Security 도입되면 현재 로그인한 유저 id를 불러오는 것으로 수정
         Long currentId = 1L;
@@ -94,7 +94,7 @@ public class MembersController {
     }
 
     @GetMapping("/memos")
-    public ResponseEntity<?> getMemos() {
+    public ResponseEntity<String> getMemos() {
 
         // TODO : Security 도입되면 현재 로그인한 유저 id를 불러오는 것으로 수정
         Long currentId = 1L;
@@ -105,7 +105,7 @@ public class MembersController {
     }
 
     @GetMapping("/mails")
-    public ResponseEntity<?> getMails(@RequestParam(required = false) Boolean unread) {
+    public ResponseEntity<List<MailsResponseDto>> getMails(@RequestParam(required = false) Boolean unread) {
 
         // TODO : Security 도입되면 현재 로그인한 유저 id를 불러오는 것으로 수정
         Long currentId = 1L;
@@ -120,7 +120,7 @@ public class MembersController {
     }
 
     @PostMapping("/bankruptcy")
-    public ResponseEntity<?> declareBankruptcy() {
+    public ResponseEntity<Void> declareBankruptcy() {
 
         // TODO : Security 도입되면 현재 로그인한 유저 id를 불러오는 것으로 수정
         Long currentId = 1L;
@@ -130,7 +130,7 @@ public class MembersController {
     }
 
     @GetMapping("/bankruptcy")
-    public ResponseEntity<?> getBankruptcy() {
+    public ResponseEntity<Integer> getBankruptcy() {
 
         // TODO : Security 도입되면 현재 로그인한 유저 id를 불러오는 것으로 수정
         Long currentId = 1L;
