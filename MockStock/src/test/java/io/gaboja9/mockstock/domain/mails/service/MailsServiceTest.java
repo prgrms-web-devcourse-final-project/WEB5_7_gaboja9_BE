@@ -124,8 +124,7 @@ public class MailsServiceTest {
         assertTrue(result.get(0).isUnread());
 
         verify(membersRepository, times(1)).findById(memberId);
-        verify(mailsRepository, times(1))
-                .findByMembersIdAndUnread(testMember.getId(), readStatus);
+        verify(mailsRepository, times(1)).findByMembersIdAndUnread(testMember.getId(), readStatus);
         verify(mailsMapper, times(1)).toDto(anyList());
     }
 
