@@ -17,6 +17,10 @@ import jakarta.validation.Valid;
 
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -55,33 +59,36 @@ public class MembersController implements MembersControllerSpec {
     }
 
     @GetMapping("/trades")
-    public ResponseEntity<List<TradesResponseDto>> getTrades() {
+    public ResponseEntity<Page<TradesResponseDto>> getTrades(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
 
-        // TODO : Security 도입되면 현재 로그인한 유저 id를 불러오는 것으로 수정
-        Long currentId = 1L;
-
-        List<TradesResponseDto> trades = tradesService.getTrades(currentId);
+        Long currentId = 1L; // TODO: 시큐리티 적용 예정
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
+        Page<TradesResponseDto> trades = tradesService.getTrades(currentId, pageable);
 
         return ResponseEntity.ok(trades);
     }
 
     @GetMapping("/trades/search")
-    public ResponseEntity<List<TradesResponseDto>> getTradesWithOption(
-            @Valid TradesRequestDto dto) {
+    public ResponseEntity<Page<TradesResponseDto>> getTradesWithOption(
+            @Valid TradesRequestDto dto,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
 
-        // TODO : Security 도입되면 현재 로그인한 유저 id를 불러오는 것으로 수정
         Long currentId = 1L;
 
         if ((dto.getStockCode() == null || dto.getStockCode().isBlank())
                 && (dto.getStockName() == null || dto.getStockName().isBlank())) {
-            throw new BaseException(
-                    ErrorCode.INVALID_INPUT_VALUE, "stockCode 또는 stockName 중 하나는 필수입니다.");
+            throw new BaseException(ErrorCode.INVALID_INPUT_VALUE, "stockCode 또는 stockName 중 하나는 필수입니다.");
         }
 
-        List<TradesResponseDto> trades = tradesService.getTradesWithOption(currentId, dto);
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
+        Page<TradesResponseDto> trades = tradesService.getTradesWithOption(currentId, dto, pageable);
 
         return ResponseEntity.ok(trades);
     }
+
 
     @PostMapping("/memos")
     public ResponseEntity<String> createMemos(@Valid @RequestBody MemosCreateRequestDto dto) {

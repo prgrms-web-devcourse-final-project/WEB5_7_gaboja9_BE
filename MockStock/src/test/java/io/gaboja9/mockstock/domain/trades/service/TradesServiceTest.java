@@ -18,6 +18,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -70,32 +74,34 @@ class TradesServiceTest {
                         .tradeDateTime(trade.getCreatedAt())
                         .build();
 
-        List<Trades> tradesList = List.of(trade);
+        Page<Trades> tradesPage = new PageImpl<>(List.of(trade));
+        Pageable pageable = PageRequest.of(0, 10);
 
         // mocking
         when(tradesRepository.findByStockCodeOrStockNameAndCreatedAtBetween(
-                        eq("005930"),
-                        eq("삼성전자"),
-                        any(LocalDateTime.class),
-                        any(LocalDateTime.class),
-                        eq(memberId)))
-                .thenReturn(tradesList);
+                eq("005930"),
+                eq("삼성전자"),
+                any(LocalDateTime.class),
+                any(LocalDateTime.class),
+                eq(memberId),
+                eq(pageable)))
+                .thenReturn(tradesPage);
 
         when(tradesMapper.toDto(trade)).thenReturn(responseDto);
 
         // when
-        List<TradesResponseDto> result = tradesService.getTradesWithOption(memberId, dto);
+        Page<TradesResponseDto> result = tradesService.getTradesWithOption(memberId, dto, pageable);
 
         // then
-        assertEquals(1, result.size());
-        assertEquals("005930", result.get(0).getStockCode());
-        verify(tradesRepository)
-                .findByStockCodeOrStockNameAndCreatedAtBetween(
-                        eq("005930"),
-                        eq("삼성전자"),
-                        any(LocalDateTime.class),
-                        any(LocalDateTime.class),
-                        eq(memberId));
+        assertEquals(1, result.getContent().size());
+        assertEquals("005930", result.getContent().get(0).getStockCode());
+        verify(tradesRepository).findByStockCodeOrStockNameAndCreatedAtBetween(
+                eq("005930"),
+                eq("삼성전자"),
+                any(LocalDateTime.class),
+                any(LocalDateTime.class),
+                eq(memberId),
+                eq(pageable));
         verify(tradesMapper).toDto(trade);
     }
 
@@ -129,16 +135,22 @@ class TradesServiceTest {
                         .tradeDateTime(trade.getCreatedAt())
                         .build();
 
-        when(tradesRepository.findByMembersId(memberId)).thenReturn(List.of(trade));
+        Page<Trades> tradesPage = new PageImpl<>(List.of(trade));
+        Pageable pageable = PageRequest.of(0, 10);
+
+        // mocking
+        when(tradesRepository.findByMembersId(eq(memberId), eq(pageable)))
+                .thenReturn(tradesPage);
+
         when(tradesMapper.toDto(trade)).thenReturn(responseDto);
 
         // when
-        List<TradesResponseDto> result = tradesService.getTrades(memberId);
+        Page<TradesResponseDto> result = tradesService.getTrades(memberId, pageable);
 
         // then
-        assertEquals(1, result.size());
-        assertEquals("000660", result.get(0).getStockCode());
-        verify(tradesRepository).findByMembersId(memberId);
+        assertEquals(1, result.getContent().size());
+        assertEquals("000660", result.getContent().get(0).getStockCode());
+        verify(tradesRepository).findByMembersId(eq(memberId), eq(pageable));
         verify(tradesMapper).toDto(trade);
     }
 }
