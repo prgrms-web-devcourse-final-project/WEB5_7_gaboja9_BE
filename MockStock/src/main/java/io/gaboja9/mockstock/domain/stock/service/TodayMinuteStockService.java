@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.influxdb.client.InfluxDBClient;
 import com.influxdb.client.WriteApi;
 import com.influxdb.client.domain.WritePrecision;
-import io.gaboja9.mockstock.domain.stock.dto.HantuTokenResponse;
 import io.gaboja9.mockstock.domain.stock.measurement.MinuteStockPrice;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -32,6 +31,7 @@ public class TodayMinuteStockService {
 
   private final RestTemplate restTemplate;
   private final ObjectMapper objectMapper;
+  private final HantuAuthService hantuAuthService;
   private final InfluxDBClient minuteClient;
 
   @Value("${hantu-openapi.domain}")
@@ -43,33 +43,30 @@ public class TodayMinuteStockService {
   @Value("${hantu-openapi.appsecret}")
   private String appSecret;
 
-  private String cachedAccessToken;
-  private long tokenExpirationTime;
-
   public TodayMinuteStockService(
       RestTemplate restTemplate,
       ObjectMapper objectMapper,
+      HantuAuthService hantuAuthService,
       @Qualifier("minuteInfluxDBClient") InfluxDBClient minuteClient) {
     this.restTemplate = restTemplate;
     this.objectMapper = objectMapper;
+    this.hantuAuthService = hantuAuthService;
     this.minuteClient = minuteClient;
   }
 
-  /**
-   * [수정됨] 단일 종목의 '당일' 분봉 데이터를 가져와 InfluxDB에 저장합니다.
-   */
+  //단일 종목의 '당일' 분봉 데이터를 가져와 InfluxDB에 저장합니다.
+
   public void fetchAndSaveCurrentDayMinuteData(String marketCode, String stockCode,
       String startTime, String periodCode, String ClsCode) {
     log.info("당일 분봉 데이터 수집 시작 - 시장: {}, 종목: {}, 시작시간: {}, 기간분류: {}, 체결분류: {}", marketCode,
         stockCode, startTime, periodCode, ClsCode);
 
-    String accessToken = getValidAccessToken();
+    String accessToken = hantuAuthService.getValidAccessToken();
     if (accessToken == null) {
       log.error("접근 토큰 발급 실패 - 데이터 수집 중단 (종목: {})", stockCode);
       return;
     }
 
-    // [수정됨] 새로운 파라미터를 받는 메소드 호출
     String responseBody = getCurrentDayStockMinuteData(marketCode, stockCode, startTime, periodCode,
         ClsCode, accessToken);
 
@@ -100,11 +97,9 @@ public class TodayMinuteStockService {
 
     UriComponentsBuilder builder =
         UriComponentsBuilder.fromHttpUrl(
-                // [수정됨] 당일 분봉 조회 API 경로로 변경
                 apiDomain + "/uapi/domestic-stock/v1/quotations/inquire-time-itemchartprice")
             .queryParam("FID_COND_MRKT_DIV_CODE", marketCode)
             .queryParam("FID_INPUT_ISCD", stockCode)
-            // [수정됨] 요청 파라미터 변경
             .queryParam("FID_INPUT_HOUR_1", startTime) // 시작 시간
             .queryParam("FID_PW_DATA_INCU_YN", periodCode)
             .queryParam("FID_ETC_CLS_CODE", clsCode);
@@ -121,7 +116,7 @@ public class TodayMinuteStockService {
     }
   }
 
-  // 분봉 데이터 저장 로직 (기존과 동일)
+  // 분봉 데이터 저장 로직
   private void saveMinuteStockDataToInflux(String responseBody, String stockCode) {
     try {
       log.info("API 응답 원본 (종목코드: {}): {}", stockCode, responseBody);
@@ -135,8 +130,6 @@ public class TodayMinuteStockService {
       }
 
       List<MinuteStockPrice> pricePoints = new ArrayList<>();
-      // 당일 데이터는 날짜가 포함되지 않을 수 있으므로, 응답 형식을 확인해야 합니다.
-      // 여기서는 기존과 같이 'stck_bsop_date' 필드가 있다고 가정합니다.
       DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
       ZoneId koreaZone = ZoneId.of("Asia/Seoul");
 
@@ -160,12 +153,6 @@ public class TodayMinuteStockService {
         pricePoints.add(point);
       }
 
-      // [추가된 부분] InfluxDB에 쓰기 직전, 리스트의 모든 타임스탬프를 로그로 출력
-      log.info("InfluxDB 저장 전 데이터 확인 (총 {}건)", pricePoints.size());
-      for (MinuteStockPrice p : pricePoints) {
-        log.info(" -> Timestamp: {}, ClosePrice: {}", p.getTimestamp(), p.getClosePrice());
-      }
-
       if (!pricePoints.isEmpty()) {
         try (WriteApi writeApi = minuteClient.getWriteApi()) {
           writeApi.writeMeasurements(WritePrecision.NS, pricePoints);
@@ -177,48 +164,4 @@ public class TodayMinuteStockService {
     }
   }
 
-  // 토큰 발급 관련 메소드 (기존과 동일)
-  private synchronized String getValidAccessToken() {
-    if (cachedAccessToken != null && System.currentTimeMillis() < tokenExpirationTime - 60000) {
-      return cachedAccessToken;
-    }
-    synchronized (this) {
-      if (cachedAccessToken == null || System.currentTimeMillis() >= tokenExpirationTime - 60000) {
-        log.info("액세스 토큰이 없거나 만료되어 새로 발급합니다.");
-        if (!fetchNewAccessToken()) {
-          return null;
-        }
-      }
-    }
-    return cachedAccessToken;
-  }
-
-  private boolean fetchNewAccessToken() {
-    HttpHeaders headers = new HttpHeaders();
-    headers.setContentType(MediaType.APPLICATION_JSON);
-    String requestBody = String.format(
-        "{\"grant_type\":\"client_credentials\",\"appkey\":\"%s\",\"appsecret\":\"%s\"}", appKey,
-        appSecret);
-    HttpEntity<String> entity = new HttpEntity<>(requestBody, headers);
-    try {
-      ResponseEntity<HantuTokenResponse> response = restTemplate.exchange(
-          apiDomain + "/oauth2/tokenP", HttpMethod.POST, entity, HantuTokenResponse.class);
-      HantuTokenResponse tokenResponse = response.getBody();
-      if (tokenResponse != null && tokenResponse.getAccessToken() != null) {
-        this.cachedAccessToken = tokenResponse.getAccessToken();
-        long expiresInMillis = (long) tokenResponse.getExpiresIn() * 1000;
-        this.tokenExpirationTime = System.currentTimeMillis() + expiresInMillis;
-        log.info("새로운 액세스 토큰을 발급했습니다. 만료까지 남은 시간: {}초", tokenResponse.getExpiresIn());
-        return true;
-      } else {
-        log.error("액세스 토큰 응답 파싱 실패. 응답: {}", response.getBody());
-        return false;
-      }
-    } catch (Exception e) {
-      log.error("Access Token 발급 요청 실패", e);
-      this.cachedAccessToken = null;
-      this.tokenExpirationTime = 0;
-      return false;
-    }
-  }
 }
