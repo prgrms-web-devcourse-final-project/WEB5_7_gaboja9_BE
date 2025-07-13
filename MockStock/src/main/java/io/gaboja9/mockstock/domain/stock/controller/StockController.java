@@ -1,10 +1,9 @@
 package io.gaboja9.mockstock.domain.stock.controller;
 
 import io.gaboja9.mockstock.domain.stock.service.DailyStockService;
-
-import io.gaboja9.mockstock.domain.stock.service.
-        MinuteStockService;
+import io.gaboja9.mockstock.domain.stock.service.MinuteStockService;
 import io.gaboja9.mockstock.domain.stock.service.TodayMinuteStockService;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -45,11 +44,9 @@ public class StockController {
             @RequestParam String stockCode,
             @RequestParam String startHour,
             @RequestParam String date,
-            @RequestParam String periodCode
-    ) {
+            @RequestParam String periodCode) {
         minuteStockService.fetchAndSaveMinuteData(
-                marketCode, stockCode, date, startHour, periodCode
-        );
+                marketCode, stockCode, date, startHour, periodCode);
         return ResponseEntity.status(HttpStatus.CREATED).body("분 주식 저장 완료");
     }
 
@@ -59,10 +56,10 @@ public class StockController {
             @RequestParam String stockCode,
             @RequestParam String startTime,
             @RequestParam String periodCode,
-            @RequestParam String clsCode
+            @RequestParam String clsCode) {
 
-    ){
-        todayMinuteStockService.fetchAndSaveCurrentDayMinuteData(marketCode, stockCode, startTime, periodCode, clsCode);
+        todayMinuteStockService.fetchAndSaveCurrentDayMinuteData(
+                marketCode, stockCode, startTime, periodCode, clsCode);
         return ResponseEntity.status(HttpStatus.CREATED).body("분 주식 저장 완료");
     }
 }
