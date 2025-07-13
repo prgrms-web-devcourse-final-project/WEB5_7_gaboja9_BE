@@ -29,14 +29,15 @@ public class TradesService {
     }
 
     @Transactional(readOnly = true)
-    public Page<TradesResponseDto> getTradesWithOption(Long membersId, TradesRequestDto dto, Pageable pageable) {
+    public Page<TradesResponseDto> getTradesWithOption(
+            Long membersId, TradesRequestDto dto, Pageable pageable) {
         LocalDateTime start = dto.getStartDate().atStartOfDay();
         LocalDateTime end = dto.getEndDate().atTime(23, 59, 59, 999_999_999);
 
-        Page<Trades> page = tradesRepository.findByStockCodeOrStockNameAndCreatedAtBetween(
-                dto.getStockCode(), dto.getStockName(), start, end, membersId, pageable);
+        Page<Trades> page =
+                tradesRepository.findByStockCodeOrStockNameAndCreatedAtBetween(
+                        dto.getStockCode(), dto.getStockName(), start, end, membersId, pageable);
 
         return page.map(tradesMapper::toDto);
     }
-
 }

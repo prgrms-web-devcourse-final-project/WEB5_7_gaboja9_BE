@@ -79,12 +79,12 @@ class TradesServiceTest {
 
         // mocking
         when(tradesRepository.findByStockCodeOrStockNameAndCreatedAtBetween(
-                eq("005930"),
-                eq("삼성전자"),
-                any(LocalDateTime.class),
-                any(LocalDateTime.class),
-                eq(memberId),
-                eq(pageable)))
+                        eq("005930"),
+                        eq("삼성전자"),
+                        any(LocalDateTime.class),
+                        any(LocalDateTime.class),
+                        eq(memberId),
+                        eq(pageable)))
                 .thenReturn(tradesPage);
 
         when(tradesMapper.toDto(trade)).thenReturn(responseDto);
@@ -95,13 +95,14 @@ class TradesServiceTest {
         // then
         assertEquals(1, result.getContent().size());
         assertEquals("005930", result.getContent().get(0).getStockCode());
-        verify(tradesRepository).findByStockCodeOrStockNameAndCreatedAtBetween(
-                eq("005930"),
-                eq("삼성전자"),
-                any(LocalDateTime.class),
-                any(LocalDateTime.class),
-                eq(memberId),
-                eq(pageable));
+        verify(tradesRepository)
+                .findByStockCodeOrStockNameAndCreatedAtBetween(
+                        eq("005930"),
+                        eq("삼성전자"),
+                        any(LocalDateTime.class),
+                        any(LocalDateTime.class),
+                        eq(memberId),
+                        eq(pageable));
         verify(tradesMapper).toDto(trade);
     }
 
@@ -139,8 +140,7 @@ class TradesServiceTest {
         Pageable pageable = PageRequest.of(0, 10);
 
         // mocking
-        when(tradesRepository.findByMembersId(eq(memberId), eq(pageable)))
-                .thenReturn(tradesPage);
+        when(tradesRepository.findByMembersId(eq(memberId), eq(pageable))).thenReturn(tradesPage);
 
         when(tradesMapper.toDto(trade)).thenReturn(responseDto);
 

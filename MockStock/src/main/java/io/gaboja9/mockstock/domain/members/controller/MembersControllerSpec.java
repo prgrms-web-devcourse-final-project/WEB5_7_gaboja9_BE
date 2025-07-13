@@ -74,7 +74,6 @@ public interface MembersControllerSpec {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size);
 
-
     @Operation(
             summary = "조건별 거래내역을 불러옵니다.",
             description = "조건에 부합하는 거래내역을 불러옵니다.",

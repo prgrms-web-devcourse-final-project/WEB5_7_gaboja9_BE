@@ -80,15 +80,16 @@ public class MembersController implements MembersControllerSpec {
 
         if ((dto.getStockCode() == null || dto.getStockCode().isBlank())
                 && (dto.getStockName() == null || dto.getStockName().isBlank())) {
-            throw new BaseException(ErrorCode.INVALID_INPUT_VALUE, "stockCode 또는 stockName 중 하나는 필수입니다.");
+            throw new BaseException(
+                    ErrorCode.INVALID_INPUT_VALUE, "stockCode 또는 stockName 중 하나는 필수입니다.");
         }
 
         Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
-        Page<TradesResponseDto> trades = tradesService.getTradesWithOption(currentId, dto, pageable);
+        Page<TradesResponseDto> trades =
+                tradesService.getTradesWithOption(currentId, dto, pageable);
 
         return ResponseEntity.ok(trades);
     }
-
 
     @PostMapping("/memos")
     public ResponseEntity<String> createMemos(@Valid @RequestBody MemosCreateRequestDto dto) {
