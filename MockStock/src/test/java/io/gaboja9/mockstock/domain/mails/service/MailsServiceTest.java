@@ -113,11 +113,11 @@ public class MailsServiceTest {
         boolean readStatus = true;
 
         when(membersRepository.findById(memberId)).thenReturn(Optional.of(testMember));
-        when(mailsRepository.findByMembersIdAndReadStatus(testMember.getId(), readStatus))
+        when(mailsRepository.findByMembersIdAndUnread(testMember.getId(), readStatus))
                 .thenReturn(List.of(testMail2));
         when(mailsMapper.toDto(List.of(testMail2))).thenReturn(List.of(testDto2));
 
-        List<MailsResponseDto> result = mailsService.getMailsByReadStatus(memberId, readStatus);
+        List<MailsResponseDto> result = mailsService.getMailsByUnreadStatus(memberId, readStatus);
 
         assertNotNull(result);
         assertEquals(1, result.size());
@@ -125,7 +125,7 @@ public class MailsServiceTest {
 
         verify(membersRepository, times(1)).findById(memberId);
         verify(mailsRepository, times(1))
-                .findByMembersIdAndReadStatus(testMember.getId(), readStatus);
+                .findByMembersIdAndUnread(testMember.getId(), readStatus);
         verify(mailsMapper, times(1)).toDto(anyList());
     }
 
@@ -136,7 +136,7 @@ public class MailsServiceTest {
 
         assertThrows(
                 NotFoundMemberException.class,
-                () -> mailsService.getMailsByReadStatus(memberId, true));
+                () -> mailsService.getMailsByUnreadStatus(memberId, true));
 
         verify(membersRepository, times(1)).findById(memberId);
         verifyNoMoreInteractions(mailsRepository);

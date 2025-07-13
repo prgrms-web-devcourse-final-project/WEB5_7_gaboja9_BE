@@ -39,7 +39,7 @@ public class MailsService {
     }
 
     @Transactional(readOnly = true)
-    public List<MailsResponseDto> getMailsByReadStatus(Long memberId, boolean unread) {
+    public List<MailsResponseDto> getMailsByUnreadStatus(Long memberId, boolean unread) {
 
         Members findMember =
                 membersRepository
