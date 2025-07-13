@@ -64,7 +64,9 @@ public class PortfoliosService {
         }
 
         double totalProfitRate =
-                totalInvestment == 0 ? 0.0 : (double) totalProfit / totalInvestment * 100;
+                totalInvestment == 0
+                        ? 0.00
+                        : Math.round((double) totalProfit / totalInvestment * 100 * 100) / 100.0;
 
         return PortfoliosSummary.builder()
                 .totalEvaluationAmount(totalEvaluationAmount)

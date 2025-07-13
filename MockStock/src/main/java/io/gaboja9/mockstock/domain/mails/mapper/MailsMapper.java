@@ -23,7 +23,7 @@ public class MailsMapper {
                                 MailsResponseDto.builder()
                                         .subject(mail.getSubject())
                                         .content(mail.getContent())
-                                        .readStatus(mail.isReadStatus())
+                                        .unread(mail.isUnread())
                                         .receivedAt(mail.getCreatedAt())
                                         .build())
                 .toList();

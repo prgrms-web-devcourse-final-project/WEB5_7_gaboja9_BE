@@ -39,7 +39,7 @@ public class MailsService {
     }
 
     @Transactional(readOnly = true)
-    public List<MailsResponseDto> getMailsByReadStatus(Long memberId, boolean readStatus) {
+    public List<MailsResponseDto> getMailsByReadStatus(Long memberId, boolean unread) {
 
         Members findMember =
                 membersRepository
@@ -47,7 +47,7 @@ public class MailsService {
                         .orElseThrow(() -> new NotFoundMemberException(memberId));
 
         List<Mails> mailsList =
-                mailsRepository.findByMembersIdAndReadStatus(findMember.getId(), readStatus);
+                mailsRepository.findByMembersIdAndUnread(findMember.getId(), unread);
 
         return mailsMapper.toDto(mailsList);
     }

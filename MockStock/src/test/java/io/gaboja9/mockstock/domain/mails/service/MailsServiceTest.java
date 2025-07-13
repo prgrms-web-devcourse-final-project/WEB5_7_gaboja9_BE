@@ -61,7 +61,7 @@ public class MailsServiceTest {
                 MailsResponseDto.builder()
                         .subject("Test Subject")
                         .content("Test Content")
-                        .readStatus(false)
+                        .unread(false)
                         .receivedAt(LocalDateTime.now())
                         .build();
 
@@ -69,7 +69,7 @@ public class MailsServiceTest {
                 MailsResponseDto.builder()
                         .subject("Test Subject2")
                         .content("Test Content2")
-                        .readStatus(true)
+                        .unread(true)
                         .receivedAt(LocalDateTime.now())
                         .build();
     }
@@ -121,7 +121,7 @@ public class MailsServiceTest {
 
         assertNotNull(result);
         assertEquals(1, result.size());
-        assertTrue(result.get(0).isReadStatus());
+        assertTrue(result.get(0).isUnread());
 
         verify(membersRepository, times(1)).findById(memberId);
         verify(mailsRepository, times(1))

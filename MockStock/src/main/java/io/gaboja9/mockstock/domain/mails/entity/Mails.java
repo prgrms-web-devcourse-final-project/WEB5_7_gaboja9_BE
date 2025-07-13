@@ -26,7 +26,7 @@ public class Mails extends BaseEntity {
 
     private String content;
 
-    private boolean readStatus = false;
+    private boolean unread = true;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "members_id")
@@ -36,12 +36,12 @@ public class Mails extends BaseEntity {
     public Mails(
             String subject,
             String content,
-            boolean readStatus,
+            boolean unread,
             LocalDateTime createdAt,
             Members members) {
         this.subject = subject;
         this.content = content;
-        this.readStatus = readStatus;
+        this.unread = unread;
         this.setCreatedAt(createdAt);
         this.members = members;
     }
