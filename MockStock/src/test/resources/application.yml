@@ -2,9 +2,6 @@ spring:
   application:
     name: MockStock
 
-app:
-  base-url: localhost:8080
-
   datasource:
     url: ${DB_URL}
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -62,4 +59,5 @@ kakaopay:
   cancel-url: "https://kapi.kakao.com/v1/payment/cancel"
   cid: TC0ONETIME
 
-
+app:
+  base-url: ${APP_BASE_URL}
