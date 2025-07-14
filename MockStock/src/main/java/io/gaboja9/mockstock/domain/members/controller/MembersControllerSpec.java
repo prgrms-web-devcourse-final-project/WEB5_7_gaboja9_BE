@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -69,7 +70,9 @@ public interface MembersControllerSpec {
                                                             implementation =
                                                                     TradesResponseDto.class))))
     @GetMapping("/trades")
-    ResponseEntity<List<TradesResponseDto>> getTrades();
+    ResponseEntity<Page<TradesResponseDto>> getTrades(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size);
 
     @Operation(
             summary = "조건별 거래내역을 불러옵니다.",
@@ -87,8 +90,10 @@ public interface MembersControllerSpec {
                                                             implementation =
                                                                     TradesResponseDto.class))))
     @GetMapping("/trades/search")
-    ResponseEntity<List<TradesResponseDto>> getTradesWithOption(
-            @ModelAttribute TradesRequestDto dto);
+    ResponseEntity<Page<TradesResponseDto>> getTradesWithOption(
+            @ModelAttribute TradesRequestDto dto,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size);
 
     @Operation(
             summary = "메모를 저장합니다.",
