@@ -79,3 +79,13 @@ springdoc:
 
   springdoc:
     show-actuator: true
+
+custom:
+  jwt:
+    validation:
+      access: 600000
+      refresh: 86400000
+
+    secrets:
+      origin-key: 01980363-86d4-74dd-8582-56edab7ad9a5
+      app-key: 20209039DFC16587937BF49B27A3D693B1B3494DA48562E3516A7780A1F0DDAF9409EB890368310EAE2C73FC3610782584ED014BDBEEB87712E0F5A4367213D4
