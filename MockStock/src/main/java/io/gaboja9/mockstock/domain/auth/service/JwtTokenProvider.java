@@ -1,11 +1,17 @@
 package io.gaboja9.mockstock.domain.auth.service;
 
 import io.gaboja9.mockstock.domain.auth.dto.TokenBody;
+import io.gaboja9.mockstock.domain.auth.dto.TokenPair;
+import io.gaboja9.mockstock.domain.auth.entity.RefreshToken;
+import io.gaboja9.mockstock.domain.auth.repository.RefreshTokenRepository;
+import io.gaboja9.mockstock.domain.auth.repository.TokenRepository;
+import io.gaboja9.mockstock.domain.members.entity.Members;
 import io.gaboja9.mockstock.domain.members.enums.Role;
 import io.gaboja9.mockstock.global.config.JwtConfiguration;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -13,15 +19,39 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.Optional;
 
 import javax.crypto.SecretKey;
 
 @Slf4j
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class JwtTokenProvider {
 
     private final JwtConfiguration jwtConfiguration;
+    private final RefreshTokenRepository refreshTokenRepository;
+
+    private final TokenRepository tokenRepository;
+
+    public TokenPair generateTokenPair(Members members) {
+
+        String acceessToken = issueAcceessToken(members.getId(), members.getRole());
+        String refreshToken = issueRefreshToken(members.getId(), members.getRole());
+
+        tokenRepository.save(members, refreshToken);
+
+        return TokenPair.builder()
+                .accessToken(acceessToken)
+                .refreshToken(refreshToken)
+                .build();
+    }
+
+    public Optional<RefreshToken> findRefreshToken(Long membersId) {
+
+        return tokenRepository.findValidRefreshToken(membersId);
+
+    }
 
     public String issueAcceessToken(Long id, Role role) {
         return issue(id, role, jwtConfiguration.getValidation().getAccess());
