@@ -117,7 +117,8 @@ public class MembersController implements MembersControllerSpec {
             return ResponseEntity.ok(allMails);
         }
 
-        List<MailsResponseDto> mailsByStatus = mailsService.getMailsByReadStatus(currentId, unread);
+        List<MailsResponseDto> mailsByStatus =
+                mailsService.getMailsByUnreadStatus(currentId, unread);
         return ResponseEntity.ok(mailsByStatus);
     }
 

@@ -18,7 +18,7 @@ public class MailsResponseDto {
     private String content;
 
     @Schema(description = "읽음 여부")
-    private boolean readStatus;
+    private boolean unread;
 
     @Schema(description = "수신 시간")
     private LocalDateTime receivedAt;
