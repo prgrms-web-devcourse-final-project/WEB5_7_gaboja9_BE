@@ -28,7 +28,7 @@ import javax.crypto.SecretKey;
 @Transactional
 @RequiredArgsConstructor
 public class JwtTokenProvider {
-
+    // .
     private final JwtConfiguration jwtConfiguration;
     private final RefreshTokenRepository refreshTokenRepository;
 
@@ -41,16 +41,12 @@ public class JwtTokenProvider {
 
         tokenRepository.save(members, refreshToken);
 
-        return TokenPair.builder()
-                .accessToken(acceessToken)
-                .refreshToken(refreshToken)
-                .build();
+        return TokenPair.builder().accessToken(acceessToken).refreshToken(refreshToken).build();
     }
 
     public Optional<RefreshToken> findRefreshToken(Long membersId) {
 
         return tokenRepository.findValidRefreshToken(membersId);
-
     }
 
     public String issueAcceessToken(Long id, Role role) {
