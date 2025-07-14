@@ -1,18 +1,18 @@
-//package io.gaboja9.mockstock.domain.auth.service;
+// package io.gaboja9.mockstock.domain.auth.service;
 //
-//import io.gaboja9.mockstock.domain.members.enums.Role;
-//import lombok.extern.slf4j.Slf4j;
-//import org.junit.jupiter.api.BeforeEach;
-//import org.junit.jupiter.api.DisplayName;
-//import org.junit.jupiter.api.Test;
-//import org.springframework.beans.factory.annotation.Autowired;
-//import org.springframework.boot.test.context.SpringBootTest;
+// import io.gaboja9.mockstock.domain.members.enums.Role;
+// import lombok.extern.slf4j.Slf4j;
+// import org.junit.jupiter.api.BeforeEach;
+// import org.junit.jupiter.api.DisplayName;
+// import org.junit.jupiter.api.Test;
+// import org.springframework.beans.factory.annotation.Autowired;
+// import org.springframework.boot.test.context.SpringBootTest;
 //
-//import static org.junit.jupiter.api.Assertions.*;
+// import static org.junit.jupiter.api.Assertions.*;
 //
-//@Slf4j
-//@SpringBootTest
-//class JwtTokenProviderTests {
+// @Slf4j
+// @SpringBootTest
+// class JwtTokenProviderTests {
 //
 //    @Autowired
 //    JwtTokenProvider provider;
@@ -27,4 +27,4 @@
 //        String token = provider.issueAcceessToken(targetId, targetRole);
 //        log.info("token = {}", token);
 //    }
-//}
+// }

@@ -5,13 +5,16 @@ import io.gaboja9.mockstock.domain.members.enums.Role;
 import io.gaboja9.mockstock.global.config.JwtConfiguration;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
-import javax.crypto.SecretKey;
 import java.util.Date;
+
+import javax.crypto.SecretKey;
 
 @Slf4j
 @Service
