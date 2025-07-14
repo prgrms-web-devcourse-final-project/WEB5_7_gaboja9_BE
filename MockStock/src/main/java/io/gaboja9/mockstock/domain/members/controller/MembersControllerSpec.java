@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -134,7 +135,10 @@ public interface MembersControllerSpec {
                                                             implementation =
                                                                     MailsResponseDto.class))))
     @GetMapping("/mails")
-    ResponseEntity<List<MailsResponseDto>> getMails(@RequestParam(required = false) Boolean unread);
+    ResponseEntity<Page<MailsResponseDto>> getMails(
+            @RequestParam(required = false) Boolean unread,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size);
 
     @Operation(
             summary = "파산 신청을 합니다.",

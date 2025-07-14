@@ -17,6 +17,10 @@ import jakarta.validation.Valid;
 
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -106,19 +110,22 @@ public class MembersController implements MembersControllerSpec {
     }
 
     @GetMapping("/mails")
-    public ResponseEntity<List<MailsResponseDto>> getMails(
-            @RequestParam(required = false) Boolean unread) {
+    public ResponseEntity<Page<MailsResponseDto>> getMails(
+            @RequestParam(required = false) Boolean unread,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
 
         // TODO : Security 도입되면 현재 로그인한 유저 id를 불러오는 것으로 수정
         Long currentId = 1L;
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
 
         if (unread == null) {
-            List<MailsResponseDto> allMails = mailsService.getAllMails(currentId);
+            Page<MailsResponseDto> allMails = mailsService.getAllMails(currentId, pageable);
             return ResponseEntity.ok(allMails);
         }
 
-        List<MailsResponseDto> mailsByStatus =
-                mailsService.getMailsByUnreadStatus(currentId, unread);
+        Page<MailsResponseDto> mailsByStatus =
+                mailsService.getMailsByUnreadStatus(currentId, unread, pageable);
         return ResponseEntity.ok(mailsByStatus);
     }
 

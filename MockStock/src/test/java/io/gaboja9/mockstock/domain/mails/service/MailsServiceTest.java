@@ -16,6 +16,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.data.domain.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -76,68 +77,76 @@ public class MailsServiceTest {
 
     @Test
     void getAllMails_정상동작() {
+        // given
         Long memberId = 1L;
+        Pageable pageable = PageRequest.of(0, 1, Sort.by("createdAt").descending());
+        Page<Mails> mailsPage = new PageImpl<>(List.of(testMail));
 
         when(membersRepository.findById(memberId)).thenReturn(Optional.of(testMember));
-        when(mailsRepository.findByMembersId(testMember.getId()))
-                .thenReturn(List.of(testMail, testMail2));
-        when(mailsMapper.toDto(List.of(testMail, testMail2)))
-                .thenReturn(List.of(testDto, testDto2));
+        when(mailsRepository.findByMembersId(testMember.getId(), pageable)).thenReturn(mailsPage);
+        when(mailsMapper.toDto(testMail)).thenReturn(testDto);
 
-        List<MailsResponseDto> result = mailsService.getAllMails(memberId);
+        // when
+        Page<MailsResponseDto> result = mailsService.getAllMails(memberId, pageable);
 
-        assertNotNull(result);
-        assertEquals(2, result.size());
-        assertEquals("Test Subject", result.get(0).getSubject());
+        // then
+        assertEquals(1, result.getTotalElements());
+        assertEquals("Test Subject", result.getContent().get(0).getSubject());
 
-        verify(membersRepository, times(1)).findById(memberId);
-        verify(mailsRepository, times(1)).findByMembersId(testMember.getId());
-        verify(mailsMapper, times(1)).toDto(anyList());
+        verify(membersRepository).findById(memberId);
+        verify(mailsRepository).findByMembersId(testMember.getId(), pageable);
+        verify(mailsMapper).toDto(testMail);
     }
 
     @Test
     void getAllMails_유저없음예외() {
         Long memberId = 2L;
+        Pageable pageable = PageRequest.of(0, 10);
+
         when(membersRepository.findById(memberId)).thenReturn(Optional.empty());
 
-        assertThrows(NotFoundMemberException.class, () -> mailsService.getAllMails(memberId));
+        assertThrows(NotFoundMemberException.class, () -> mailsService.getAllMails(memberId, pageable));
 
-        verify(membersRepository, times(1)).findById(memberId);
+        verify(membersRepository).findById(memberId);
         verifyNoMoreInteractions(mailsRepository);
         verifyNoMoreInteractions(mailsMapper);
     }
 
     @Test
     void getMailsByReadStatus_정상동작() {
+        // given
         Long memberId = 1L;
-        boolean readStatus = true;
+        boolean unread = true;
+        Pageable pageable = PageRequest.of(0, 10);
+        Page<Mails> mailsPage = new PageImpl<>(List.of(testMail2));
 
         when(membersRepository.findById(memberId)).thenReturn(Optional.of(testMember));
-        when(mailsRepository.findByMembersIdAndUnread(testMember.getId(), readStatus))
-                .thenReturn(List.of(testMail2));
-        when(mailsMapper.toDto(List.of(testMail2))).thenReturn(List.of(testDto2));
+        when(mailsRepository.findByMembersIdAndUnread(testMember.getId(), unread, pageable)).thenReturn(mailsPage);
+        when(mailsMapper.toDto(testMail2)).thenReturn(testDto2);
 
-        List<MailsResponseDto> result = mailsService.getMailsByUnreadStatus(memberId, readStatus);
+        // when
+        Page<MailsResponseDto> result = mailsService.getMailsByUnreadStatus(memberId, unread, pageable);
 
-        assertNotNull(result);
-        assertEquals(1, result.size());
-        assertTrue(result.get(0).isUnread());
+        // then
+        assertEquals(1, result.getContent().size());
+        assertTrue(result.getContent().get(0).isUnread());
 
-        verify(membersRepository, times(1)).findById(memberId);
-        verify(mailsRepository, times(1)).findByMembersIdAndUnread(testMember.getId(), readStatus);
-        verify(mailsMapper, times(1)).toDto(anyList());
+        verify(membersRepository).findById(memberId);
+        verify(mailsRepository).findByMembersIdAndUnread(testMember.getId(), unread, pageable);
+        verify(mailsMapper).toDto(testMail2);
     }
 
     @Test
     void getMailsByReadStatus_유저없음예외() {
-        Long memberId = 2L;
+        Long memberId = 3L;
+        Pageable pageable = PageRequest.of(0, 10);
+
         when(membersRepository.findById(memberId)).thenReturn(Optional.empty());
 
-        assertThrows(
-                NotFoundMemberException.class,
-                () -> mailsService.getMailsByUnreadStatus(memberId, true));
+        assertThrows(NotFoundMemberException.class, () ->
+                mailsService.getMailsByUnreadStatus(memberId, true, pageable));
 
-        verify(membersRepository, times(1)).findById(memberId);
+        verify(membersRepository).findById(memberId);
         verifyNoMoreInteractions(mailsRepository);
         verifyNoMoreInteractions(mailsMapper);
     }

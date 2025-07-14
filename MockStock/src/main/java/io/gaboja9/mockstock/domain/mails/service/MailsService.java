@@ -10,6 +10,8 @@ import io.gaboja9.mockstock.domain.members.repository.MembersRepository;
 
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,29 +28,29 @@ public class MailsService {
     private final MailsMapper mailsMapper;
 
     @Transactional(readOnly = true)
-    public List<MailsResponseDto> getAllMails(Long memberId) {
+    public Page<MailsResponseDto> getAllMails(Long memberId, Pageable pageable) {
 
         Members findMember =
                 membersRepository
                         .findById(memberId)
                         .orElseThrow(() -> new NotFoundMemberException(memberId));
 
-        List<Mails> mailsList = mailsRepository.findByMembersId(findMember.getId());
+        Page<Mails> mailsPage = mailsRepository.findByMembersId(findMember.getId(), pageable);
 
-        return mailsMapper.toDto(mailsList);
+        return mailsPage.map(mailsMapper::toDto);
     }
 
     @Transactional(readOnly = true)
-    public List<MailsResponseDto> getMailsByUnreadStatus(Long memberId, boolean unread) {
+    public Page<MailsResponseDto> getMailsByUnreadStatus(Long memberId, boolean unread, Pageable pageable) {
 
         Members findMember =
                 membersRepository
                         .findById(memberId)
                         .orElseThrow(() -> new NotFoundMemberException(memberId));
 
-        List<Mails> mailsList =
-                mailsRepository.findByMembersIdAndUnread(findMember.getId(), unread);
+        Page<Mails> mailsPage =
+                mailsRepository.findByMembersIdAndUnread(findMember.getId(), unread,pageable);
 
-        return mailsMapper.toDto(mailsList);
+        return mailsPage.map(mailsMapper::toDto);
     }
 }
