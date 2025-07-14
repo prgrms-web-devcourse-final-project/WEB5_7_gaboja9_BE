@@ -6,8 +6,11 @@ import io.gaboja9.mockstock.domain.auth.repository.RefreshTokenBlackListReposito
 import io.gaboja9.mockstock.domain.auth.repository.RefreshTokenRepository;
 import io.gaboja9.mockstock.domain.auth.repository.TokenRepository;
 import io.gaboja9.mockstock.domain.members.entity.Members;
+
 import jakarta.persistence.EntityManager;
+
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
@@ -24,33 +27,28 @@ public class RefreshTokenRepositoryAdapter implements TokenRepository {
     @Override
     public RefreshToken save(Members members, String token) {
         return refreshTokenRepository.save(
-                RefreshToken.builder()
-                    .members(members)
-                    .refreshToken(token)
-                    .build()
-        );
+                RefreshToken.builder().members(members).refreshToken(token).build());
     }
 
     @Override
     public RefreshTokenBlackList addBlackList(RefreshToken refreshToken) {
         return refreshTokenBlackListRepository.save(
-                RefreshTokenBlackList.builder()
-                        .refreshToken(refreshToken)
-                        .build()
-        );
+                RefreshTokenBlackList.builder().refreshToken(refreshToken).build());
     }
 
     @Override
     public Optional<RefreshToken> findValidRefreshToken(Long membersId) {
 
         // refreshToken 조회 (단, 블랙리스트에 토큰 등록 X)
-        String jpql = """
-            select rf from RefreshToken rf 
-            left join RefreshTokenBlackList rtb on rtb.refreshToken = rf 
-            where rf.members.id = :membersId and rtb.id is null
-        """;
+        String jpql =
+                """
+                    select rf from RefreshToken rf
+                    left join RefreshTokenBlackList rtb on rtb.refreshToken = rf
+                    where rf.members.id = :membersId and rtb.id is null
+                """;
 
-        return entityManager.createQuery(jpql, RefreshToken.class)
+        return entityManager
+                .createQuery(jpql, RefreshToken.class)
                 .setParameter("membersId", membersId)
                 .getResultStream()
                 .findFirst();

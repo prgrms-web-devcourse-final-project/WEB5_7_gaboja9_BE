@@ -1,7 +1,9 @@
 package io.gaboja9.mockstock.domain.auth.entity;
 
 import io.gaboja9.mockstock.global.common.BaseEntity;
+
 import jakarta.persistence.*;
+
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -21,10 +23,8 @@ public class RefreshTokenBlackList extends BaseEntity {
     @JoinColumn(name = "refresh_token_id")
     private RefreshToken refreshToken;
 
-
     @Builder
     public RefreshTokenBlackList(RefreshToken refreshToken) {
         this.refreshToken = refreshToken;
     }
 }
-

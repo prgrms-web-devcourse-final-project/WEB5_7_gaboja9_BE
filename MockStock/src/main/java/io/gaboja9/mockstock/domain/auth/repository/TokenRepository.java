@@ -8,6 +8,8 @@ import java.util.Optional;
 
 public interface TokenRepository {
     RefreshToken save(Members members, String token);
+
     RefreshTokenBlackList addBlackList(RefreshToken refreshToken);
+
     Optional<RefreshToken> findValidRefreshToken(Long memberId);
 }

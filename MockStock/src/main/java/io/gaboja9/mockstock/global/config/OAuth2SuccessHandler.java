@@ -5,8 +5,8 @@ import io.gaboja9.mockstock.domain.auth.dto.TokenPair;
 import io.gaboja9.mockstock.domain.auth.entity.RefreshToken;
 import io.gaboja9.mockstock.domain.auth.service.AuthService;
 import io.gaboja9.mockstock.domain.auth.service.JwtTokenProvider;
-
 import io.gaboja9.mockstock.domain.members.entity.Members;
+
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -46,14 +46,16 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
         HashMap<String, String> params = new HashMap<>();
 
-        Optional<RefreshToken> refreshTokenOptional = jwtTokenProvider.findRefreshToken(principal.getId());
+        Optional<RefreshToken> refreshTokenOptional =
+                jwtTokenProvider.findRefreshToken(principal.getId());
 
         if (refreshTokenOptional.isEmpty()) {
             TokenPair tokenPair = jwtTokenProvider.generateTokenPair(findMembers);
             params.put("access", tokenPair.getAccessToken());
             params.put("refresh", tokenPair.getRefreshToken());
         } else {
-            String acceessToken = jwtTokenProvider.issueAcceessToken(principal.getId(), principal.getRole());
+            String acceessToken =
+                    jwtTokenProvider.issueAcceessToken(principal.getId(), principal.getRole());
             params.put("access", acceessToken);
             params.put("refresh", refreshTokenOptional.get().getRefreshToken());
         }

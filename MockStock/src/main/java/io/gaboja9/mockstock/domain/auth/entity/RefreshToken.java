@@ -2,7 +2,9 @@ package io.gaboja9.mockstock.domain.auth.entity;
 
 import io.gaboja9.mockstock.domain.members.entity.Members;
 import io.gaboja9.mockstock.global.common.BaseEntity;
+
 import jakarta.persistence.*;
+
 import lombok.*;
 
 @Getter
@@ -21,7 +23,6 @@ public class RefreshToken extends BaseEntity {
     @ManyToOne
     @JoinColumn(name = "members_id")
     private Members members;
-
 
     @Builder
     public RefreshToken(String refreshToken, Members members) {
