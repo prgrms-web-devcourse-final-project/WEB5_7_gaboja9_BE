@@ -23,11 +23,9 @@ import java.time.LocalDateTime;
 @DataJpaTest
 class TradesRepositoryTest {
 
-    @Autowired
-    private TradesRepository tradesRepository;
+    @Autowired private TradesRepository tradesRepository;
 
-    @Autowired
-    private EntityManager em;
+    @Autowired private EntityManager em;
 
     @Test
     @DisplayName("기간 내 거래만 조회되는지 확인")
