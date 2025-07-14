@@ -58,3 +58,6 @@ kakaopay:
   approve-url: "https://kapi.kakao.com/v1/payment/approve"
   cancel-url: "https://kapi.kakao.com/v1/payment/cancel"
   cid: TC0ONETIME
+
+app:
+  base-url: ${APP_BASE_URL}
