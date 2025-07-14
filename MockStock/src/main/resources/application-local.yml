@@ -11,3 +11,50 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
+
+  influx:
+    url: http://localhost:8086
+    token: ${INFLUX_TOKEN}
+    org: your-org
+    bucket:
+      daily: stock_daily
+      minute: stock_minute
+
+  autoconfigure:
+    exclude: org.springframework.boot.actuate.autoconfigure.metrics.export.influx.InfluxMetricsExportAutoConfiguration
+
+hantu-openapi:
+  domain: https://openapivts.koreainvestment.com:29443
+  appkey: ${HANTU_APPKEY}
+  appsecret: ${HANTU_APPSECRET}
+
+springdoc:
+  api-docs:
+    enabled: true
+    path: /v3/api-docs
+    groups:
+      enabled: true
+
+  swagger-ui:
+    enabled : true
+    path: /swagger-ui.html
+    operations-sorter: method # GET, POST, PUT, DELETE 순으로 정렬
+    tags-sorter: alpha        # 태그 이름 기준 알파벳 정렬
+    display-request-duration: true  # API 요청 시간(응답 시간)을 표시
+    doc-expansion: none             # 전부 접힘 상태로 시작
+    persist-authorization: true
+    default-models-expand-depth: -1
+
+
+  cache:
+    disabled: true # 캐시 비활성화
+
+  show-actuator: true
+
+kakaopay:
+  secret-key: ${KAKAO_SECRET_KEY}
+  base-url: https://open-api.kakaopay.com
+  ready-url: "https://kapi.kakao.com/v1/payment/ready"
+  approve-url: "https://kapi.kakao.com/v1/payment/approve"
+  cancel-url: "https://kapi.kakao.com/v1/payment/cancel"
+  cid: TC0ONETIME
