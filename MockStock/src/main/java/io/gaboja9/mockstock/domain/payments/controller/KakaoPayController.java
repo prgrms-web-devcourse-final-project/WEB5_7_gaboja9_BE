@@ -7,6 +7,7 @@ import io.gaboja9.mockstock.domain.payments.dto.PaymentResponse;
 import io.gaboja9.mockstock.domain.payments.service.KakaoPayService;
 
 import jakarta.validation.Valid;
+
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.http.ResponseEntity;
@@ -20,7 +21,8 @@ public class KakaoPayController implements KakaoPayControllerSpec {
 
     @PostMapping("/ready")
     @Override
-    public ResponseEntity<PaymentResponse> paymentReady(@Valid @RequestBody PaymentRequest request) {
+    public ResponseEntity<PaymentResponse> paymentReady(
+            @Valid @RequestBody PaymentRequest request) {
         try {
             Long memberId = 1L;
 
