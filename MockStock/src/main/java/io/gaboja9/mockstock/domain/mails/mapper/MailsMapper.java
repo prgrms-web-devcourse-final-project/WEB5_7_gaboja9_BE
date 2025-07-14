@@ -5,27 +5,19 @@ import io.gaboja9.mockstock.domain.mails.entity.Mails;
 
 import org.springframework.stereotype.Component;
 
-import java.util.Collections;
-import java.util.List;
-
 @Component
 public class MailsMapper {
 
-    public List<MailsResponseDto> toDto(List<Mails> mailsList) {
-
-        if (mailsList == null) {
-            return Collections.emptyList();
+    public MailsResponseDto toDto(Mails mail) {
+        if (mail == null) {
+            return null;
         }
 
-        return mailsList.stream()
-                .map(
-                        mail ->
-                                MailsResponseDto.builder()
-                                        .subject(mail.getSubject())
-                                        .content(mail.getContent())
-                                        .unread(mail.isUnread())
-                                        .receivedAt(mail.getCreatedAt())
-                                        .build())
-                .toList();
+        return MailsResponseDto.builder()
+                .subject(mail.getSubject())
+                .content(mail.getContent())
+                .unread(mail.isUnread())
+                .receivedAt(mail.getCreatedAt())
+                .build();
     }
 }

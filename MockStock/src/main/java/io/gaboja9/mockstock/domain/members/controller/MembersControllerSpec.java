@@ -139,7 +139,10 @@ public interface MembersControllerSpec {
                                                             implementation =
                                                                     MailsResponseDto.class))))
     @GetMapping("/mails")
-    ResponseEntity<List<MailsResponseDto>> getMails(@RequestParam(required = false) Boolean unread);
+    ResponseEntity<Page<MailsResponseDto>> getMails(
+            @RequestParam(required = false) Boolean unread,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size);
 
     @Operation(
             summary = "파산 신청을 합니다.",
