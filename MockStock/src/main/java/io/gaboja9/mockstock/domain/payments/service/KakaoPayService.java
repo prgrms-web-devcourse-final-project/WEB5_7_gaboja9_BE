@@ -43,10 +43,6 @@ public class KakaoPayService {
 
     public KakaoPayReadyResponse paymentReady(Long memberId, int amount) {
 
-        if (amount <= 0) {
-            throw new PaymentException(ErrorCode.INVALID_PAYMENT_AMOUNT);
-        }
-
         Members member =
                 membersRepository
                         .findById(memberId)
