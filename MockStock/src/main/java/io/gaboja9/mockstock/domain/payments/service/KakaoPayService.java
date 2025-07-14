@@ -37,15 +37,14 @@ public class KakaoPayService {
     @Value("${kakaopay.cid}")
     private String cid;
 
+    @Value("${app.base-url}")
+    private String appBaseUrl;
+
     private final RestTemplate restTemplate;
     private final PaymentHistoryRepository paymentHistoryRepository;
     private final MembersRepository membersRepository;
 
     public KakaoPayReadyResponse paymentReady(Long memberId, int amount) {
-
-        if (amount <= 0) {
-            throw new PaymentException(ErrorCode.INVALID_PAYMENT_AMOUNT);
-        }
 
         Members member =
                 membersRepository
@@ -74,9 +73,9 @@ public class KakaoPayService {
         params.put("quantity", "1");
         params.put("total_amount", String.valueOf(amount));
         params.put("tax_free_amount", "0");
-        params.put("approval_url", "http://localhost:8080/payments/approve");
-        params.put("cancel_url", "http://localhost:8080/payments/cancel");
-        params.put("fail_url", "http://localhost:8080/payments/fail");
+        params.put("approval_url", appBaseUrl + "/payments/approve");
+        params.put("cancel_url", appBaseUrl + "/payments/cancel");
+        params.put("fail_url", appBaseUrl + "/payments/fail");
 
         HttpEntity<Map<String, Object>> entity = new HttpEntity<>(params, headers);
 
