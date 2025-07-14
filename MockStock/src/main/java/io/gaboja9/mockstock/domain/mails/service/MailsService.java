@@ -15,8 +15,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-
 @Service
 @RequiredArgsConstructor
 public class MailsService {
@@ -41,7 +39,8 @@ public class MailsService {
     }
 
     @Transactional(readOnly = true)
-    public Page<MailsResponseDto> getMailsByUnreadStatus(Long memberId, boolean unread, Pageable pageable) {
+    public Page<MailsResponseDto> getMailsByUnreadStatus(
+            Long memberId, boolean unread, Pageable pageable) {
 
         Members findMember =
                 membersRepository
@@ -49,7 +48,7 @@ public class MailsService {
                         .orElseThrow(() -> new NotFoundMemberException(memberId));
 
         Page<Mails> mailsPage =
-                mailsRepository.findByMembersIdAndUnread(findMember.getId(), unread,pageable);
+                mailsRepository.findByMembersIdAndUnread(findMember.getId(), unread, pageable);
 
         return mailsPage.map(mailsMapper::toDto);
     }

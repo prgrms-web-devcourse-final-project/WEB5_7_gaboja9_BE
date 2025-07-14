@@ -5,9 +5,6 @@ import io.gaboja9.mockstock.domain.mails.entity.Mails;
 
 import org.springframework.stereotype.Component;
 
-import java.util.Collections;
-import java.util.List;
-
 @Component
 public class MailsMapper {
 

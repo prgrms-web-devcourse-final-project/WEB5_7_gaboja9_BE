@@ -105,7 +105,8 @@ public class MailsServiceTest {
 
         when(membersRepository.findById(memberId)).thenReturn(Optional.empty());
 
-        assertThrows(NotFoundMemberException.class, () -> mailsService.getAllMails(memberId, pageable));
+        assertThrows(
+                NotFoundMemberException.class, () -> mailsService.getAllMails(memberId, pageable));
 
         verify(membersRepository).findById(memberId);
         verifyNoMoreInteractions(mailsRepository);
@@ -121,11 +122,13 @@ public class MailsServiceTest {
         Page<Mails> mailsPage = new PageImpl<>(List.of(testMail2));
 
         when(membersRepository.findById(memberId)).thenReturn(Optional.of(testMember));
-        when(mailsRepository.findByMembersIdAndUnread(testMember.getId(), unread, pageable)).thenReturn(mailsPage);
+        when(mailsRepository.findByMembersIdAndUnread(testMember.getId(), unread, pageable))
+                .thenReturn(mailsPage);
         when(mailsMapper.toDto(testMail2)).thenReturn(testDto2);
 
         // when
-        Page<MailsResponseDto> result = mailsService.getMailsByUnreadStatus(memberId, unread, pageable);
+        Page<MailsResponseDto> result =
+                mailsService.getMailsByUnreadStatus(memberId, unread, pageable);
 
         // then
         assertEquals(1, result.getContent().size());
@@ -143,8 +146,9 @@ public class MailsServiceTest {
 
         when(membersRepository.findById(memberId)).thenReturn(Optional.empty());
 
-        assertThrows(NotFoundMemberException.class, () ->
-                mailsService.getMailsByUnreadStatus(memberId, true, pageable));
+        assertThrows(
+                NotFoundMemberException.class,
+                () -> mailsService.getMailsByUnreadStatus(memberId, true, pageable));
 
         verify(membersRepository).findById(memberId);
         verifyNoMoreInteractions(mailsRepository);
