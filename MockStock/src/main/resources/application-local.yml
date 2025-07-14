@@ -23,6 +23,21 @@ spring:
   autoconfigure:
     exclude: org.springframework.boot.actuate.autoconfigure.metrics.export.influx.InfluxMetricsExportAutoConfiguration
 
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+  endpoint:
+    health:
+      show-details: always
+    prometheus:
+      enabled: true
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+
 hantu-openapi:
   domain: https://openapivts.koreainvestment.com:29443
   appkey: ${HANTU_APPKEY}
@@ -61,3 +76,10 @@ kakaopay:
 
 app:
   base-url: ${APP_BASE_URL}
+
+logging:
+  level:
+    root: INFO
+    io.github.mockstock: DEBUG
+    org.springframework.web: DEBUG
+    org.springframework.web.client: DEBUG
