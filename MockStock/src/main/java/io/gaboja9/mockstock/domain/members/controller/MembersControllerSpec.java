@@ -16,8 +16,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @Tag(name = "마이페이지 컨트롤러", description = "마이페이지 API입니다.")
 @RequestMapping("/members/me")
 public interface MembersControllerSpec {
