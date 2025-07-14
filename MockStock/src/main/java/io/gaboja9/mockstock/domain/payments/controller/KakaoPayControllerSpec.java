@@ -21,7 +21,7 @@ public interface KakaoPayControllerSpec {
             summary = "결제 준비",
             description =
                     "카카오페이 결제를 준비하고 결제 URL을 반환합니다. 다른 API는 리다이렉션 API라 따로 사용하진 않고 해당 API를 통해 반환된"
-                        + " next_redirect_pc_url 주소로 결제를 진행합니다.")
+                            + " next_redirect_pc_url 주소로 결제를 진행합니다.")
     @ApiResponses(
             value = {
                 @ApiResponse(
