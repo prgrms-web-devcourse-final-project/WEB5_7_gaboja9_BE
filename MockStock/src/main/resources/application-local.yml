@@ -30,8 +30,8 @@ spring:
         registration:
           kakao:
             client-name: Kakao
-            client-id: ${kakao_client_id}
-            client-secret: ${kakao_client_secret}
+            client-id: ${KAKAO_CLIENT_ID}
+            client-secret: ${KAKAO_CLIENT_SECRET}
             redirect-uri: "{baseUrl}/{action}/oauth2/code/{registrationId}"
             authorization-grant-type: authorization_code
             client-authentication-method: client_secret_post
@@ -40,8 +40,8 @@ spring:
               - profile_image
           naver:
             client-name: Naver
-            client-id: ${naver_client_id}
-            client-secret: ${naver_client_secret}
+            client-id: ${NAVER_CLIENT_ID}
+            client-secret: ${NAVER_CLIENT_SECRET}
             redirect-uri: "{baseUrl}/{action}/oauth2/code/{registrationId}"
             authorization-grant-type: authorization_code
             client-authentication-method: client_secret_post
@@ -50,8 +50,8 @@ spring:
               - nickname
               - profile
           google:
-            client-id: ${google_client_id}
-            client-secret: ${google_client_secret}
+            client-id: ${GOOGLE_CLIENT_ID}
+            client-secret: ${GOOGLE_CLIENT_SECRET}
             scope:
               - email
               - profile
@@ -73,7 +73,6 @@ springdoc:
     persist-authorization: true
     default-models-expand-depth: -1
 
-
   cache:
     disabled: true # 캐시 비활성화
 
@@ -82,10 +81,13 @@ springdoc:
 
 custom:
   jwt:
+    redirection:
+      base: https://mock-stock.pages.dev/
+
     validation:
       access: 600000
       refresh: 86400000
 
     secrets:
-      origin-key: 01980363-86d4-74dd-8582-56edab7ad9a5
-      app-key: 20209039DFC16587937BF49B27A3D693B1B3494DA48562E3516A7780A1F0DDAF9409EB890368310EAE2C73FC3610782584ED014BDBEEB87712E0F5A4367213D4
+      origin-key: ${JWT_ORIGIN_KEY}
+      app-key: ${JWT_APP_KEY}

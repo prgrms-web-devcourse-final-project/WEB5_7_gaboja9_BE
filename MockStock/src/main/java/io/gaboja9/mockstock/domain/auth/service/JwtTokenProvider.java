@@ -29,7 +29,6 @@ import javax.crypto.SecretKey;
 @Transactional
 @RequiredArgsConstructor
 public class JwtTokenProvider {
-    // .
     private final JwtConfiguration jwtConfiguration;
     private final RefreshTokenRepository refreshTokenRepository;
 
@@ -85,7 +84,7 @@ public class JwtTokenProvider {
             log.error("이상한 토큰입니다.");
         } catch (Exception e) {
             log.error("token = {}", token);
-            log.error(";;;");
+            log.error("토큰이 잘못되었습니다.");
         }
 
         return false;

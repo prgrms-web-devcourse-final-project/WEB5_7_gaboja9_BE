@@ -71,4 +71,10 @@ public class AuthService extends DefaultOAuth2UserService {
     public Members getById(Long id) {
         return findById(id).orElseThrow(() -> new NoSuchElementException());
     }
+
+    public MembersDetails getMembersDetailsById(Long id) {
+        Members findMembers = getById(id);
+        return MembersDetails.from(findMembers);
+    }
+
 }

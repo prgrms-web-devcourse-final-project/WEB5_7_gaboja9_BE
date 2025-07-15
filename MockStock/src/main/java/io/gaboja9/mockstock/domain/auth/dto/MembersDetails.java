@@ -1,5 +1,6 @@
 package io.gaboja9.mockstock.domain.auth.dto;
 
+import io.gaboja9.mockstock.domain.members.entity.Members;
 import io.gaboja9.mockstock.domain.members.enums.Role;
 
 import lombok.*;
@@ -30,6 +31,19 @@ public class MembersDetails implements OAuth2User {
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority(role.name()));
+    }
+
+    public static MembersDetails from(Members members) {
+        MembersDetails membersDetails = new MembersDetails();
+
+        membersDetails.id = members.getId();
+
+        membersDetails.email = members.getEmail();
+
+        membersDetails.role = members.getRole();
+        membersDetails.profileImage = members.getProfileImage();
+
+        return membersDetails;
     }
 
     @Builder
