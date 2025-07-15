@@ -9,6 +9,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 
@@ -33,9 +34,11 @@ public class Members extends BaseEntity {
 
     private String profileImage;
 
-    private int cashBalance;
+    @Setter private int cashBalance = 30_000_000;
 
-    private int bankruptcyCnt;
+    @Setter private int bankruptcyCnt;
+
+    @Setter private String memo;
 
     @Builder
     public Members(

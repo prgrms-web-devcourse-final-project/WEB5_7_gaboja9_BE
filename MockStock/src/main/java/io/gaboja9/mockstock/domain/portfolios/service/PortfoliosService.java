@@ -1,5 +1,7 @@
 package io.gaboja9.mockstock.domain.portfolios.service;
 
+import io.gaboja9.mockstock.domain.members.entity.Members;
+import io.gaboja9.mockstock.domain.members.exception.NotFoundMemberException;
 import io.gaboja9.mockstock.domain.members.repository.MembersRepository;
 import io.gaboja9.mockstock.domain.portfolios.dto.PortfoliosSummary;
 import io.gaboja9.mockstock.domain.portfolios.dto.response.PortfolioResponseDto;
@@ -38,7 +40,7 @@ public class PortfoliosService {
         int cashBalance =
                 membersRepository
                         .findById(memberId)
-                        .orElseThrow(() -> new RuntimeException("유저 없음"))
+                        .orElseThrow(() -> new NotFoundMemberException(memberId))
                         .getCashBalance();
 
         return PortfoliosResponseDto.builder()
@@ -62,12 +64,25 @@ public class PortfoliosService {
         }
 
         double totalProfitRate =
-                totalInvestment == 0 ? 0.0 : (double) totalProfit / totalInvestment * 100;
+                totalInvestment == 0
+                        ? 0.00
+                        : Math.round((double) totalProfit / totalInvestment * 100 * 100) / 100.0;
 
         return PortfoliosSummary.builder()
                 .totalEvaluationAmount(totalEvaluationAmount)
                 .totalProfit(totalProfit)
                 .totalProfitRate(totalProfitRate)
                 .build();
+    }
+
+    @Transactional
+    public void remove(Long memberId) {
+
+        Members findMember =
+                membersRepository
+                        .findById(memberId)
+                        .orElseThrow(() -> new NotFoundMemberException(memberId));
+
+        portfoliosRepository.deleteByMembersId(findMember.getId());
     }
 }

@@ -56,6 +56,38 @@ spring:
               - email
               - profile
 
+  influx:
+    url: http://localhost:8086
+    token: ${INFLUX_TOKEN}
+    org: your-org
+    bucket:
+      daily: stock_daily
+      minute: stock_minute
+
+  autoconfigure:
+    exclude: org.springframework.boot.actuate.autoconfigure.metrics.export.influx.InfluxMetricsExportAutoConfiguration
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+  endpoint:
+    health:
+      show-details: always
+    prometheus:
+      enabled: true
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+
+hantu-openapi:
+  domain: https://openapivts.koreainvestment.com:29443
+  appkey: ${HANTU_APPKEY}
+  appsecret: ${HANTU_APPSECRET}
+
+
 springdoc:
   api-docs:
     enabled: true
@@ -76,8 +108,6 @@ springdoc:
   cache:
     disabled: true # 캐시 비활성화
 
-  springdoc:
-    show-actuator: true
 
 custom:
   jwt:
@@ -91,3 +121,24 @@ custom:
     secrets:
       origin-key: ${JWT_ORIGIN_KEY}
       app-key: ${JWT_APP_KEY}
+
+  show-actuator: true
+
+kakaopay:
+  secret-key: ${KAKAO_SECRET_KEY}
+  base-url: https://open-api.kakaopay.com
+  ready-url: "https://kapi.kakao.com/v1/payment/ready"
+  approve-url: "https://kapi.kakao.com/v1/payment/approve"
+  cancel-url: "https://kapi.kakao.com/v1/payment/cancel"
+  cid: TC0ONETIME
+
+app:
+  base-url: ${APP_BASE_URL}
+
+logging:
+  level:
+    root: INFO
+    io.github.mockstock: DEBUG
+    org.springframework.web: DEBUG
+    org.springframework.web.client: DEBUG
+
