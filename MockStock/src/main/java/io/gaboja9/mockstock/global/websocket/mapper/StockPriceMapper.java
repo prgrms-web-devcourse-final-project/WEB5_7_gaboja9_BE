@@ -4,8 +4,7 @@ import io.gaboja9.mockstock.global.websocket.dto.StockPrice;
 
 public class StockPriceMapper {
 
-
-     // 문자열 배열 데이터를 StockPriceData로 파싱
+    // 문자열 배열 데이터를 StockPriceData로 파싱
     public static StockPrice parseStockPriceData(String[] fields) {
         return StockPrice.builder()
                 .stockCode(fields[0])
@@ -17,7 +16,11 @@ public class StockPriceMapper {
     }
 
     private static int parseInt(String value) {
-        try { return Integer.parseInt(value); } catch (Exception e) { return 0; }
+        try {
+            return Integer.parseInt(value);
+        } catch (Exception e) {
+            return 0;
+        }
     }
 
     public static long parseLong(String value) {
@@ -29,6 +32,10 @@ public class StockPriceMapper {
     }
 
     private static double parseDouble(String value) {
-        try { return Double.parseDouble(value); } catch (Exception e) { return 0.0; }
+        try {
+            return Double.parseDouble(value);
+        } catch (Exception e) {
+            return 0.0;
+        }
     }
 }
