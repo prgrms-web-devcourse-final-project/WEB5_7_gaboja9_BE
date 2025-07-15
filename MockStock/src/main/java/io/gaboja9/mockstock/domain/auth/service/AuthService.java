@@ -76,5 +76,4 @@ public class AuthService extends DefaultOAuth2UserService {
         Members findMembers = getById(id);
         return MembersDetails.from(findMembers);
     }
-
 }
