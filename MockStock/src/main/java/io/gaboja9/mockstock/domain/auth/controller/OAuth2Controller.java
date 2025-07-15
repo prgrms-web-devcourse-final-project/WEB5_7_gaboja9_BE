@@ -8,5 +8,4 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-public class OAuth2Controller {
-}
+public class OAuth2Controller {}
