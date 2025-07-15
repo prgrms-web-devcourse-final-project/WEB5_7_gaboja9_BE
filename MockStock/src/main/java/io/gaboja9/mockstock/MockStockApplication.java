@@ -7,7 +7,6 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
 @SpringBootApplication
 @ConfigurationPropertiesScan
-@EnableJpaAuditing
 public class MockStockApplication {
 
     public static void main(String[] args) {

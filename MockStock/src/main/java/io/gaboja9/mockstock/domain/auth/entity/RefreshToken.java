@@ -20,7 +20,7 @@ public class RefreshToken extends BaseEntity {
     private String refreshToken;
 
     @Setter
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "members_id")
     private Members members;
 

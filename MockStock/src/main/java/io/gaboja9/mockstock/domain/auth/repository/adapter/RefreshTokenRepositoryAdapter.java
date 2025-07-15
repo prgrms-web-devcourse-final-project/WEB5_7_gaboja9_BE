@@ -20,7 +20,7 @@ import java.util.Optional;
 public class RefreshTokenRepositoryAdapter implements TokenRepository {
 
     private final RefreshTokenRepository refreshTokenRepository;
-    private RefreshTokenBlackListRepository refreshTokenBlackListRepository;
+    private final RefreshTokenBlackListRepository refreshTokenBlackListRepository;
 
     private final EntityManager entityManager;
 
