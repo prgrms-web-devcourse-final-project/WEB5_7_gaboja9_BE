@@ -2,6 +2,7 @@ package io.gaboja9.mockstock.domain.members.service;
 
 import io.gaboja9.mockstock.domain.members.dto.request.MemosCreateRequestDto;
 import io.gaboja9.mockstock.domain.members.dto.response.MemberInfoDto;
+import io.gaboja9.mockstock.domain.members.dto.response.MemoResponseDto;
 import io.gaboja9.mockstock.domain.members.entity.Members;
 import io.gaboja9.mockstock.domain.members.exception.NotFoundMemberException;
 import io.gaboja9.mockstock.domain.members.repository.MembersRepository;
@@ -38,6 +39,7 @@ public class MembersService {
         // int ranking = ranksService.getRankByMemberId(memberId); // TODO : 랭킹 로직 개발되면 추가
         int period =
                 (int) ChronoUnit.DAYS.between(member.getCreatedAt().toLocalDate(), LocalDate.now());
+        int bankruptcyCnt = member.getBankruptcyCnt();
 
         return MemberInfoDto.builder()
                 .nickname(member.getNickname())
@@ -47,6 +49,7 @@ public class MembersService {
                 .tradeCnt(tradeCnt)
                 // .ranking(ranking)
                 .period(period)
+                .bankruptcyCnt(bankruptcyCnt)
                 .build();
     }
 
@@ -63,17 +66,6 @@ public class MembersService {
         findMember.setBankruptcyCnt(findMember.getBankruptcyCnt() + 1);
     }
 
-    @Transactional(readOnly = true)
-    public int getBankruptcyCnt(Long memberId) {
-
-        Members findMember =
-                membersRepository
-                        .findById(memberId)
-                        .orElseThrow(() -> new NotFoundMemberException(memberId));
-
-        return findMember.getBankruptcyCnt();
-    }
-
     @Transactional
     public void createMemo(Long membersId, MemosCreateRequestDto dto) {
 
@@ -86,13 +78,13 @@ public class MembersService {
     }
 
     @Transactional(readOnly = true)
-    public String getMemo(Long memberId) {
+    public MemoResponseDto getMemo(Long memberId) {
 
         Members findMember =
                 membersRepository
                         .findById(memberId)
                         .orElseThrow(() -> new NotFoundMemberException(memberId));
 
-        return findMember.getMemo();
+        return MemoResponseDto.builder().memo(findMember.getMemo()).build();
     }
 }
