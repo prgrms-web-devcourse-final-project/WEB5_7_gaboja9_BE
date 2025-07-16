@@ -56,7 +56,7 @@ public class HantuWebSocketConnectionManager extends WebSocketConnectionManager 
                                             || !sessionManager.getSession().isOpen())) {
                                 log.warn(
                                         "Heartbeat detected inactive session. Attempting to"
-                                            + " reconnect...");
+                                                + " reconnect...");
                                 reconnect();
                             }
                         },
