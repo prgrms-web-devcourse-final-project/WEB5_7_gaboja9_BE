@@ -31,7 +31,14 @@ public enum ErrorCode {
     JWT_TOKEN_INVALID(HttpStatus.UNAUTHORIZED, "JWT-002", "유효하지 않은 토큰입니다."),
     JWT_TOKEN_MALFORMED(HttpStatus.UNAUTHORIZED, "JWT-003", "잘못된 형식의 토큰입니다."),
     JWT_SIGNATURE_INVALID(HttpStatus.UNAUTHORIZED, "JWT-004", "토큰 서명이 유효하지 않습니다."),
-    JWT_TOKEN_UNSUPPORTED(HttpStatus.UNAUTHORIZED, "JWT-005", "지원되지 않는 토큰입니다.");
+    JWT_TOKEN_UNSUPPORTED(HttpStatus.UNAUTHORIZED, "JWT-005", "지원되지 않는 토큰입니다."),
+
+    INVALID_CREDENTIALS(HttpStatus.UNAUTHORIZED, "AUTH-001", "이메일 또는 비밀번호가 올바르지 않습니다."),
+    EMAIL_ALREADY_EXISTS(HttpStatus.CONFLICT, "AUTH-002", "이미 존재하는 이메일입니다."),
+    PASSWORD_MISMATCH(HttpStatus.BAD_REQUEST, "AUTH-003", "비밀번호가 일치하지 않습니다."),
+    INVALID_VERIFICATION_CODE(HttpStatus.BAD_REQUEST, "AUTH-004", "인증코드가 올바르지 않습니다."),
+    VERIFICATION_CODE_EXPIRED(HttpStatus.BAD_REQUEST, "AUTH-005", "인증코드가 만료되었습니다."),
+    WEAK_PASSWORD(HttpStatus.BAD_REQUEST, "AUTH-006", "비밀번호 강도가 부족합니다.");
 
     private final HttpStatus status;
     private final String code;
