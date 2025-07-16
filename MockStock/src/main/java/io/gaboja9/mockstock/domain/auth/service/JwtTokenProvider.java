@@ -3,6 +3,7 @@ package io.gaboja9.mockstock.domain.auth.service;
 import io.gaboja9.mockstock.domain.auth.dto.TokenBody;
 import io.gaboja9.mockstock.domain.auth.dto.TokenPair;
 import io.gaboja9.mockstock.domain.auth.entity.RefreshToken;
+import io.gaboja9.mockstock.domain.auth.exception.JwtAuthenticationException;
 import io.gaboja9.mockstock.domain.auth.repository.RefreshTokenRepository;
 import io.gaboja9.mockstock.domain.auth.repository.TokenRepository;
 import io.gaboja9.mockstock.domain.members.entity.Members;
@@ -69,25 +70,24 @@ public class JwtTokenProvider {
     }
 
     public boolean validate(String token) {
-
         try {
-
             Jwts.parser().verifyWith(getSecretKey()).build().parseClaimsJws(token);
-
             return true;
 
-        } catch (JwtException e) {
-            log.error("token = {}", token);
-            log.error("잘못된 토큰입니다.");
+        } catch (ExpiredJwtException e) {
+            throw JwtAuthenticationException.expired();
+        } catch (MalformedJwtException e) {
+            throw JwtAuthenticationException.malformed();
+        } catch (SignatureException e) {
+            throw JwtAuthenticationException.invalidSignature();
+        } catch (UnsupportedJwtException e) {
+            throw JwtAuthenticationException.unsupported();
         } catch (IllegalArgumentException e) {
-            log.error("token = {}", token);
-            log.error("이상한 토큰입니다.");
+            throw JwtAuthenticationException.invalid();
         } catch (Exception e) {
-            log.error("token = {}", token);
-            log.error("토큰이 잘못되었습니다.");
+            log.error("JWT 검증 중 알 수 없는 오류입니다.", e);
+            throw JwtAuthenticationException.invalid();
         }
-
-        return false;
     }
 
     public TokenBody parseJwt(String token) {

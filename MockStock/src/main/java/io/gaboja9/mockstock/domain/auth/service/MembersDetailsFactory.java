@@ -1,7 +1,7 @@
 package io.gaboja9.mockstock.domain.auth.service;
 
 import io.gaboja9.mockstock.domain.auth.dto.MembersDetails;
-import io.gaboja9.mockstock.domain.auth.exceptions.UnavailableProviderException;
+import io.gaboja9.mockstock.domain.auth.exception.UnavailableProviderException;
 
 import org.springframework.security.oauth2.core.user.OAuth2User;
 

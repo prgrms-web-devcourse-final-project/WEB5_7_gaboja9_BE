@@ -1,4 +1,4 @@
-package io.gaboja9.mockstock.domain.auth.exceptions;
+package io.gaboja9.mockstock.domain.auth.exception;
 
 public class UnavailableProviderException extends RuntimeException {
 
