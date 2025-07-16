@@ -118,7 +118,10 @@ public interface MembersControllerSpec {
                             content =
                                     @Content(
                                             mediaType = "application/json",
-                                            schema = @Schema(implementation = MemoResponseDto.class))))
+                                            schema =
+                                                    @Schema(
+                                                            implementation =
+                                                                    MemoResponseDto.class))))
     @GetMapping("/memos")
     ResponseEntity<MemoResponseDto> getMemos();
 
@@ -153,5 +156,4 @@ public interface MembersControllerSpec {
                             content = @Content(schema = @Schema(hidden = true))))
     @PostMapping("/bankruptcy")
     ResponseEntity<Void> declareBankruptcy();
-
 }
