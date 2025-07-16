@@ -29,4 +29,7 @@ public class MemberInfoDto {
 
     @Schema(description = "활동 기간")
     private int period;
+
+    @Schema(description = "파산 횟수")
+    private int bankruptcyCnt;
 }
