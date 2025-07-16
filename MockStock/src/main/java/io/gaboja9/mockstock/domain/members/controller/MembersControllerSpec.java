@@ -3,6 +3,7 @@ package io.gaboja9.mockstock.domain.members.controller;
 import io.gaboja9.mockstock.domain.mails.dto.response.MailsResponseDto;
 import io.gaboja9.mockstock.domain.members.dto.request.MemosCreateRequestDto;
 import io.gaboja9.mockstock.domain.members.dto.response.MemberInfoDto;
+import io.gaboja9.mockstock.domain.members.dto.response.MemoResponseDto;
 import io.gaboja9.mockstock.domain.portfolios.dto.response.PortfoliosResponseDto;
 import io.gaboja9.mockstock.domain.trades.dto.request.TradesRequestDto;
 import io.gaboja9.mockstock.domain.trades.dto.response.TradesResponseDto;
@@ -15,8 +16,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Map;
 
 @Tag(name = "마이페이지 컨트롤러", description = "마이페이지 API입니다.")
 @RequestMapping("/members/me")
@@ -119,9 +118,9 @@ public interface MembersControllerSpec {
                             content =
                                     @Content(
                                             mediaType = "application/json",
-                                            schema = @Schema(implementation = String.class))))
+                                            schema = @Schema(implementation = MemoResponseDto.class))))
     @GetMapping("/memos")
-    ResponseEntity<Map<String, String>> getMemos();
+    ResponseEntity<MemoResponseDto> getMemos();
 
     @Operation(
             summary = "메일을 불러옵니다.",
@@ -155,17 +154,4 @@ public interface MembersControllerSpec {
     @PostMapping("/bankruptcy")
     ResponseEntity<Void> declareBankruptcy();
 
-    @Operation(
-            summary = "파산 횟수를 불러옵니다.",
-            description = "사용자의 파산 신청 횟수를 불러옵니다.",
-            responses =
-                    @ApiResponse(
-                            responseCode = "200",
-                            description = "성공적으로 파산 횟수를 불러왔습니다.",
-                            content =
-                                    @Content(
-                                            mediaType = "application/json",
-                                            schema = @Schema(implementation = Integer.class))))
-    @GetMapping("/bankruptcy")
-    ResponseEntity<Integer> getBankruptcy();
 }

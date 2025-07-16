@@ -4,6 +4,7 @@ import io.gaboja9.mockstock.domain.mails.dto.response.MailsResponseDto;
 import io.gaboja9.mockstock.domain.mails.service.MailsService;
 import io.gaboja9.mockstock.domain.members.dto.request.MemosCreateRequestDto;
 import io.gaboja9.mockstock.domain.members.dto.response.MemberInfoDto;
+import io.gaboja9.mockstock.domain.members.dto.response.MemoResponseDto;
 import io.gaboja9.mockstock.domain.members.service.MembersService;
 import io.gaboja9.mockstock.domain.portfolios.dto.response.PortfoliosResponseDto;
 import io.gaboja9.mockstock.domain.portfolios.service.PortfoliosService;
@@ -24,8 +25,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Map;
 
 @RestController
 @RequestMapping("/members/me")
@@ -103,14 +102,14 @@ public class MembersController implements MembersControllerSpec {
     }
 
     @GetMapping("/memos")
-    public ResponseEntity<Map<String, String>> getMemos() {
+    public ResponseEntity<MemoResponseDto> getMemos() {
 
         // TODO : Security 도입되면 현재 로그인한 유저 id를 불러오는 것으로 수정
         Long currentId = 1L;
 
-        String memo = membersService.getMemo(currentId);
+        MemoResponseDto memo = membersService.getMemo(currentId);
 
-        return ResponseEntity.ok(Map.of("message",memo));
+        return ResponseEntity.ok(memo);
     }
 
     @GetMapping("/mails")
@@ -141,15 +140,5 @@ public class MembersController implements MembersControllerSpec {
 
         membersService.processBankruptcy(currentId);
         return ResponseEntity.noContent().build();
-    }
-
-    @GetMapping("/bankruptcy")
-    public ResponseEntity<Integer> getBankruptcy() {
-
-        // TODO : Security 도입되면 현재 로그인한 유저 id를 불러오는 것으로 수정
-        Long currentId = 1L;
-
-        int bankruptcyCnt = membersService.getBankruptcyCnt(currentId);
-        return ResponseEntity.ok(bankruptcyCnt);
     }
 }
