@@ -53,6 +53,7 @@ public class SecurityConfig {
 
         configuration.setAllowedOriginPatterns(List.of("*"));
 
+
         configuration.setAllowedMethods(
                 List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
 
