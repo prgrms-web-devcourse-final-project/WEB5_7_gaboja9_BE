@@ -16,6 +16,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 @Tag(name = "마이페이지 컨트롤러", description = "마이페이지 API입니다.")
 @RequestMapping("/members/me")
 public interface MembersControllerSpec {
@@ -119,7 +121,7 @@ public interface MembersControllerSpec {
                                             mediaType = "application/json",
                                             schema = @Schema(implementation = String.class))))
     @GetMapping("/memos")
-    ResponseEntity<String> getMemos();
+    ResponseEntity<Map<String, String>> getMemos();
 
     @Operation(
             summary = "메일을 불러옵니다.",
