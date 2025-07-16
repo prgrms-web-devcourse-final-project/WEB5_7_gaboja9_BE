@@ -40,6 +40,10 @@ public class Members extends BaseEntity {
 
     @Setter private String memo;
 
+    @Column(nullable = true)
+    @Setter
+    private String password;
+
     @Builder
     public Members(
             String email,
@@ -48,7 +52,8 @@ public class Members extends BaseEntity {
             String provider,
             String profileImage,
             int cashBalance,
-            int bankruptcyCnt) {
+            int bankruptcyCnt,
+            String password) {
         this.email = email;
         this.nickname = nickname;
         this.role = role;
@@ -56,6 +61,7 @@ public class Members extends BaseEntity {
         this.profileImage = profileImage;
         this.cashBalance = cashBalance;
         this.bankruptcyCnt = bankruptcyCnt;
+        this.password = password;
     }
 
     // 테스트용 생성자
@@ -76,5 +82,6 @@ public class Members extends BaseEntity {
         this.cashBalance = cashBalance;
         this.bankruptcyCnt = bankruptcyCnt;
         this.setCreatedAt(createdAt);
+        this.password = null;
     }
 }
