@@ -15,6 +15,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Schema(description = "회원가입 요청")
 public class SignUpRequestDto {
 
     @Schema(description = "이름", example = "홍길동")
