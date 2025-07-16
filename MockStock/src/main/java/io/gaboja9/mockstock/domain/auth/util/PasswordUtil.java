@@ -1,7 +1,7 @@
 package io.gaboja9.mockstock.domain.auth.util;
 
-
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
@@ -14,9 +14,8 @@ public class PasswordUtil {
     private final PasswordEncoder passwordEncoder;
 
     // 비밀번호 -> 최소 8자, 영문, 숫자, 특수문자 포함
-    public static final Pattern PASSWORD_PATTERN = Pattern.compile(
-            "^(?=.*[a-zA-Z])(?=.*\\d)(?=.*[~!@#$%^&*?])[A-Za-z\\d~!@#$%^&*?]{8,}$"
-    );
+    public static final Pattern PASSWORD_PATTERN =
+            Pattern.compile("^(?=.*[a-zA-Z])(?=.*\\d)(?=.*[~!@#$%^&*?])[A-Za-z\\d~!@#$%^&*?]{8,}$");
 
     public String encode(String rawPassword) {
         return passwordEncoder.encode(rawPassword);

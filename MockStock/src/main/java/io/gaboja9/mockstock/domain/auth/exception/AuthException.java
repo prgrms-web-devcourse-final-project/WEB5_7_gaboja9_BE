@@ -28,5 +28,4 @@ public class AuthException extends BaseException {
     public static AuthException invalidVerificationCode() {
         return new AuthException(ErrorCode.INVALID_VERIFICATION_CODE);
     }
-
 }
