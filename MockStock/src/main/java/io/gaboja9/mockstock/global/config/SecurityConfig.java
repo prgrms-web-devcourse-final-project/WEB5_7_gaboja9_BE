@@ -39,7 +39,7 @@ public class SecurityConfig {
                         })
                 .formLogin(form -> form.disable())
                 .csrf(csrf -> csrf.disable())
-                .cors(cors -> cors.disable()) // TODO 포트 걸어주기
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .sessionManagement(
                         session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(
