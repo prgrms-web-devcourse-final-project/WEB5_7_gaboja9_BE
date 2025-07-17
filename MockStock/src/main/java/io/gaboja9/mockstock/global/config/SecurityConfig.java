@@ -1,7 +1,5 @@
 package io.gaboja9.mockstock.global.config;
 
-import io.gaboja9.mockstock.domain.auth.service.AuthService;
-
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.context.annotation.Bean;
@@ -22,7 +20,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    private final AuthService authService;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final OAuth2SuccessHandler oAuth2SuccessHandler;
 

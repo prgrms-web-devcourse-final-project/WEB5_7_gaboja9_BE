@@ -1,15 +1,20 @@
 package io.gaboja9.mockstock.domain.auth.service;
 
 import io.gaboja9.mockstock.domain.auth.dto.MembersDetails;
+import io.gaboja9.mockstock.domain.auth.dto.TokenPair;
+import io.gaboja9.mockstock.domain.auth.dto.request.LoginRequestDto;
+import io.gaboja9.mockstock.domain.auth.dto.request.SignUpRequestDto;
+import io.gaboja9.mockstock.domain.auth.exception.AuthException;
 import io.gaboja9.mockstock.domain.members.entity.Members;
 import io.gaboja9.mockstock.domain.members.enums.Role;
 import io.gaboja9.mockstock.domain.members.repository.MembersRepository;
 
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
@@ -27,6 +32,7 @@ public class AuthService extends DefaultOAuth2UserService {
 
     private final MembersRepository membersRepository;
 
+    // OAuth
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
 
@@ -53,6 +59,7 @@ public class AuthService extends DefaultOAuth2UserService {
                                             .profileImage(membersDetails.getProfileImage())
                                             .cashBalance(30000000)
                                             .bankruptcyCnt(0)
+                                            .password(null)
                                             .build();
                             return membersRepository.save(saved);
                         });
