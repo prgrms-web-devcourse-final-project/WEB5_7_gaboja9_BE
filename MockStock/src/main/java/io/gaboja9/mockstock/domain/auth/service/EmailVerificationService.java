@@ -4,11 +4,12 @@ import io.gaboja9.mockstock.domain.auth.entity.EmailVerification;
 import io.gaboja9.mockstock.domain.auth.exception.AuthException;
 import io.gaboja9.mockstock.domain.auth.repository.EmailVerificationRepository;
 import io.gaboja9.mockstock.domain.members.repository.MembersRepository;
-import io.gaboja9.mockstock.global.exception.ErrorCode;
-import org.springframework.transaction.annotation.Transactional;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -42,7 +43,7 @@ public class EmailVerificationService {
     public void sendVerificationCode(String email) {
 
         // 이메일 중복 검사
-        if( membersRepository.findByEmail(email).isPresent() ) {
+        if (membersRepository.findByEmail(email).isPresent()) {
             throw AuthException.emailAlreadyExists();
         }
 
@@ -53,32 +54,35 @@ public class EmailVerificationService {
         String VerificationCode = generateVerificationCode();
 
         // 인증정보 저장
-        EmailVerification emailVerification = EmailVerification.builder()
-                .email(email)
-                .verificationCode(VerificationCode)
-                .expiredAt(LocalDateTime.now().plusMinutes(VERIFICATION_CODE_EXPIRY_MINUTES))
-                .build();
+        EmailVerification emailVerification =
+                EmailVerification.builder()
+                        .email(email)
+                        .verificationCode(VerificationCode)
+                        .expiredAt(
+                                LocalDateTime.now().plusMinutes(VERIFICATION_CODE_EXPIRY_MINUTES))
+                        .build();
 
         emailVerificationRepository.save(emailVerification);
 
         // 이메일 발송
         sendEmail(email, VerificationCode);
-        log.info("인증코드가 {}로 발송되었습니다. 코드: {}",  email, VerificationCode);
+        log.info("인증코드가 {}로 발송되었습니다. 코드: {}", email, VerificationCode);
     }
 
     // 인증코드 검증
     @Transactional(readOnly = true)
     public boolean verifyCode(String email, String code) {
         Optional<EmailVerification> verificationOpt =
-                emailVerificationRepository.findByEmailAndVerificationCodeAndVerifiedFalse(email, code);
+                emailVerificationRepository.findByEmailAndVerificationCodeAndVerifiedFalse(
+                        email, code);
 
-        if( verificationOpt.isEmpty() ) {
+        if (verificationOpt.isEmpty()) {
             return false;
         }
 
         EmailVerification verification = verificationOpt.get();
 
-        if(verification.expired()) {
+        if (verification.expired()) {
             return false;
         }
 
@@ -99,12 +103,12 @@ public class EmailVerificationService {
         Optional<EmailVerification> recentVerification =
                 emailVerificationRepository.findTopByEmailOrderByCreatedAtDesc(email);
 
-        if ( recentVerification.isPresent() ) {
+        if (recentVerification.isPresent()) {
             LocalDateTime lastSentTime = recentVerification.get().getCreatedAt();
             LocalDateTime now = LocalDateTime.now();
             LocalDateTime cooldownTime = lastSentTime.plusMinutes(RESEND_COOLDOWN_MINUTES);
 
-            if( now.isBefore(cooldownTime) ) {
+            if (now.isBefore(cooldownTime)) {
                 long retryAfterSeconds = Duration.between(now, cooldownTime).getSeconds();
                 throw AuthException.authResendTooEarly(retryAfterSeconds);
             }
@@ -116,7 +120,7 @@ public class EmailVerificationService {
         Random random = new Random();
         StringBuilder code = new StringBuilder();
 
-        for (int i =0; i<VERIFICATION_CODE_LENGTH; i++) {
+        for (int i = 0; i < VERIFICATION_CODE_LENGTH; i++) {
             code.append(random.nextInt(10));
         }
 

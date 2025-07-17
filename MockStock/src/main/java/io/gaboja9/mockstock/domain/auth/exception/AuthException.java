@@ -32,7 +32,8 @@ public class AuthException extends BaseException {
     }
 
     public static AuthException authResendTooEarly(long seconds) {
-        String message = MessageFormat.format(ErrorCode.AUTH_RESEND_TOO_EARLY.getMessage(), seconds);
+        String message =
+                MessageFormat.format(ErrorCode.AUTH_RESEND_TOO_EARLY.getMessage(), seconds);
         return new AuthException(ErrorCode.AUTH_RESEND_TOO_EARLY, message);
     }
 }
