@@ -38,7 +38,8 @@ public enum ErrorCode {
     PASSWORD_MISMATCH(HttpStatus.BAD_REQUEST, "AUTH-003", "비밀번호가 일치하지 않습니다."),
     INVALID_VERIFICATION_CODE(HttpStatus.BAD_REQUEST, "AUTH-004", "인증코드가 올바르지 않습니다."),
     VERIFICATION_CODE_EXPIRED(HttpStatus.BAD_REQUEST, "AUTH-005", "인증코드가 만료되었습니다."),
-    WEAK_PASSWORD(HttpStatus.BAD_REQUEST, "AUTH-006", "비밀번호 강도가 부족합니다.");
+    WEAK_PASSWORD(HttpStatus.BAD_REQUEST, "AUTH-006", "비밀번호 강도가 부족합니다."),
+    AUTH_RESEND_TOO_EARLY(HttpStatus.BAD_REQUEST, "AUTH-007", "인증코드는 {0}초 후에 재발송할 수 있습니다.");
 
     private final HttpStatus status;
     private final String code;
