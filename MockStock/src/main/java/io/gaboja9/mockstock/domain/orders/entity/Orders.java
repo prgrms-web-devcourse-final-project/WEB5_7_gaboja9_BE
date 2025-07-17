@@ -2,9 +2,7 @@ package io.gaboja9.mockstock.domain.orders.entity;
 
 import io.gaboja9.mockstock.domain.members.entity.Members;
 import io.gaboja9.mockstock.domain.trades.entity.TradeType;
-
 import jakarta.persistence.*;
-
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -41,14 +39,8 @@ public class Orders {
     @JoinColumn(name = "members_id")
     private Members members;
 
-    public Orders(
-            String stockCode,
-            String stockName,
-            OrderType orderType,
-            TradeType tradeType,
-            int quantity,
-            int price,
-            Members members) {
+    public Orders(String stockCode, String stockName, OrderType orderType,
+                  TradeType tradeType, int quantity, int price, Members members) {
         this.stockCode = stockCode;
         this.stockName = stockName;
         this.orderType = orderType;
