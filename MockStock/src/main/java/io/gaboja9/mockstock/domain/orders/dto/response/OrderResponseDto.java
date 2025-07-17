@@ -1,7 +1,7 @@
 package io.gaboja9.mockstock.domain.orders.dto.response;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.AllArgsConstructor;
+
 import lombok.Builder;
 import lombok.Getter;
 
@@ -17,5 +17,4 @@ public class OrderResponseDto {
 
     @Schema(description = "거래 가격")
     private int price;
-
 }

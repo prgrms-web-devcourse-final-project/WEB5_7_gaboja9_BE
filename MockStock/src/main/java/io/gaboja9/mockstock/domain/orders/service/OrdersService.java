@@ -17,7 +17,9 @@ import io.gaboja9.mockstock.domain.portfolios.service.PortfoliosService;
 import io.gaboja9.mockstock.domain.trades.entity.TradeType;
 import io.gaboja9.mockstock.domain.trades.entity.Trades;
 import io.gaboja9.mockstock.domain.trades.repository.TradesRepository;
+
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -50,11 +52,20 @@ public class OrdersService {
             throw new NotEnoughCashException(cashBalance);
         }
 
-        Orders order = new Orders(stockCode, stockName, OrderType.MARKET, TradeType.BUY, quantity, currentPrice, findMember);
+        Orders order =
+                new Orders(
+                        stockCode,
+                        stockName,
+                        OrderType.MARKET,
+                        TradeType.BUY,
+                        quantity,
+                        currentPrice,
+                        findMember);
         order.execute();
         ordersRepository.save(order);
 
-        Trades trades = new Trades(stockCode, stockName, TradeType.BUY, quantity, currentPrice, findMember);
+        Trades trades =
+                new Trades(stockCode, stockName, TradeType.BUY, quantity, currentPrice, findMember);
         tradesRepository.save(trades);
 
         findMember.setCashBalance(cashBalance - totalPrice);
@@ -71,15 +82,19 @@ public class OrdersService {
     @Transactional
     public OrderResponseDto executeMarketSellOrders(Long memberId, OrdersMarketTypeRequestDto dto) {
 
-        Members member = membersRepository.findById(memberId)
-                .orElseThrow(() -> new NotFoundMemberException(memberId));
+        Members member =
+                membersRepository
+                        .findById(memberId)
+                        .orElseThrow(() -> new NotFoundMemberException(memberId));
 
         String stockCode = dto.getStockCode();
         String stockName = dto.getStockName();
         int quantity = dto.getQuantity();
 
-        Portfolios portfolio = portfoliosRepository.findByMembersIdAndStockCode(memberId, stockCode)
-                .orElseThrow(() -> new NotFoundPortfolioException());
+        Portfolios portfolio =
+                portfoliosRepository
+                        .findByMembersIdAndStockCode(memberId, stockCode)
+                        .orElseThrow(() -> new NotFoundPortfolioException());
 
         if (portfolio.getQuantity() < quantity) {
             throw new InvalidSellQuantityException(quantity);
@@ -88,11 +103,20 @@ public class OrdersService {
         int currentPrice = 100000; // TODO: 실제 시장가 서비스 연동
         int totalAmount = currentPrice * quantity;
 
-        Orders order = new Orders(stockCode, stockName, OrderType.MARKET, TradeType.SELL, quantity, currentPrice, member);
+        Orders order =
+                new Orders(
+                        stockCode,
+                        stockName,
+                        OrderType.MARKET,
+                        TradeType.SELL,
+                        quantity,
+                        currentPrice,
+                        member);
         order.execute();
         ordersRepository.save(order);
 
-        Trades trades = new Trades(stockCode, stockName, TradeType.SELL, quantity, currentPrice, member);
+        Trades trades =
+                new Trades(stockCode, stockName, TradeType.SELL, quantity, currentPrice, member);
         tradesRepository.save(trades);
 
         portfoliosService.updateForSell(memberId, stockCode, quantity);
@@ -105,5 +129,4 @@ public class OrdersService {
                 .price(currentPrice)
                 .build();
     }
-
 }

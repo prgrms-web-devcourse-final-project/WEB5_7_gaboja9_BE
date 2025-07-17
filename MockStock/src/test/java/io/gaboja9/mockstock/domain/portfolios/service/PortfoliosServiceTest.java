@@ -160,12 +160,22 @@ class PortfoliosServiceTest {
         int quantity = 5;
         int price = 200;
 
-        Members member = new Members(memberId, "test@example.com", "testUser", "google", "profile.png", 30000000, 0, LocalDateTime.now());
+        Members member =
+                new Members(
+                        memberId,
+                        "test@example.com",
+                        "testUser",
+                        "google",
+                        "profile.png",
+                        30000000,
+                        0,
+                        LocalDateTime.now());
 
         Portfolios portfolio = new Portfolios(stockCode, stockName, 10, 150, member);
 
         given(membersRepository.findById(memberId)).willReturn(Optional.of(member));
-        given(portfoliosRepository.findByMembersIdAndStockCode(memberId, stockCode)).willReturn(Optional.of(portfolio));
+        given(portfoliosRepository.findByMembersIdAndStockCode(memberId, stockCode))
+                .willReturn(Optional.of(portfolio));
 
         // when
         portfoliosService.updateForBuy(memberId, stockCode, stockName, quantity, price);
@@ -185,10 +195,20 @@ class PortfoliosServiceTest {
         int quantity = 3;
         int price = 180;
 
-        Members member = new Members(memberId, "test@example.com", "testUser", "google", "profile.png", 30000000, 0, LocalDateTime.now());
+        Members member =
+                new Members(
+                        memberId,
+                        "test@example.com",
+                        "testUser",
+                        "google",
+                        "profile.png",
+                        30000000,
+                        0,
+                        LocalDateTime.now());
 
         given(membersRepository.findById(memberId)).willReturn(Optional.of(member));
-        given(portfoliosRepository.findByMembersIdAndStockCode(memberId, stockCode)).willReturn(Optional.empty());
+        given(portfoliosRepository.findByMembersIdAndStockCode(memberId, stockCode))
+                .willReturn(Optional.empty());
 
         // when
         portfoliosService.updateForBuy(memberId, stockCode, stockName, quantity, price);
@@ -204,12 +224,22 @@ class PortfoliosServiceTest {
         String stockCode = "AAPL";
         int quantityToSell = 5;
 
-        Members member = new Members(memberId, "test@example.com", "testUser", "google", "profile.png", 30000000, 0, LocalDateTime.now());
+        Members member =
+                new Members(
+                        memberId,
+                        "test@example.com",
+                        "testUser",
+                        "google",
+                        "profile.png",
+                        30000000,
+                        0,
+                        LocalDateTime.now());
 
         Portfolios portfolio = new Portfolios(stockCode, "애플", 10, 150, member);
 
         given(membersRepository.findById(memberId)).willReturn(Optional.of(member));
-        given(portfoliosRepository.findByMembersIdAndStockCode(memberId, stockCode)).willReturn(Optional.of(portfolio));
+        given(portfoliosRepository.findByMembersIdAndStockCode(memberId, stockCode))
+                .willReturn(Optional.of(portfolio));
 
         // when
         portfoliosService.updateForSell(memberId, stockCode, quantityToSell);
@@ -227,12 +257,22 @@ class PortfoliosServiceTest {
         String stockCode = "AAPL";
         int quantityToSell = 10;
 
-        Members member = new Members(memberId, "test@example.com", "testUser", "google", "profile.png", 30000000, 0, LocalDateTime.now());
+        Members member =
+                new Members(
+                        memberId,
+                        "test@example.com",
+                        "testUser",
+                        "google",
+                        "profile.png",
+                        30000000,
+                        0,
+                        LocalDateTime.now());
 
         Portfolios portfolio = new Portfolios(stockCode, "애플", 10, 150, member);
 
         given(membersRepository.findById(memberId)).willReturn(Optional.of(member));
-        given(portfoliosRepository.findByMembersIdAndStockCode(memberId, stockCode)).willReturn(Optional.of(portfolio));
+        given(portfoliosRepository.findByMembersIdAndStockCode(memberId, stockCode))
+                .willReturn(Optional.of(portfolio));
 
         // when
         portfoliosService.updateForSell(memberId, stockCode, quantityToSell);
@@ -250,7 +290,16 @@ class PortfoliosServiceTest {
         int quantity = 5;
 
         // 멤버는 존재
-        Members member = new Members(memberId, "test@example.com", "testUser", "google", "profile.png", 30000000, 0, LocalDateTime.now());
+        Members member =
+                new Members(
+                        memberId,
+                        "test@example.com",
+                        "testUser",
+                        "google",
+                        "profile.png",
+                        30000000,
+                        0,
+                        LocalDateTime.now());
         when(membersRepository.findById(memberId)).thenReturn(Optional.of(member));
 
         // 포트폴리오는 없음
@@ -258,8 +307,10 @@ class PortfoliosServiceTest {
                 .thenReturn(Optional.empty());
 
         // when & then
-        assertThrows(NotFoundPortfolioException.class, () -> {
-            portfoliosService.updateForSell(memberId, stockCode, quantity);
-        });
+        assertThrows(
+                NotFoundPortfolioException.class,
+                () -> {
+                    portfoliosService.updateForSell(memberId, stockCode, quantity);
+                });
     }
 }

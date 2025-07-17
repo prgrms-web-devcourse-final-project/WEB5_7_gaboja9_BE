@@ -1,8 +1,10 @@
 package io.gaboja9.mockstock.domain.orders.dto.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+
 import lombok.Builder;
 import lombok.Getter;
 
@@ -21,5 +23,4 @@ public class OrdersMarketTypeRequestDto {
     @NotNull
     @Schema(description = "매수/매도 수량")
     private int quantity;
-
 }

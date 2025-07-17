@@ -4,8 +4,11 @@ import io.gaboja9.mockstock.domain.auth.dto.MembersDetails;
 import io.gaboja9.mockstock.domain.orders.dto.request.OrdersMarketTypeRequestDto;
 import io.gaboja9.mockstock.domain.orders.dto.response.OrderResponseDto;
 import io.gaboja9.mockstock.domain.orders.service.OrdersService;
+
 import jakarta.validation.Valid;
+
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -22,7 +25,9 @@ public class OrdersController implements OrdersControllerSpec {
     private final OrdersService ordersService;
 
     @PostMapping("/market/buy")
-    public ResponseEntity<OrderResponseDto> executeMarketBuy(@Valid @RequestBody OrdersMarketTypeRequestDto requestDto, @AuthenticationPrincipal MembersDetails membersDetails) {
+    public ResponseEntity<OrderResponseDto> executeMarketBuy(
+            @Valid @RequestBody OrdersMarketTypeRequestDto requestDto,
+            @AuthenticationPrincipal MembersDetails membersDetails) {
 
         Long id = membersDetails.getId();
 
@@ -32,7 +37,9 @@ public class OrdersController implements OrdersControllerSpec {
     }
 
     @PostMapping("/market/sell")
-    public ResponseEntity<OrderResponseDto> executeMarketSell(@Valid @RequestBody OrdersMarketTypeRequestDto requestDto, @AuthenticationPrincipal MembersDetails membersDetails) {
+    public ResponseEntity<OrderResponseDto> executeMarketSell(
+            @Valid @RequestBody OrdersMarketTypeRequestDto requestDto,
+            @AuthenticationPrincipal MembersDetails membersDetails) {
 
         Long id = membersDetails.getId();
 

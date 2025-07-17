@@ -31,7 +31,8 @@ public class Portfolios extends BaseEntity {
     @JoinColumn(name = "members_id")
     private Members members;
 
-    public Portfolios(String stockCode, String stockName, int quantity, int avgPrice, Members members) {
+    public Portfolios(
+            String stockCode, String stockName, int quantity, int avgPrice, Members members) {
         this.stockCode = stockCode;
         this.stockName = stockName;
         this.quantity = quantity;

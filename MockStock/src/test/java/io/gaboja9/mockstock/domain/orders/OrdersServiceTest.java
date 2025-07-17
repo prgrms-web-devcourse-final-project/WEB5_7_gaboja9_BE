@@ -1,7 +1,9 @@
 package io.gaboja9.mockstock.domain.orders;
 
+import static org.assertj.core.api.Assertions.*;
+import static org.mockito.Mockito.*;
+
 import io.gaboja9.mockstock.domain.members.entity.Members;
-import io.gaboja9.mockstock.domain.members.exception.NotFoundMemberException;
 import io.gaboja9.mockstock.domain.members.repository.MembersRepository;
 import io.gaboja9.mockstock.domain.orders.dto.request.OrdersMarketTypeRequestDto;
 import io.gaboja9.mockstock.domain.orders.dto.response.OrderResponseDto;
@@ -15,6 +17,7 @@ import io.gaboja9.mockstock.domain.portfolios.exception.NotFoundPortfolioExcepti
 import io.gaboja9.mockstock.domain.portfolios.repository.PortfoliosRepository;
 import io.gaboja9.mockstock.domain.portfolios.service.PortfoliosService;
 import io.gaboja9.mockstock.domain.trades.repository.TradesRepository;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -24,41 +27,42 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.*;
-import static org.mockito.Mockito.*;
-
 @ExtendWith(MockitoExtension.class)
 class OrdersServiceTest {
 
-    @InjectMocks
-    private OrdersService ordersService;
+    @InjectMocks private OrdersService ordersService;
 
-    @Mock
-    private MembersRepository membersRepository;
+    @Mock private MembersRepository membersRepository;
 
-    @Mock
-    private OrdersRepository ordersRepository;
+    @Mock private OrdersRepository ordersRepository;
 
-    @Mock
-    private TradesRepository tradesRepository;
+    @Mock private TradesRepository tradesRepository;
 
-    @Mock
-    private PortfoliosService portfoliosService;
+    @Mock private PortfoliosService portfoliosService;
 
-    @Mock
-    private PortfoliosRepository portfoliosRepository;
+    @Mock private PortfoliosRepository portfoliosRepository;
 
     @Test
     void executeMarketBuyOrders_성공() {
         Long memberId = 1L;
-        Members member = new Members(memberId, "test@example.com", "testUser", "google", "profile.png", 30000000, 0, LocalDateTime.now());
+        Members member =
+                new Members(
+                        memberId,
+                        "test@example.com",
+                        "testUser",
+                        "google",
+                        "profile.png",
+                        30000000,
+                        0,
+                        LocalDateTime.now());
         member.setCashBalance(1_000_000);
 
-        OrdersMarketTypeRequestDto dto = OrdersMarketTypeRequestDto.builder()
-                .stockCode("AAPL")
-                .stockName("애플")
-                .quantity(5)
-                .build();
+        OrdersMarketTypeRequestDto dto =
+                OrdersMarketTypeRequestDto.builder()
+                        .stockCode("AAPL")
+                        .stockName("애플")
+                        .quantity(5)
+                        .build();
 
         when(membersRepository.findById(memberId)).thenReturn(Optional.of(member));
 
@@ -75,15 +79,24 @@ class OrdersServiceTest {
     @Test
     void executeMarketBuyOrders_실패_현금부족() {
         Long memberId = 1L;
-        Members member = new Members(memberId, "test@example.com", "testUser", "google", "profile.png", 30000000, 0, LocalDateTime.now());
+        Members member =
+                new Members(
+                        memberId,
+                        "test@example.com",
+                        "testUser",
+                        "google",
+                        "profile.png",
+                        30000000,
+                        0,
+                        LocalDateTime.now());
         member.setCashBalance(100_000);
 
-        OrdersMarketTypeRequestDto dto = OrdersMarketTypeRequestDto.builder()
-                .stockCode("AAPL")
-                .stockName("애플")
-                .quantity(2)
-                .build();
-
+        OrdersMarketTypeRequestDto dto =
+                OrdersMarketTypeRequestDto.builder()
+                        .stockCode("AAPL")
+                        .stockName("애플")
+                        .quantity(2)
+                        .build();
 
         when(membersRepository.findById(memberId)).thenReturn(Optional.of(member));
 
@@ -94,20 +107,30 @@ class OrdersServiceTest {
     @Test
     void executeMarketSellOrders_성공() {
         Long memberId = 1L;
-        Members member = new Members(memberId, "test@example.com", "testUser", "google", "profile.png", 30000000, 0, LocalDateTime.now());
+        Members member =
+                new Members(
+                        memberId,
+                        "test@example.com",
+                        "testUser",
+                        "google",
+                        "profile.png",
+                        30000000,
+                        0,
+                        LocalDateTime.now());
         member.setCashBalance(100_000);
 
-        OrdersMarketTypeRequestDto dto = OrdersMarketTypeRequestDto.builder()
-                .stockCode("AAPL")
-                .stockName("애플")
-                .quantity(3)
-                .build();
-
+        OrdersMarketTypeRequestDto dto =
+                OrdersMarketTypeRequestDto.builder()
+                        .stockCode("AAPL")
+                        .stockName("애플")
+                        .quantity(3)
+                        .build();
 
         Portfolios portfolio = new Portfolios("AAPL", "애플", 5, 100000, member);
 
         when(membersRepository.findById(memberId)).thenReturn(Optional.of(member));
-        when(portfoliosRepository.findByMembersIdAndStockCode(memberId, "AAPL")).thenReturn(Optional.of(portfolio));
+        when(portfoliosRepository.findByMembersIdAndStockCode(memberId, "AAPL"))
+                .thenReturn(Optional.of(portfolio));
 
         OrderResponseDto response = ordersService.executeMarketSellOrders(memberId, dto);
 
@@ -122,19 +145,29 @@ class OrdersServiceTest {
     @Test
     void executeMarketSellOrders_실패_수량초과() {
         Long memberId = 1L;
-        Members member = new Members(memberId, "test@example.com", "testUser", "google", "profile.png", 30000000, 0, LocalDateTime.now());
+        Members member =
+                new Members(
+                        memberId,
+                        "test@example.com",
+                        "testUser",
+                        "google",
+                        "profile.png",
+                        30000000,
+                        0,
+                        LocalDateTime.now());
 
-        OrdersMarketTypeRequestDto dto = OrdersMarketTypeRequestDto.builder()
-                .stockCode("AAPL")
-                .stockName("애플")
-                .quantity(10)
-                .build();
-
+        OrdersMarketTypeRequestDto dto =
+                OrdersMarketTypeRequestDto.builder()
+                        .stockCode("AAPL")
+                        .stockName("애플")
+                        .quantity(10)
+                        .build();
 
         Portfolios portfolio = new Portfolios("AAPL", "애플", 5, 100000, member);
 
         when(membersRepository.findById(memberId)).thenReturn(Optional.of(member));
-        when(portfoliosRepository.findByMembersIdAndStockCode(memberId, "AAPL")).thenReturn(Optional.of(portfolio));
+        when(portfoliosRepository.findByMembersIdAndStockCode(memberId, "AAPL"))
+                .thenReturn(Optional.of(portfolio));
 
         assertThatThrownBy(() -> ordersService.executeMarketSellOrders(memberId, dto))
                 .isInstanceOf(InvalidSellQuantityException.class);
@@ -143,19 +176,29 @@ class OrdersServiceTest {
     @Test
     void executeMarketSellOrders_실패_포트폴리오없음() {
         Long memberId = 1L;
-        Members member = new Members(memberId, "test@example.com", "testUser", "google", "profile.png", 30000000, 0, LocalDateTime.now());
+        Members member =
+                new Members(
+                        memberId,
+                        "test@example.com",
+                        "testUser",
+                        "google",
+                        "profile.png",
+                        30000000,
+                        0,
+                        LocalDateTime.now());
 
-        OrdersMarketTypeRequestDto dto = OrdersMarketTypeRequestDto.builder()
-                .stockCode("AAPL")
-                .stockName("애플")
-                .quantity(3)
-                .build();
+        OrdersMarketTypeRequestDto dto =
+                OrdersMarketTypeRequestDto.builder()
+                        .stockCode("AAPL")
+                        .stockName("애플")
+                        .quantity(3)
+                        .build();
 
         when(membersRepository.findById(memberId)).thenReturn(Optional.of(member));
-        when(portfoliosRepository.findByMembersIdAndStockCode(memberId, "AAPL")).thenReturn(Optional.empty());
+        when(portfoliosRepository.findByMembersIdAndStockCode(memberId, "AAPL"))
+                .thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> ordersService.executeMarketSellOrders(memberId, dto))
                 .isInstanceOf(NotFoundPortfolioException.class);
     }
 }
-

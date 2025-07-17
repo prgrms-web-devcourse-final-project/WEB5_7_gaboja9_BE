@@ -89,10 +89,13 @@ public class PortfoliosService {
     }
 
     @Transactional
-    public void updateForBuy(Long memberId, String stockCode, String stockName, int quantity, int price) {
+    public void updateForBuy(
+            Long memberId, String stockCode, String stockName, int quantity, int price) {
 
-        Members member = membersRepository.findById(memberId)
-                .orElseThrow(() -> new NotFoundMemberException(memberId));
+        Members member =
+                membersRepository
+                        .findById(memberId)
+                        .orElseThrow(() -> new NotFoundMemberException(memberId));
 
         Optional<Portfolios> optionalPortfolios =
                 portfoliosRepository.findByMembersIdAndStockCode(memberId, stockCode);
@@ -111,11 +114,14 @@ public class PortfoliosService {
 
     @Transactional
     public void updateForSell(Long memberId, String stockCode, int quantity) {
-        membersRepository.findById(memberId)
+        membersRepository
+                .findById(memberId)
                 .orElseThrow(() -> new NotFoundMemberException(memberId));
 
-        Portfolios portfolio = portfoliosRepository.findByMembersIdAndStockCode(memberId, stockCode)
-                .orElseThrow(() -> new NotFoundPortfolioException());
+        Portfolios portfolio =
+                portfoliosRepository
+                        .findByMembersIdAndStockCode(memberId, stockCode)
+                        .orElseThrow(() -> new NotFoundPortfolioException());
 
         portfolio.updateForSell(quantity);
 
