@@ -31,7 +31,7 @@ public class FormAuthService {
     public void signUp(SignUpRequestDto dto) {
 
         // 이메일 중복 확인
-        if (membersRepository.findByEmail(dto.getEmail()).isPresent()) {
+        if (!emailCheck(dto.getEmail())) {
             throw AuthException.emailAlreadyExists();
         }
 
