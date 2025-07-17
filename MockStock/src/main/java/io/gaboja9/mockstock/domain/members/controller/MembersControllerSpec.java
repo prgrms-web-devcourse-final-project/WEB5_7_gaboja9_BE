@@ -36,7 +36,8 @@ public interface MembersControllerSpec {
                                             schema =
                                                     @Schema(implementation = MemberInfoDto.class))))
     @GetMapping("/info")
-    ResponseEntity<MemberInfoDto> getMemberInfo(@AuthenticationPrincipal MembersDetails membersDetails);
+    ResponseEntity<MemberInfoDto> getMemberInfo(
+            @AuthenticationPrincipal MembersDetails membersDetails);
 
     @Operation(
             summary = "포트폴리오를 불러옵니다.",
@@ -53,7 +54,8 @@ public interface MembersControllerSpec {
                                                             implementation =
                                                                     PortfoliosResponseDto.class))))
     @GetMapping("/portfolios")
-    ResponseEntity<PortfoliosResponseDto> getPortfolios(@AuthenticationPrincipal MembersDetails membersDetails);
+    ResponseEntity<PortfoliosResponseDto> getPortfolios(
+            @AuthenticationPrincipal MembersDetails membersDetails);
 
     @Operation(
             summary = "전체 거래내역을 불러옵니다.",
@@ -110,7 +112,9 @@ public interface MembersControllerSpec {
                                             mediaType = "application/json",
                                             schema = @Schema(implementation = String.class))))
     @PostMapping("/memos")
-    ResponseEntity<String> createMemos(@RequestBody MemosCreateRequestDto dto, @AuthenticationPrincipal MembersDetails membersDetails);
+    ResponseEntity<String> createMemos(
+            @RequestBody MemosCreateRequestDto dto,
+            @AuthenticationPrincipal MembersDetails membersDetails);
 
     @Operation(
             summary = "메모를 불러옵니다.",
@@ -127,7 +131,8 @@ public interface MembersControllerSpec {
                                                             implementation =
                                                                     MemoResponseDto.class))))
     @GetMapping("/memos")
-    ResponseEntity<MemoResponseDto> getMemos(@AuthenticationPrincipal MembersDetails membersDetails);
+    ResponseEntity<MemoResponseDto> getMemos(
+            @AuthenticationPrincipal MembersDetails membersDetails);
 
     @Operation(
             summary = "메일을 불러옵니다.",

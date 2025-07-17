@@ -39,7 +39,8 @@ public class MembersController implements MembersControllerSpec {
     private final MailsService mailsService;
 
     @GetMapping("/info")
-    public ResponseEntity<MemberInfoDto> getMemberInfo(@AuthenticationPrincipal MembersDetails membersDetails) {
+    public ResponseEntity<MemberInfoDto> getMemberInfo(
+            @AuthenticationPrincipal MembersDetails membersDetails) {
 
         Long currentId = membersDetails.getId();
 
@@ -51,7 +52,8 @@ public class MembersController implements MembersControllerSpec {
     }
 
     @GetMapping("/portfolios")
-    public ResponseEntity<PortfoliosResponseDto> getPortfolios(@AuthenticationPrincipal MembersDetails membersDetails) {
+    public ResponseEntity<PortfoliosResponseDto> getPortfolios(
+            @AuthenticationPrincipal MembersDetails membersDetails) {
 
         Long currentId = membersDetails.getId();
 
@@ -96,7 +98,9 @@ public class MembersController implements MembersControllerSpec {
     }
 
     @PostMapping("/memos")
-    public ResponseEntity<String> createMemos(@Valid @RequestBody MemosCreateRequestDto dto, @AuthenticationPrincipal MembersDetails membersDetails) {
+    public ResponseEntity<String> createMemos(
+            @Valid @RequestBody MemosCreateRequestDto dto,
+            @AuthenticationPrincipal MembersDetails membersDetails) {
 
         Long currentId = membersDetails.getId();
 
@@ -106,7 +110,8 @@ public class MembersController implements MembersControllerSpec {
     }
 
     @GetMapping("/memos")
-    public ResponseEntity<MemoResponseDto> getMemos(@AuthenticationPrincipal MembersDetails membersDetails) {
+    public ResponseEntity<MemoResponseDto> getMemos(
+            @AuthenticationPrincipal MembersDetails membersDetails) {
 
         Long currentId = membersDetails.getId();
 
@@ -122,7 +127,6 @@ public class MembersController implements MembersControllerSpec {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
 
-
         Long currentId = membersDetails.getId();
         Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
 
@@ -137,7 +141,8 @@ public class MembersController implements MembersControllerSpec {
     }
 
     @PostMapping("/bankruptcy")
-    public ResponseEntity<Void> declareBankruptcy(@AuthenticationPrincipal MembersDetails membersDetails) {
+    public ResponseEntity<Void> declareBankruptcy(
+            @AuthenticationPrincipal MembersDetails membersDetails) {
 
         Long currentId = membersDetails.getId();
 
