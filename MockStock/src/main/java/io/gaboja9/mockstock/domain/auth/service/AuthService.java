@@ -1,25 +1,19 @@
 package io.gaboja9.mockstock.domain.auth.service;
 
 import io.gaboja9.mockstock.domain.auth.dto.MembersDetails;
-import io.gaboja9.mockstock.domain.auth.dto.TokenPair;
-import io.gaboja9.mockstock.domain.auth.dto.request.LoginRequestDto;
-import io.gaboja9.mockstock.domain.auth.dto.request.SignUpRequestDto;
-import io.gaboja9.mockstock.domain.auth.exception.AuthException;
 import io.gaboja9.mockstock.domain.members.entity.Members;
 import io.gaboja9.mockstock.domain.members.enums.Role;
 import io.gaboja9.mockstock.domain.members.repository.MembersRepository;
 
-import org.springframework.transaction.annotation.Transactional;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.NoSuchElementException;
 import java.util.Optional;
