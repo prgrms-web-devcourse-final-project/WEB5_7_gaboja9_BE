@@ -29,7 +29,11 @@ public class SecurityConfig {
         return http.authorizeHttpRequests(
                         auth ->
                                 auth.requestMatchers(
-                                                "/swagger-ui/**", "/v3/api-docs/**", "/actuator/**")
+                                                "/swagger-ui/**",
+                                                "/v3/api-docs/**",
+                                                "/actuator/**",
+                                                "/ws-stock",
+                                                "/ws-stock/**")
                                         .permitAll()
                                         .anyRequest()
                                         .authenticated())
