@@ -1,6 +1,8 @@
 package io.gaboja9.mockstock.domain.stock.service;
 
+import io.gaboja9.mockstock.domain.stock.dto.StockResponse;
 import io.gaboja9.mockstock.domain.stock.entity.Stocks;
+import io.gaboja9.mockstock.domain.stock.mapper.StocksMapper;
 import io.gaboja9.mockstock.domain.stock.repository.StocksRepository;
 
 import jakarta.annotation.PostConstruct;
@@ -18,6 +20,7 @@ import java.util.List;
 public class StocksService {
 
     private final StocksRepository stocksRepository;
+    private final StocksMapper stocksMapper;
 
     // 초기 데이터 생성 배포 서버에서는 직접 넣어줄 예정
     @PostConstruct
@@ -46,7 +49,8 @@ public class StocksService {
         }
     }
 
-    public List<Stocks> getAllStocks() {
-        return stocksRepository.findAll();
+    public List<StockResponse> getAllStocks() {
+
+        return stocksMapper.toDtoList(stocksRepository.findAll());
     }
 }
