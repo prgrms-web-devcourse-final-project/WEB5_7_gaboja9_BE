@@ -11,5 +11,4 @@ public class StockResponse {
 
     private String stockCode;
     private String stockName;
-
 }

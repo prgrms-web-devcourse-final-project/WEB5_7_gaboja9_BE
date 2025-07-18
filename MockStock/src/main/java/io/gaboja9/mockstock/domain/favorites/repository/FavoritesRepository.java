@@ -1,9 +1,9 @@
 package io.gaboja9.mockstock.domain.favorites.repository;
 
 import io.gaboja9.mockstock.domain.favorites.entity.Favorites;
-
 import io.gaboja9.mockstock.domain.members.entity.Members;
 import io.gaboja9.mockstock.domain.stock.entity.Stocks;
+
 import org.springframework.data.repository.CrudRepository;
 
 import java.util.List;

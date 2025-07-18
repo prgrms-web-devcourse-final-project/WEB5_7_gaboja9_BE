@@ -23,7 +23,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/stocks")
 @RequiredArgsConstructor
-public class StockController implements StockControllerSpec{
+public class StockController implements StockControllerSpec {
 
     private final DailyStockService dailyStockService;
     private final MinuteStockService minuteStockService;
@@ -41,7 +41,8 @@ public class StockController implements StockControllerSpec{
         log.info("주식 데이터 수집 요청: {}, 기간: {} ~ {}", stockCode, startDate, endDate);
 
         // 단일 종목 처리용 서비스 호출
-        dailyStockService.fetchAndSaveDailyData(marketCode, stockCode, startDate, endDate, periodCode);
+        dailyStockService.fetchAndSaveDailyData(
+                marketCode, stockCode, startDate, endDate, periodCode);
 
         return ResponseEntity.status(HttpStatus.CREATED).body("데일리 주식 저장 완료");
     }
@@ -72,7 +73,7 @@ public class StockController implements StockControllerSpec{
     }
 
     @GetMapping()
-    public ResponseEntity<List<StockResponse>> getAllStocks(){
+    public ResponseEntity<List<StockResponse>> getAllStocks() {
         return ResponseEntity.ok(stocksService.getAllStocks());
     }
 }

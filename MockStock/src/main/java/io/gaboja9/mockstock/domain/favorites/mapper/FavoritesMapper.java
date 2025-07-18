@@ -2,10 +2,10 @@ package io.gaboja9.mockstock.domain.favorites.mapper;
 
 import io.gaboja9.mockstock.domain.favorites.dto.response.FavoriteResponse;
 import io.gaboja9.mockstock.domain.favorites.entity.Favorites;
+
 import org.springframework.stereotype.Component;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Component
 public class FavoritesMapper {
@@ -21,5 +21,4 @@ public class FavoritesMapper {
     public List<FavoriteResponse> toDtoList(List<Favorites> favorites) {
         return favorites.stream().map(this::toDto).toList();
     }
-
 }

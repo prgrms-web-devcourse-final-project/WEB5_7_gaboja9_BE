@@ -1,5 +1,13 @@
 package io.gaboja9.mockstock.domain.favorites.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.then;
+import static org.mockito.Mockito.*;
+
 import io.gaboja9.mockstock.domain.favorites.dto.response.FavoriteResponse;
 import io.gaboja9.mockstock.domain.favorites.entity.Favorites;
 import io.gaboja9.mockstock.domain.favorites.exception.FavoriteAlreadyExistException;
@@ -12,6 +20,7 @@ import io.gaboja9.mockstock.domain.members.repository.MembersRepository;
 import io.gaboja9.mockstock.domain.stock.entity.Stocks;
 import io.gaboja9.mockstock.domain.stock.exception.NotFoundStockException;
 import io.gaboja9.mockstock.domain.stock.repository.StocksRepository;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -21,38 +30,23 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.then;
-import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("FavoritesService 테스트")
 class FavoritesServiceTest {
 
-    @Mock
-    private FavoritesRepository favoritesRepository;
+    @Mock private FavoritesRepository favoritesRepository;
 
-    @Mock
-    private StocksRepository stocksRepository;
+    @Mock private StocksRepository stocksRepository;
 
-    @Mock
-    private MembersRepository membersRepository;
+    @Mock private MembersRepository membersRepository;
 
-    @Mock
-    private FavoritesMapper favoritesMapper;
+    @Mock private FavoritesMapper favoritesMapper;
 
-    @InjectMocks
-    private FavoritesService favoritesService;
+    @InjectMocks private FavoritesService favoritesService;
 
     private Members testMember;
     private Stocks testStock;
@@ -62,32 +56,22 @@ class FavoritesServiceTest {
     @BeforeEach
     void setUp() {
         // 테스트용 Members 객체 생성
-        testMember = Members.builder()
-                .id(1L)
-                .email("test@example.com")
-                .nickname("testUser")
-                .build();
+        testMember =
+                Members.builder().id(1L).email("test@example.com").nickname("testUser").build();
 
         // 테스트용 Stocks 객체 생성
-        testStock = Stocks.builder()
-                .id(1L)
-                .stockName("삼성전자")
-                .stockCode("005930")
-                .build();
+        testStock = Stocks.builder().id(1L).stockName("삼성전자").stockCode("005930").build();
 
         // 테스트용 Favorites 객체 생성
-        testFavorite = Favorites.builder()
-                .id(1L)
-                .members(testMember)
-                .stocks(testStock)
-                .build();
+        testFavorite = Favorites.builder().id(1L).members(testMember).stocks(testStock).build();
 
         // 테스트용 FavoriteResponse 객체 생성
-        testFavoriteResponse = FavoriteResponse.builder()
-                .memberId(1L)
-                .stockName("삼성전자")
-                .stockCode("005930")
-                .build();
+        testFavoriteResponse =
+                FavoriteResponse.builder()
+                        .memberId(1L)
+                        .stockName("삼성전자")
+                        .stockCode("005930")
+                        .build();
     }
 
     @Nested
@@ -103,7 +87,8 @@ class FavoritesServiceTest {
 
             given(stocksRepository.findByStockCode(stockCode)).willReturn(Optional.of(testStock));
             given(membersRepository.findById(memberId)).willReturn(Optional.of(testMember));
-            given(favoritesRepository.existsByMembersAndStocks(testMember, testStock)).willReturn(false);
+            given(favoritesRepository.existsByMembersAndStocks(testMember, testStock))
+                    .willReturn(false);
             given(favoritesRepository.save(any(Favorites.class))).willReturn(testFavorite);
             given(favoritesMapper.toDto(any(Favorites.class))).willReturn(testFavoriteResponse);
 
@@ -169,7 +154,8 @@ class FavoritesServiceTest {
 
             given(stocksRepository.findByStockCode(stockCode)).willReturn(Optional.of(testStock));
             given(membersRepository.findById(memberId)).willReturn(Optional.of(testMember));
-            given(favoritesRepository.existsByMembersAndStocks(testMember, testStock)).willReturn(true);
+            given(favoritesRepository.existsByMembersAndStocks(testMember, testStock))
+                    .willReturn(true);
 
             // when & then
             assertThatThrownBy(() -> favoritesService.addFavorite(memberId, stockCode))
@@ -278,27 +264,22 @@ class FavoritesServiceTest {
             // given
             Long memberId = 1L;
 
-            Stocks stock2 = Stocks.builder()
-                    .id(2L)
-                    .stockName("SK하이닉스")
-                    .stockCode("000660")
-                    .build();
+            Stocks stock2 = Stocks.builder().id(2L).stockName("SK하이닉스").stockCode("000660").build();
 
-            Favorites favorite2 = Favorites.builder()
-                    .id(2L)
-                    .members(testMember)
-                    .stocks(stock2)
-                    .build();
+            Favorites favorite2 =
+                    Favorites.builder().id(2L).members(testMember).stocks(stock2).build();
 
             List<Favorites> favoritesList = Arrays.asList(testFavorite, favorite2);
 
-            FavoriteResponse response2 = FavoriteResponse.builder()
-                    .memberId(1L)
-                    .stockName("SK하이닉스")
-                    .stockCode("000660")
-                    .build();
+            FavoriteResponse response2 =
+                    FavoriteResponse.builder()
+                            .memberId(1L)
+                            .stockName("SK하이닉스")
+                            .stockCode("000660")
+                            .build();
 
-            List<FavoriteResponse> expectedResponses = Arrays.asList(testFavoriteResponse, response2);
+            List<FavoriteResponse> expectedResponses =
+                    Arrays.asList(testFavoriteResponse, response2);
 
             given(membersRepository.findById(memberId)).willReturn(Optional.of(testMember));
             given(favoritesRepository.findByMembersOrderByCreatedAtDesc(testMember))
@@ -331,7 +312,9 @@ class FavoritesServiceTest {
                     .isInstanceOf(NotFoundMemberException.class);
 
             then(membersRepository).should().findById(invalidMemberId);
-            then(favoritesRepository).should(never()).findByMembersOrderByCreatedAtDesc(any(Members.class));
+            then(favoritesRepository)
+                    .should(never())
+                    .findByMembersOrderByCreatedAtDesc(any(Members.class));
         }
 
         @Test
@@ -358,5 +341,4 @@ class FavoritesServiceTest {
             then(favoritesMapper).should().toDtoList(emptyList);
         }
     }
-
 }

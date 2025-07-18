@@ -24,7 +24,8 @@ public class KakaoPayController implements KakaoPayControllerSpec {
     @PostMapping("/ready")
     @Override
     public ResponseEntity<PaymentResponse> paymentReady(
-            @Valid @RequestBody PaymentRequest request, @AuthenticationPrincipal MembersDetails membersDetails) {
+            @Valid @RequestBody PaymentRequest request,
+            @AuthenticationPrincipal MembersDetails membersDetails) {
         try {
             KakaoPayReadyResponse response =
                     kakaoPayService.paymentReady(membersDetails.getId(), request.getChargeAmount());

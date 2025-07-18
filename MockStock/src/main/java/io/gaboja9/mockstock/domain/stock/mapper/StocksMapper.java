@@ -2,6 +2,7 @@ package io.gaboja9.mockstock.domain.stock.mapper;
 
 import io.gaboja9.mockstock.domain.stock.dto.StockResponse;
 import io.gaboja9.mockstock.domain.stock.entity.Stocks;
+
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -17,8 +18,6 @@ public class StocksMapper {
     }
 
     public List<StockResponse> toDtoList(List<Stocks> stocks) {
-        return stocks.stream()
-                .map(this::toDto)
-                .toList();
+        return stocks.stream().map(this::toDto).toList();
     }
 }

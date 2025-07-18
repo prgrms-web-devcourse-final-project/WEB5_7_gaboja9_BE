@@ -1,6 +1,7 @@
 package io.gaboja9.mockstock.domain.favorites.dto.response;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+
 import lombok.Builder;
 import lombok.Getter;
 
@@ -17,5 +18,4 @@ public class FavoriteResponse {
 
     @Schema(description = "주식 코드", example = "005930", pattern = "\\d{6}")
     String stockCode;
-
 }

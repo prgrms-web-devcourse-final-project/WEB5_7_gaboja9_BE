@@ -26,6 +26,4 @@ public class Favorites extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "stock_id")
     private Stocks stocks;
-
-
 }
