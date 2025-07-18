@@ -1,5 +1,6 @@
 package io.gaboja9.mockstock.domain.stock.controller;
 
+import io.gaboja9.mockstock.domain.stock.dto.StockResponse;
 import io.gaboja9.mockstock.domain.stock.service.DailyStockService;
 import io.gaboja9.mockstock.domain.stock.service.MinuteStockService;
 import io.gaboja9.mockstock.domain.stock.service.StocksService;
@@ -15,12 +16,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 /** 주식 데이터 수집을 위한 컨트롤러 */
 @Slf4j
 @RestController
 @RequestMapping("/api/stocks")
 @RequiredArgsConstructor
-public class StockController {
+public class StockController implements StockControllerSpec{
 
     private final DailyStockService dailyStockService;
     private final MinuteStockService minuteStockService;
@@ -69,7 +72,7 @@ public class StockController {
     }
 
     @GetMapping()
-    public ResponseEntity<?> getAllStocks(){
+    public ResponseEntity<List<StockResponse>> getAllStocks(){
         return ResponseEntity.ok(stocksService.getAllStocks());
     }
 }

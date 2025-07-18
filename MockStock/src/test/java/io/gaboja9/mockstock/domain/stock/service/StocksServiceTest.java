@@ -1,6 +1,8 @@
 package io.gaboja9.mockstock.domain.stock.service;
 
+import io.gaboja9.mockstock.domain.stock.dto.StockResponse;
 import io.gaboja9.mockstock.domain.stock.entity.Stocks;
+import io.gaboja9.mockstock.domain.stock.mapper.StocksMapper;
 import io.gaboja9.mockstock.domain.stock.repository.StocksRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -23,6 +25,9 @@ class StocksServiceTest {
 
     @Mock
     private StocksRepository stocksRepository;
+
+    @Mock
+    private StocksMapper stocksMapper;
 
     @InjectMocks
     private StocksService stocksService;
@@ -78,14 +83,39 @@ class StocksServiceTest {
                 new Stocks("NAVER", "035420"),
                 new Stocks("카카오", "035720")
         );
+
+        List<StockResponse> expectedStockResponses = Arrays.asList(
+                StockResponse.builder()
+                        .stockCode("005930")
+                        .stockName("삼성전자")
+                        .build(),
+                StockResponse.builder()
+                        .stockCode("035420")
+                        .stockName("NAVER")
+                        .build(),
+                StockResponse.builder()
+                        .stockCode("035720")
+                        .stockName("카카오")
+                        .build()
+        );
+
         when(stocksRepository.findAll()).thenReturn(expectedStocks);
+        when(stocksMapper.toDtoList(expectedStocks)).thenReturn(expectedStockResponses);
+
 
         // when
-        List<Stocks> actualStocks = stocksService.getAllStocks();
+        List<StockResponse> actualStocks = stocksService.getAllStocks();
 
         // then
-        assertThat(actualStocks).hasSize(3);
-        assertThat(actualStocks).containsExactlyElementsOf(expectedStocks);
+        assertThat(actualStocks.get(0).getStockCode()).isEqualTo("005930");
+        assertThat(actualStocks.get(0).getStockName()).isEqualTo("삼성전자");
+
+        assertThat(actualStocks.get(1).getStockCode()).isEqualTo("035420");
+        assertThat(actualStocks.get(1).getStockName()).isEqualTo("NAVER");
+
+        assertThat(actualStocks.get(2).getStockCode()).isEqualTo("035720");
+        assertThat(actualStocks.get(2).getStockName()).isEqualTo("카카오");
+
         verify(stocksRepository, times(1)).findAll();
     }
 
