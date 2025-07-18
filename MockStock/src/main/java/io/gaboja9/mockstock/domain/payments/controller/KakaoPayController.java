@@ -21,7 +21,6 @@ import org.springframework.web.bind.annotation.*;
 public class KakaoPayController implements KakaoPayControllerSpec {
     private final KakaoPayService kakaoPayService;
 
-
     @PostMapping("/ready")
     @Override
     public ResponseEntity<PaymentResponse> paymentReady(
