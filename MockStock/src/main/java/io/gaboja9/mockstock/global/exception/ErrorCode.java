@@ -31,7 +31,14 @@ public enum ErrorCode {
     JWT_TOKEN_INVALID(HttpStatus.UNAUTHORIZED, "JWT-002", "유효하지 않은 토큰입니다."),
     JWT_TOKEN_MALFORMED(HttpStatus.UNAUTHORIZED, "JWT-003", "잘못된 형식의 토큰입니다."),
     JWT_SIGNATURE_INVALID(HttpStatus.UNAUTHORIZED, "JWT-004", "토큰 서명이 유효하지 않습니다."),
-    JWT_TOKEN_UNSUPPORTED(HttpStatus.UNAUTHORIZED, "JWT-005", "지원되지 않는 토큰입니다.");
+    JWT_TOKEN_UNSUPPORTED(HttpStatus.UNAUTHORIZED, "JWT-005", "지원되지 않는 토큰입니다."),
+
+    // 주문 관련 에러
+    INVALID_SELL_QUANTITY(HttpStatus.BAD_REQUEST, "ORDER-001", "매도 수량이 보유 수량보다 많습니다."),
+    NOT_ENOUGH_CASH(HttpStatus.BAD_REQUEST, "ORDER-002", "잔액이 부족합니다"),
+
+    // 포트폴리오 관련 에러
+    NOT_FOUND_PORTFOLIO(HttpStatus.NOT_FOUND, "PORTFOLIO-001", "보유한 주식이 없습니다.");
 
     private final HttpStatus status;
     private final String code;
