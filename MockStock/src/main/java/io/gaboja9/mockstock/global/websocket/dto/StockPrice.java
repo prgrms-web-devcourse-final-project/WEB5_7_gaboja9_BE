@@ -42,7 +42,7 @@ public class StockPrice {
     public String toString() {
         return String.format(
                 "종목코드: %s | 현재가: %,d원 | 등락률: %.2f%% | 시간: %s | 체결 거래량: %,d | 고가: %,d | 저가: %,d | 누적"
-                    + " 거래량: %,d",
+                        + " 거래량: %,d",
                 stockCode,
                 currentPrice,
                 dayOverDayPercent,
