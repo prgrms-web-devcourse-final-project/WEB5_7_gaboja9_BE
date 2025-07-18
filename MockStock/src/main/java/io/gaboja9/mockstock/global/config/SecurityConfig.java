@@ -29,7 +29,12 @@ public class SecurityConfig {
         return http.authorizeHttpRequests(
                         auth ->
                                 auth.requestMatchers(
-                                                "/swagger-ui/**", "/v3/api-docs/**", "/actuator/**")
+                                                "/swagger-ui/**",
+                                                "/v3/api-docs/**",
+                                                "/actuator/**",
+                                                "/api/stocks",
+                                                "/ws-stock",
+                                                "/ws-stock/**")
                                         .permitAll()
                                         .anyRequest()
                                         .authenticated())
@@ -39,7 +44,7 @@ public class SecurityConfig {
                         })
                 .formLogin(form -> form.disable())
                 .csrf(csrf -> csrf.disable())
-                .cors(cors -> cors.disable()) // TODO 포트 걸어주기
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .sessionManagement(
                         session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(
