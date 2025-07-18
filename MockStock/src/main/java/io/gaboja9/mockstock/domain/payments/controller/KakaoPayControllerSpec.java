@@ -1,5 +1,6 @@
 package io.gaboja9.mockstock.domain.payments.controller;
 
+import io.gaboja9.mockstock.domain.auth.dto.MembersDetails;
 import io.gaboja9.mockstock.domain.payments.dto.PaymentRequest;
 import io.gaboja9.mockstock.domain.payments.dto.PaymentResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -12,6 +13,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -56,7 +58,7 @@ public interface KakaoPayControllerSpec {
             })
     ResponseEntity<PaymentResponse> paymentReady(
             @Parameter(description = "결제 요청 정보", required = true) @RequestBody
-                    PaymentRequest request);
+                    PaymentRequest request, @AuthenticationPrincipal MembersDetails membersDetails);
 
     @Operation(summary = "결제 승인", description = "카카오페이 결제를 승인합니다.")
     @ApiResponses(
