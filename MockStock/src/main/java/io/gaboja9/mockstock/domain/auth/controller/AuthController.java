@@ -47,7 +47,7 @@ public class AuthController {
 
         TokenPair tokenPair = formAuthService.login(loginRequestDto);
 
-        return ResponseEntity.ok(AuthResponseDto.success("로그인이 완려되었습니다.", tokenPair));
+        return ResponseEntity.ok(AuthResponseDto.success("로그인이 완료되었습니다.", tokenPair));
     }
 
     @PostMapping("/email")
