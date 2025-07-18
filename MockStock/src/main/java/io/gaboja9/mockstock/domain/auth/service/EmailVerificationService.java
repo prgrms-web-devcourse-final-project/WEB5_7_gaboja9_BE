@@ -6,6 +6,7 @@ import io.gaboja9.mockstock.domain.auth.repository.EmailVerificationRepository;
 import io.gaboja9.mockstock.domain.members.repository.MembersRepository;
 
 import jakarta.mail.internet.MimeMessage;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -43,14 +44,12 @@ public class EmailVerificationService {
             helper.setSubject("MockStock 회원가입 인증코드");
             helper.setText(
                     String.format(
-                            "안녕하세요!\n\n" +
-                                    "MockStock 회원가입 인증코드는 다음과 같습니다:\n\n" +
-                                    "인증코드: %s\n\n" +
-                                    "5분 내에 인증을 완료해주세요.\n\n" +
-                                    "감사합니다.",
-                            verificationCode
-                    )
-            );
+                            "안녕하세요!\n\n"
+                                    + "MockStock 회원가입 인증코드는 다음과 같습니다:\n\n"
+                                    + "인증코드: %s\n\n"
+                                    + "5분 내에 인증을 완료해주세요.\n\n"
+                                    + "감사합니다.",
+                            verificationCode));
 
             mailSender.send(message);
             log.info("이메일 발송 성공: {}", email);
