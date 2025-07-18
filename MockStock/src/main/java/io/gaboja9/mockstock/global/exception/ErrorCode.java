@@ -38,7 +38,14 @@ public enum ErrorCode {
     INVALID_STOCK_CODE(HttpStatus.BAD_REQUEST, "STOCK-002", "유효하지 않은 주식 코드입니다."),
     // 관심 종목 에러
     NOT_FOUND_FAVORITE(HttpStatus.NOT_FOUND, "FAVORITE-001", "등록되지 않은 관심종목입니다."),
-    FAVORITE_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, "FAVORITE-002", "이미 관심종목으로 등록된 주식입니다.");
+    FAVORITE_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, "FAVORITE-002", "이미 관심종목으로 등록된 주식입니다."),
+
+    // 주문 관련 에러
+    INVALID_SELL_QUANTITY(HttpStatus.BAD_REQUEST, "ORDER-001", "매도 수량이 보유 수량보다 많습니다."),
+    NOT_ENOUGH_CASH(HttpStatus.BAD_REQUEST, "ORDER-002", "잔액이 부족합니다"),
+
+    // 포트폴리오 관련 에러
+    NOT_FOUND_PORTFOLIO(HttpStatus.NOT_FOUND, "PORTFOLIO-001", "보유한 주식이 없습니다.");
 
     private final HttpStatus status;
     private final String code;
