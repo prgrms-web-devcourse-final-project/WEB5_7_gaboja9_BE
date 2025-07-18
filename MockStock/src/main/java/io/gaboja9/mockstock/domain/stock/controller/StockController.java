@@ -38,7 +38,8 @@ public class StockController {
         log.info("주식 데이터 수집 요청: {}, 기간: {} ~ {}", stockCode, startDate, endDate);
 
         // 단일 종목 처리용 서비스 호출
-        dailyStockService.fetchAndSaveDailyData(marketCode, stockCode, startDate, endDate, periodCode);
+        dailyStockService.fetchAndSaveDailyData(
+                marketCode, stockCode, startDate, endDate, periodCode);
 
         return ResponseEntity.status(HttpStatus.CREATED).body("데일리 주식 저장 완료");
     }
@@ -69,7 +70,7 @@ public class StockController {
     }
 
     @GetMapping()
-    public ResponseEntity<?> getAllStocks(){
+    public ResponseEntity<?> getAllStocks() {
         return ResponseEntity.ok(stocksService.getAllStocks());
     }
 }

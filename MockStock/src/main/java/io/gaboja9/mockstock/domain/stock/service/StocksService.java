@@ -2,9 +2,12 @@ package io.gaboja9.mockstock.domain.stock.service;
 
 import io.gaboja9.mockstock.domain.stock.entity.Stocks;
 import io.gaboja9.mockstock.domain.stock.repository.StocksRepository;
+
 import jakarta.annotation.PostConstruct;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.stereotype.Service;
 
 import java.util.List;

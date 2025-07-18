@@ -7,5 +7,4 @@ public class StockListResponse {
 
     private String stockCode;
     private String stockName;
-
 }
