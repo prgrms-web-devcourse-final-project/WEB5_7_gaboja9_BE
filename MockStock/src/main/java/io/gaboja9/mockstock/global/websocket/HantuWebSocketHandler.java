@@ -233,14 +233,11 @@ public class HantuWebSocketHandler extends TextWebSocketHandler {
                 if (parts.length >= 4) {
                     String[] fields = parts[3].split("\\^");
                     StockPrice priceData = StockPriceMapper.parseStockPriceData(fields);
-                    //log.info(priceData.toString());
+                    // log.info(priceData.toString());
                     //  STOMP 브로드캐스트 추가
 
                     messagingTemplate.convertAndSend(
-                        "/topic/stock/" + priceData.getStockCode(),
-                        priceData
-                    );
-
+                            "/topic/stock/" + priceData.getStockCode(), priceData);
                 }
             } catch (Exception e) {
                 log.error("Error processing real-time data: {}", message, e);
@@ -276,9 +273,6 @@ public class HantuWebSocketHandler extends TextWebSocketHandler {
             log.warn("Could not parse JSON message: {}", message, e);
         }
     }
-
-
-
 
     //  /**
     //   * 재연결 후 기존 구독 복원

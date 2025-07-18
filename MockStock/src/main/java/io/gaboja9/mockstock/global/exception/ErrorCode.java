@@ -34,7 +34,7 @@ public enum ErrorCode {
     JWT_TOKEN_UNSUPPORTED(HttpStatus.UNAUTHORIZED, "JWT-005", "지원되지 않는 토큰입니다."),
 
     // 구독관련 에러
-    INVALID_STOCK(HttpStatus.NOT_FOUND , "STOCK-001" , " 없는 주식 코드 입니다."),
+    INVALID_STOCK(HttpStatus.NOT_FOUND, "STOCK-001", " 없는 주식 코드 입니다."),
     SOCKET_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "SOCKET-001", "소켓 에러입니다.");
 
     private final HttpStatus status;
