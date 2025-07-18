@@ -16,6 +16,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.socket.CloseStatus;
@@ -46,7 +47,8 @@ public class HantuWebSocketHandler extends TextWebSocketHandler {
 
     private final ObjectMapper objectMapper;
     private final RestTemplate restTemplate;
-    private final WebSocketSessionManager eventService;
+    private final HantuWebSocketSessionManager eventService;
+    private final SimpMessagingTemplate messagingTemplate;
 
     private WebSocketSession session;
     private String approvalKey;
@@ -231,7 +233,14 @@ public class HantuWebSocketHandler extends TextWebSocketHandler {
                 if (parts.length >= 4) {
                     String[] fields = parts[3].split("\\^");
                     StockPrice priceData = StockPriceMapper.parseStockPriceData(fields);
-                    log.info(priceData.toString());
+                    //log.info(priceData.toString());
+                    //  STOMP 브로드캐스트 추가
+
+                    messagingTemplate.convertAndSend(
+                        "/topic/stock/" + priceData.getStockCode(),
+                        priceData
+                    );
+
                 }
             } catch (Exception e) {
                 log.error("Error processing real-time data: {}", message, e);
@@ -267,6 +276,9 @@ public class HantuWebSocketHandler extends TextWebSocketHandler {
             log.warn("Could not parse JSON message: {}", message, e);
         }
     }
+
+
+
 
     //  /**
     //   * 재연결 후 기존 구독 복원
