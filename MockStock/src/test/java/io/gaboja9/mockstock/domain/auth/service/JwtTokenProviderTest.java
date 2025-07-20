@@ -7,7 +7,6 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-
 import io.gaboja9.mockstock.domain.auth.dto.TokenBody;
 import io.gaboja9.mockstock.domain.auth.dto.TokenPair;
 import io.gaboja9.mockstock.domain.auth.entity.RefreshToken;
@@ -17,8 +16,8 @@ import io.gaboja9.mockstock.domain.auth.repository.TokenRepository;
 import io.gaboja9.mockstock.domain.members.entity.Members;
 import io.gaboja9.mockstock.domain.members.enums.Role;
 import io.gaboja9.mockstock.global.config.JwtConfiguration;
-
 import io.gaboja9.mockstock.global.exception.ErrorCode;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -35,39 +34,33 @@ import java.util.Base64;
 @MockitoSettings(strictness = Strictness.LENIENT)
 class JwtTokenProviderTest {
 
-    @Mock
-    private JwtConfiguration jwtConfiguration;
+    @Mock private JwtConfiguration jwtConfiguration;
 
-    @Mock
-    private JwtConfiguration.Validation validation;
+    @Mock private JwtConfiguration.Validation validation;
 
-    @Mock
-    private JwtConfiguration.Secrets secrets;
+    @Mock private JwtConfiguration.Secrets secrets;
 
-    @Mock
-    private TokenRepository tokenRepository;
+    @Mock private TokenRepository tokenRepository;
 
-    @Mock
-    private RefreshTokenRepository refreshTokenRepository;
+    @Mock private RefreshTokenRepository refreshTokenRepository;
 
-    @InjectMocks
-    private JwtTokenProvider jwtTokenProvider;
+    @InjectMocks private JwtTokenProvider jwtTokenProvider;
 
     private Members testMember;
     private final String TEST_SECRET_KEY = "testSecretKeyForJwtTokenProviderTestMustBeLongEnough";
 
     @BeforeEach
     void setUp() {
-        testMember = new Members(
-                1L,
-                "test@example.com",
-                "testUser",
-                "LOCAL",
-                "test.png",
-                30000000,
-                0,
-                LocalDateTime.now()
-        );
+        testMember =
+                new Members(
+                        1L,
+                        "test@example.com",
+                        "testUser",
+                        "LOCAL",
+                        "test.png",
+                        30000000,
+                        0,
+                        LocalDateTime.now());
 
         when(jwtConfiguration.getValidation()).thenReturn(validation);
         when(jwtConfiguration.getSecrets()).thenReturn(secrets);
@@ -81,10 +74,11 @@ class JwtTokenProviderTest {
         when(validation.getAccess()).thenReturn(600000L);
         when(validation.getRefresh()).thenReturn(86400000L);
 
-        RefreshToken savedRefreshToken = RefreshToken.builder()
-                .refreshToken("mocked-refresh-token")
-                .members(testMember)
-                .build();
+        RefreshToken savedRefreshToken =
+                RefreshToken.builder()
+                        .refreshToken("mocked-refresh-token")
+                        .members(testMember)
+                        .build();
 
         when(tokenRepository.save(eq(testMember), anyString())).thenReturn(savedRefreshToken);
 
@@ -158,7 +152,6 @@ class JwtTokenProviderTest {
         System.out.println("memberToken = " + memberToken);
         System.out.println("adminTokenBody = " + adminTokenBody);
         System.out.println("memberTokenBody = " + memberTokenBody);
-
     }
 
     // 2. 토큰 검증 테스트
@@ -193,7 +186,7 @@ class JwtTokenProviderTest {
 
         String expiredToken = jwtTokenProvider.issueAcceessToken(memberId, role);
 
-        try{
+        try {
             Thread.sleep(10);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
@@ -233,11 +226,15 @@ class JwtTokenProviderTest {
     @Test
     void validate_지원되지_않는_토큰_예외발생() {
         // given: alg가 none인 토큰을 수동으로 생성
-        String header = Base64.getUrlEncoder().withoutPadding()
-                .encodeToString("{\"alg\":\"none\",\"typ\":\"JWT\"}".getBytes());
+        String header =
+                Base64.getUrlEncoder()
+                        .withoutPadding()
+                        .encodeToString("{\"alg\":\"none\",\"typ\":\"JWT\"}".getBytes());
 
-        String payload = Base64.getUrlEncoder().withoutPadding()
-                .encodeToString("{\"sub\":\"1\",\"role\":\"MEMBER\"}".getBytes());
+        String payload =
+                Base64.getUrlEncoder()
+                        .withoutPadding()
+                        .encodeToString("{\"sub\":\"1\",\"role\":\"MEMBER\"}".getBytes());
 
         String unsupportedToken = header + "." + payload + ".";
 
