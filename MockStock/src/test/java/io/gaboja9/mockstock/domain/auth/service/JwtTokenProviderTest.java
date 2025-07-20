@@ -29,6 +29,7 @@ import org.mockito.quality.Strictness;
 
 import java.time.LocalDateTime;
 import java.util.Base64;
+import java.util.Optional;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
@@ -272,5 +273,94 @@ class JwtTokenProviderTest {
         // then
         assertThat(result.getMemberId()).isEqualTo(1L);
         assertThat(result.getRole()).isEqualTo(Role.MEMBER);
+    }
+
+    // 4. RefreshToken으로 AccessToken 갱신 테스트
+    @Test
+    void refreshAccessToken_정상_갱신_성공() {
+        // given
+        when(validation.getAccess()).thenReturn(600000L);
+        when(validation.getRefresh()).thenReturn(86400000L);
+
+        Long memberId = 1L;
+        Role role = Role.MEMBER;
+
+        String refreshToken = jwtTokenProvider.issueRefreshToken(memberId, role);
+
+        RefreshToken validRefreshToken =
+                RefreshToken.builder().refreshToken(refreshToken).members(testMember).build();
+
+        when(tokenRepository.findValidRefreshToken(memberId))
+                .thenReturn(Optional.of(validRefreshToken));
+
+        // when
+        String newAccessToken = jwtTokenProvider.refreshAccessToken(refreshToken);
+
+        // then
+        assertThat(newAccessToken).isNotNull();
+        assertThat(newAccessToken.split("\\.")).hasSize(3);
+
+        TokenBody tokenBody = jwtTokenProvider.parseJwt(newAccessToken);
+        assertThat(tokenBody.getMemberId()).isEqualTo(memberId);
+        assertThat(tokenBody.getRole()).isEqualTo(role);
+    }
+
+    @Test
+    void refreshAccessToken_유효하지_않은_토큰_예외발생() {
+        // given
+        String invalidToken = "invalid.token.format";
+
+        // when & then
+        assertThatThrownBy(() -> jwtTokenProvider.refreshAccessToken(invalidToken))
+                .isInstanceOf(JwtAuthenticationException.class);
+    }
+
+    @Test
+    void refreshAccessToken_DB에_토큰_없음_예외발생() {
+        // given
+        when(validation.getRefresh()).thenReturn(86400000L);
+
+        String refreshToken = jwtTokenProvider.issueRefreshToken(1L, Role.MEMBER);
+        when(tokenRepository.findValidRefreshToken(1L)).thenReturn(Optional.empty());
+
+        // when & then
+        assertThatThrownBy(() -> jwtTokenProvider.refreshAccessToken(refreshToken))
+                .isInstanceOf(JwtAuthenticationException.class);
+    }
+
+    // 5. 토큰 추출 테스트
+    @Test
+    void extractTokenFromHeader_정상_추출_성공() {
+        // given
+        String token = "eyJhbGciOiJIUzI1NiJ9.test.token";
+        String authorization = "Bearer " + token;
+
+        // when
+        String result = jwtTokenProvider.extractTokenFromHeader(authorization);
+
+        // then
+        assertThat(result).isEqualTo(token);
+    }
+
+    @Test
+    void extractTokenFromHeader_Bearer_없음_예외발생() {
+        // given
+        String authorization = "InvalidHeader eyJhbGciOiJIUzI1NiJ9.test.token";
+
+        // when & then
+        assertThatThrownBy(() -> jwtTokenProvider.extractTokenFromHeader(authorization))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("잘못된 인증 헤더");
+    }
+
+    @Test
+    void extractTokenFromHeader_null_헤더_예외발생() {
+        // given
+        String authorization = null;
+
+        // when & then
+        assertThatThrownBy(() -> jwtTokenProvider.extractTokenFromHeader(authorization))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("잘못된 인증 헤더");
     }
 }
