@@ -1,7 +1,10 @@
 package io.gaboja9.mockstock.global.config;
 
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
+import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
 import io.swagger.v3.oas.annotations.info.Info;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.security.SecurityScheme;
 
 import org.springframework.context.annotation.Configuration;
 
@@ -13,6 +16,11 @@ import org.springframework.context.annotation.Configuration;
                         description =
                                 """
                                 ## MockStock API Documentation
+
+                                ### 인증
+                                - **JWT Bearer Token** 사용
+                                - 우측 상단 "Authorize" 버튼을 클릭하여 토큰 입력
+                                - 토큰 형식: `Bearer {your_jwt_token}`
 
                                 ### REST API
                                 일반적인 HTTP 요청/응답 기반 API
@@ -59,5 +67,12 @@ import org.springframework.context.annotation.Configuration;
                                 - 잘못된 종목코드 구독 시 에러 메시지 후 해당 구독 차단
                                 - 심각한 오류 발생 시 자동 연결 종료
                                 - 모든 에러는 `/user/queue/errors`로 수신
-                                """))
+                                """),
+        security = @SecurityRequirement(name = "bearerAuth"))
+@SecurityScheme(
+        name = "bearerAuth",
+        type = SecuritySchemeType.HTTP,
+        scheme = "bearer",
+        bearerFormat = "JWT",
+        description = "JWT 토큰을 입력하세요. 'Bearer ' 접두사는 자동으로 추가됩니다.")
 public class SwaggerConfig {}
