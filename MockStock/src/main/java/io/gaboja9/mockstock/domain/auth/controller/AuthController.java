@@ -2,9 +2,7 @@ package io.gaboja9.mockstock.domain.auth.controller;
 
 import io.gaboja9.mockstock.domain.auth.dto.MembersDetails;
 import io.gaboja9.mockstock.domain.auth.dto.TokenPair;
-import io.gaboja9.mockstock.domain.auth.dto.request.EmailVerificationRequestDto;
-import io.gaboja9.mockstock.domain.auth.dto.request.LoginRequestDto;
-import io.gaboja9.mockstock.domain.auth.dto.request.SignUpRequestDto;
+import io.gaboja9.mockstock.domain.auth.dto.request.*;
 import io.gaboja9.mockstock.domain.auth.dto.response.AuthResponseDto;
 import io.gaboja9.mockstock.domain.auth.entity.RefreshToken;
 import io.gaboja9.mockstock.domain.auth.exception.JwtAuthenticationException;
@@ -72,12 +70,11 @@ public class AuthController {
 
     @PostMapping("/emailVerify")
     public ResponseEntity<AuthResponseDto> emailVerify(
-            @RequestParam @NotBlank @Email String email,
-            @RequestParam @NotBlank String verificationCode) {
+            @Valid @RequestBody EmailVerifyRequestDto dto) {
+        log.info("이메일 인증 요청: {}", dto.getEmail());
 
-        log.info("이메일 인증 요청: {}", email);
-
-        boolean verified = emailVerificationService.verifyCode(email, verificationCode);
+        boolean verified =
+                emailVerificationService.verifyCode(dto.getEmail(), dto.getVerificationCode());
 
         if (verified) {
             return ResponseEntity.ok(AuthResponseDto.success("이메일 인증이 완료되었습니다."));
@@ -104,20 +101,17 @@ public class AuthController {
 
     @PostMapping("/passwordReset")
     public ResponseEntity<AuthResponseDto> resetPassword(
-            @RequestParam @NotBlank @Email String email,
-            @RequestParam @NotBlank String code,
-            @RequestParam @NotBlank String newPassword) {
+            @Valid @RequestBody PasswordResetRequestDto dto) {
+        log.info("비밀번호 재설정 요청: {}", dto.getEmail());
 
-        log.info("비밀번호 재설정 요청: {}", email);
-
-        boolean verified = emailVerificationService.verifyCode(email, code);
+        boolean verified = emailVerificationService.verifyCode(dto.getEmail(), dto.getCode());
 
         if (!verified) {
             return ResponseEntity.badRequest()
                     .body(AuthResponseDto.fail("인증코드가 올바르지 않거나 만료되었습니다."));
         }
 
-        formAuthService.resetPassword(email, newPassword);
+        formAuthService.resetPassword(dto.getEmail(), dto.getNewPassword());
 
         return ResponseEntity.ok(AuthResponseDto.success("비밀번호가 재설정되었습니다."));
     }
