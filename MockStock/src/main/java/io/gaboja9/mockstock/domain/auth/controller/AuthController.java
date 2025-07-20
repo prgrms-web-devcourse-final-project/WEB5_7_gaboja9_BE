@@ -95,9 +95,10 @@ public class AuthController {
         boolean duplicate = formAuthService.emailCheck(email);
 
         if (duplicate) {
-            return ResponseEntity.ok(AuthResponseDto.success("이미 사용 중인 이메일입니다.", true));
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body(AuthResponseDto.fail("이미 사용 중인 이메일입니다."));
         } else {
-            return ResponseEntity.ok(AuthResponseDto.success("사용 가능한 이메일입니다.", false));
+            return ResponseEntity.ok(AuthResponseDto.success("사용 가능한 이메일입니다."));
         }
     }
 
