@@ -132,7 +132,7 @@ public class JwtTokenProvider {
         log.info("사용자 ID {}의 AccessToken 갱신 완료", memberId);
 
         return newAccessToken;
-        }
+    }
 
     public String extractTokenFromHeader(String authorization) {
         if (authorization == null || !authorization.startsWith("Bearer ")) {

@@ -1,7 +1,6 @@
 package io.gaboja9.mockstock.domain.auth.controller;
 
 import io.gaboja9.mockstock.domain.auth.dto.MembersDetails;
-import io.gaboja9.mockstock.domain.auth.dto.TokenBody;
 import io.gaboja9.mockstock.domain.auth.dto.TokenPair;
 import io.gaboja9.mockstock.domain.auth.dto.request.EmailVerificationRequestDto;
 import io.gaboja9.mockstock.domain.auth.dto.request.LoginRequestDto;
@@ -160,5 +159,4 @@ public class AuthController {
                     .body(AuthResponseDto.fail("토큰 갱신에 실패했습니다."));
         }
     }
-
 }
