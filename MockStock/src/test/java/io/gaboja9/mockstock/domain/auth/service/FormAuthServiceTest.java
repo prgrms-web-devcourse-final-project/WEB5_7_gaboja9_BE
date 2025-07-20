@@ -2,6 +2,7 @@ package io.gaboja9.mockstock.domain.auth.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.*;
 
 import io.gaboja9.mockstock.domain.auth.dto.TokenPair;
 import io.gaboja9.mockstock.domain.auth.dto.request.LoginRequestDto;
@@ -11,6 +12,7 @@ import io.gaboja9.mockstock.domain.members.entity.Members;
 import io.gaboja9.mockstock.domain.members.enums.Role;
 import io.gaboja9.mockstock.domain.members.repository.MembersRepository;
 import io.gaboja9.mockstock.global.exception.ErrorCode;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -22,8 +24,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
-
-import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class FormAuthServiceTest {
