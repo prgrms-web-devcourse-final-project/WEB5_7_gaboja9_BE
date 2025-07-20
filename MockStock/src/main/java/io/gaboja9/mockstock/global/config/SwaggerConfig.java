@@ -68,6 +68,7 @@ import org.springframework.context.annotation.Configuration;
         ),
         security = @SecurityRequirement(name = "bearerAuth")
 )
+
 @SecurityScheme(
         name = "bearerAuth",
         type = SecuritySchemeType.HTTP,
@@ -76,3 +77,4 @@ import org.springframework.context.annotation.Configuration;
         description = "JWT 토큰을 입력하세요. 'Bearer ' 접두사는 자동으로 추가됩니다."
 )
 public class SwaggerConfig {}
+
