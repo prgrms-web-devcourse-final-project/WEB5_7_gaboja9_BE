@@ -1,5 +1,6 @@
 package io.gaboja9.mockstock.domain.auth.controller;
 
+import io.gaboja9.mockstock.domain.auth.dto.MembersDetails;
 import io.gaboja9.mockstock.domain.auth.dto.TokenBody;
 import io.gaboja9.mockstock.domain.auth.dto.TokenPair;
 import io.gaboja9.mockstock.domain.auth.dto.request.EmailVerificationRequestDto;
@@ -7,6 +8,7 @@ import io.gaboja9.mockstock.domain.auth.dto.request.LoginRequestDto;
 import io.gaboja9.mockstock.domain.auth.dto.request.SignUpRequestDto;
 import io.gaboja9.mockstock.domain.auth.dto.response.AuthResponseDto;
 import io.gaboja9.mockstock.domain.auth.entity.RefreshToken;
+import io.gaboja9.mockstock.domain.auth.exception.JwtAuthenticationException;
 import io.gaboja9.mockstock.domain.auth.repository.TokenRepository;
 import io.gaboja9.mockstock.domain.auth.service.EmailVerificationService;
 import io.gaboja9.mockstock.domain.auth.service.FormAuthService;
@@ -21,6 +23,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
@@ -120,35 +123,21 @@ public class AuthController {
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<AuthResponseDto> logout(
-            @RequestHeader("Authorization") String authorization) {
+    public ResponseEntity<AuthResponseDto> logout(Authentication authentication) {
 
         log.info("로그아웃 요청");
 
-        try {
-            String accessToken = authorization.replace("Bearer ", "");
+        MembersDetails membersDetails = (MembersDetails) authentication.getPrincipal();
+        Long memberId = membersDetails.getId();
 
-            if (!jwtTokenProvider.validate(accessToken)) {
-                return ResponseEntity.badRequest().body(AuthResponseDto.fail("유효하지 않은 토큰입니다."));
-            }
+        Optional<RefreshToken> refreshTokenOptional = jwtTokenProvider.findRefreshToken(memberId);
 
-            TokenBody tokenBody = jwtTokenProvider.parseJwt(accessToken);
-            Long memberId = tokenBody.getMemberId();
-
-            Optional<RefreshToken> refreshTokenOptional =
-                    jwtTokenProvider.findRefreshToken(memberId);
-
-            if (refreshTokenOptional.isPresent()) {
-                RefreshToken refreshToken = refreshTokenOptional.get();
-                tokenRepository.addBlackList(refreshToken);
-            }
-
-            return ResponseEntity.ok(AuthResponseDto.success("로그아웃이 완료되었습니다."));
-
-        } catch (Exception e) {
-            log.error("로그아웃 처리 중 오류 발생", e);
-            return ResponseEntity.badRequest().body(AuthResponseDto.fail("로그아웃 처리에 실패했습니다."));
+        if (refreshTokenOptional.isPresent()) {
+            RefreshToken refreshToken = refreshTokenOptional.get();
+            tokenRepository.addBlackList(refreshToken);
         }
+
+        return ResponseEntity.ok(AuthResponseDto.success("로그아웃이 완료되었습니다."));
     }
 
     @PostMapping("/refresh")
@@ -157,44 +146,19 @@ public class AuthController {
         log.info("토큰 갱신 요청");
 
         try {
-            String refreshToken = authorization.replace("Bearer ", "");
-
-            if (!jwtTokenProvider.validate(refreshToken)) {
-                log.info("유효하지 않은 RefreshToken으로 갱신 시도");
-
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                        .body(AuthResponseDto.fail("유효하지 않은 RefreshToken입니다."));
-            }
-
-            TokenBody tokenBody = jwtTokenProvider.parseJwt(refreshToken);
-            Long memberId = tokenBody.getMemberId();
-
-            Optional<RefreshToken> validRefreshTokenOptional =
-                    jwtTokenProvider.findRefreshToken(memberId);
-
-            if (validRefreshTokenOptional.isEmpty()) {
-                log.warn("사용자 ID {}의 유효한 RefreshToken을 찾을 수 없음 (블랙리스트 포함)", memberId);
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                        .body(AuthResponseDto.fail("유효한 RefreshToken을 찾을 수 없습니다."));
-            }
-
-            RefreshToken validRefreshToken = validRefreshTokenOptional.get();
-            if (!validRefreshToken.getRefreshToken().equals(refreshToken)) {
-                log.warn("사용자 ID {}의 RefreshToken이 DB와 일치하지 않음", memberId);
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                        .body(AuthResponseDto.fail("RefreshToken이 일치하지 않습니다."));
-            }
-
-            String newAccessToken =
-                    jwtTokenProvider.issueAcceessToken(memberId, tokenBody.getRole());
-
-            log.info("사용자 ID {}의 AccessToken 갱신 완료", memberId);
+            String refreshToken = jwtTokenProvider.extractTokenFromHeader(authorization);
+            String newAccessToken = jwtTokenProvider.refreshAccessToken(refreshToken);
 
             return ResponseEntity.ok(AuthResponseDto.success("토큰 갱신이 완료되었습니다.", newAccessToken));
+
+        } catch (JwtAuthenticationException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(AuthResponseDto.fail(e.getMessage()));
         } catch (Exception e) {
             log.error("토큰 갱신 처리 중 오류 발생", e);
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(AuthResponseDto.fail("토큰 갱신에 실패했습니다."));
         }
     }
+
 }
