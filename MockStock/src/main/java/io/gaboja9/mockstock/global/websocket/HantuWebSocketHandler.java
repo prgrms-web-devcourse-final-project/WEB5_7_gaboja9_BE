@@ -54,6 +54,8 @@ public class HantuWebSocketHandler extends TextWebSocketHandler {
     private String approvalKey;
     private final ExecutorService executorService = Executors.newFixedThreadPool(5);
     private final Map<String, String> subscribedStocks = new ConcurrentHashMap<>();
+    private final Map<String, StockPrice> latestPrices = new ConcurrentHashMap<>();
+
 
     // 웹소켓 세션이 열렸을 때 호출됨
 
@@ -238,6 +240,7 @@ public class HantuWebSocketHandler extends TextWebSocketHandler {
 
                     messagingTemplate.convertAndSend(
                             "/topic/stock/" + priceData.getStockCode(), priceData);
+                    latestPrices.put(priceData.getStockCode(), priceData);
                 }
             } catch (Exception e) {
                 log.error("Error processing real-time data: {}", message, e);
@@ -294,4 +297,7 @@ public class HantuWebSocketHandler extends TextWebSocketHandler {
     //    });
     //  }
 
+    public StockPrice getLatestPrice(String stockCode) {
+        return latestPrices.get(stockCode);
+    }
 }

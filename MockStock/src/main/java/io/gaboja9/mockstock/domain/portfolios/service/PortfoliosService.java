@@ -98,7 +98,7 @@ public class PortfoliosService {
                         .orElseThrow(() -> new NotFoundMemberException(memberId));
 
         Optional<Portfolios> optionalPortfolios =
-                portfoliosRepository.findByMembersIdAndStockCode(memberId, stockCode);
+                portfoliosRepository.findByMembersIdAndStockCodeWithLock(memberId, stockCode);
 
         if (optionalPortfolios.isPresent()) {
             // 기존에 매수한 동일 주식이 있는 경우 평균단가 업데이트
@@ -118,10 +118,8 @@ public class PortfoliosService {
                 .findById(memberId)
                 .orElseThrow(() -> new NotFoundMemberException(memberId));
 
-        Portfolios portfolio =
-                portfoliosRepository
-                        .findByMembersIdAndStockCode(memberId, stockCode)
-                        .orElseThrow(() -> new NotFoundPortfolioException());
+        Portfolios portfolio = portfoliosRepository.findByMembersIdAndStockCodeWithLock(memberId, stockCode)
+                .orElseThrow(() -> new NotFoundPortfolioException());
 
         portfolio.updateForSell(quantity);
 

@@ -1,6 +1,7 @@
 package io.gaboja9.mockstock.domain.orders.controller;
 
 import io.gaboja9.mockstock.domain.auth.dto.MembersDetails;
+import io.gaboja9.mockstock.domain.orders.dto.request.OrdersLimitTypeRequestDto;
 import io.gaboja9.mockstock.domain.orders.dto.request.OrdersMarketTypeRequestDto;
 import io.gaboja9.mockstock.domain.orders.dto.response.OrderResponseDto;
 import io.gaboja9.mockstock.domain.orders.service.OrdersService;
@@ -41,6 +42,26 @@ public class OrdersController implements OrdersControllerSpec {
         Long id = membersDetails.getId();
 
         OrderResponseDto responseDto = ordersService.executeMarketSellOrders(id, requestDto);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
+    }
+
+    @PostMapping("/limit/buy")
+    public ResponseEntity<OrderResponseDto> executeLimitBuy(@Valid @RequestBody OrdersLimitTypeRequestDto requestDto, @AuthenticationPrincipal MembersDetails membersDetails) {
+
+        Long id = membersDetails.getId();
+
+        OrderResponseDto responseDto = ordersService.executeLimitBuyOrders(id, requestDto);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
+    }
+
+    @PostMapping("/limit/sell")
+    public ResponseEntity<OrderResponseDto> executeLimitSell(@Valid @RequestBody OrdersLimitTypeRequestDto requestDto, @AuthenticationPrincipal MembersDetails membersDetails) {
+
+        Long id = membersDetails.getId();
+
+        OrderResponseDto responseDto = ordersService.executeLimitSellOrders(id, requestDto);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
     }
