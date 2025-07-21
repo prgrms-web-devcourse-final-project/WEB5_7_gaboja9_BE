@@ -40,10 +40,10 @@ public enum ErrorCode {
     VERIFICATION_CODE_EXPIRED(HttpStatus.BAD_REQUEST, "AUTH-005", "인증코드가 만료되었습니다."),
     WEAK_PASSWORD(HttpStatus.BAD_REQUEST, "AUTH-006", "비밀번호 강도가 부족합니다."),
     AUTH_RESEND_TOO_EARLY(HttpStatus.BAD_REQUEST, "AUTH-007", "인증코드는 {0}초 후에 재발송할 수 있습니다."),
-    SOCIAL_LOGIN_REQUIRED(HttpStatus.BAD_REQUEST, "AUTH-006", "{0} 계정이 존재합니다. {0} 로그인을 이용해주세요.");
+    SOCIAL_LOGIN_REQUIRED(HttpStatus.BAD_REQUEST, "AUTH-006", "{0} 계정이 존재합니다. {0} 로그인을 이용해주세요."),
 
     // 주식 관련 에러
-    NOT_FOUNT_STOCK(HttpStatus.NOT_FOUND, "STOCK-001", "존재하지 않는 주식입니다."),
+    NOT_FOUND_STOCK(HttpStatus.NOT_FOUND, "STOCK-001", "존재하지 않는 주식입니다."),
     INVALID_STOCK_CODE(HttpStatus.BAD_REQUEST, "STOCK-002", "유효하지 않은 주식 코드입니다."),
     // 관심 종목 에러
     NOT_FOUND_FAVORITE(HttpStatus.NOT_FOUND, "FAVORITE-001", "등록되지 않은 관심종목입니다."),
@@ -59,7 +59,6 @@ public enum ErrorCode {
 
     // 포트폴리오 관련 에러
     NOT_FOUND_PORTFOLIO(HttpStatus.NOT_FOUND, "PORTFOLIO-001", "보유한 주식이 없습니다.");
-
 
     private final HttpStatus status;
     private final String code;
