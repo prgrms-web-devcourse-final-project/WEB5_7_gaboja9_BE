@@ -240,7 +240,6 @@ public class HantuWebSocketHandler extends TextWebSocketHandler {
 
                     messagingTemplate.convertAndSend(
                             "/topic/stock/" + priceData.getStockCode(), priceData);
-
                 }
             } catch (Exception e) {
                 //                log.error("Error processing real-time data: {}", message, e);

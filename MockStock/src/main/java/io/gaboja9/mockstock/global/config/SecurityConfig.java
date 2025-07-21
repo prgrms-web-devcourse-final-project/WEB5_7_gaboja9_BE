@@ -35,7 +35,6 @@ public class SecurityConfig {
                                                 "/api/stocks",
                                                 "/ws-stock",
                                                 "/ws-stock/**")
-
                                         .permitAll()
                                         .anyRequest()
                                         .authenticated())
