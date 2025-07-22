@@ -21,4 +21,5 @@ public interface OrdersRepository extends JpaRepository<Orders, Long> {
     @Query("SELECT o FROM Orders o JOIN FETCH o.members WHERE o.status = :status AND o.orderType = :orderType ORDER BY o.createdAt ASC")
     List<Orders> findByStatusAndOrderTypeOrderByCreatedAtAsc(@Param("status") OrderStatus status, @Param("orderType") OrderType orderType);
 
+    void deleteByMembersId(Long memberId);
 }

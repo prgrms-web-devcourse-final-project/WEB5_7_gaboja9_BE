@@ -306,4 +306,15 @@ public class OrdersService {
         }
         return stockPrice.getCurrentPrice();
     }
+
+    @Transactional
+    public void remove(Long memberId) {
+        Members findMember =
+                membersRepository
+                        .findById(memberId)
+                        .orElseThrow(() -> new NotFoundMemberException(memberId));
+
+        ordersRepository.deleteByMembersId(memberId);
+
+    }
 }
