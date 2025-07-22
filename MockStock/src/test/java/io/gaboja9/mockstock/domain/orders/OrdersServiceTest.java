@@ -21,6 +21,7 @@ import io.gaboja9.mockstock.domain.trades.repository.TradesRepository;
 
 import io.gaboja9.mockstock.global.websocket.HantuWebSocketHandler;
 import io.gaboja9.mockstock.global.websocket.dto.StockPrice;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -32,8 +33,6 @@ import java.util.Optional;
 
 @ExtendWith(MockitoExtension.class)
 class OrdersServiceTest {
-
-    @InjectMocks private OrdersService ordersService;
 
     @Mock private MembersRepository membersRepository;
 
@@ -47,6 +46,22 @@ class OrdersServiceTest {
 
     @Mock
     private HantuWebSocketHandler hantuWebSocketHandler;
+
+    private OrdersService ordersService;
+
+    @BeforeEach
+    void setUp() {
+        ordersService = spy(new OrdersService(
+                membersRepository,
+                ordersRepository,
+                tradesRepository,
+                portfoliosService,
+                portfoliosRepository,
+                hantuWebSocketHandler
+        ));
+
+        doReturn(true).when(ordersService).openKoreanMarket();
+    }
 
     @Test
     void executeMarketBuyOrders_성공() {
