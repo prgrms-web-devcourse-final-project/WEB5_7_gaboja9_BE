@@ -49,6 +49,7 @@ public enum ErrorCode {
     NOT_ENOUGH_CASH(HttpStatus.BAD_REQUEST, "ORDER-002", "잔액이 부족합니다"),
     ORDER_PROCESSING_TIMEOUT(HttpStatus.REQUEST_TIMEOUT, "ORDER-003", "주문 처리 대기 시간이 초과되었습니다."),
     ORDER_PROCESSING_INTERRUPTED(HttpStatus.INTERNAL_SERVER_ERROR, "ORDER-004", "주문 처리 중 인터럽트가 발생했습니다."),
+    NOT_FOUND_ORDER(HttpStatus.NOT_FOUND, "ORDER-005", "주문을 찾을 수 없습니다."),
 
     // 포트폴리오 관련 에러
     NOT_FOUND_PORTFOLIO(HttpStatus.NOT_FOUND, "PORTFOLIO-001", "보유한 주식이 없습니다.");

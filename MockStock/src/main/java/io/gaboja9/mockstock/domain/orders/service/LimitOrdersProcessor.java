@@ -4,6 +4,7 @@ import io.gaboja9.mockstock.domain.members.entity.Members;
 import io.gaboja9.mockstock.domain.orders.entity.OrderStatus;
 import io.gaboja9.mockstock.domain.orders.entity.OrderType;
 import io.gaboja9.mockstock.domain.orders.entity.Orders;
+import io.gaboja9.mockstock.domain.orders.exception.NotFoundOrderException;
 import io.gaboja9.mockstock.domain.orders.repository.OrdersRepository;
 import io.gaboja9.mockstock.domain.portfolios.service.PortfoliosService;
 import io.gaboja9.mockstock.domain.trades.entity.TradeType;
@@ -52,7 +53,7 @@ public class LimitOrdersProcessor {
     public void processIndividualOrder(Orders order) {
 
         Orders currentOrder = ordersRepository.findByIdWithMember(order.getId())
-                .orElseThrow(() -> new RuntimeException("주문을 찾을 수 없습니다."));
+                .orElseThrow(() -> new NotFoundOrderException());
 
         if (currentOrder.getStatus() != OrderStatus.PENDING) {
             log.debug("이미 처리된 주문입니다. orderId={}, status={}",
