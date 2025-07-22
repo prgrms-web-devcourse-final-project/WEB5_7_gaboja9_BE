@@ -19,6 +19,10 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.DayOfWeek;
+import java.time.LocalTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -31,12 +35,14 @@ public class LimitOrdersProcessor {
     private final TradesRepository tradesRepository;
     private final PortfoliosService portfoliosService;
     private final HantuWebSocketHandler hantuWebSocketHandler;
+    private final OrdersService ordersService;
 
     // 동시성 제어를 위한 락 매니저
     private final ConcurrentHashMap<String, Object> memberLocks = new ConcurrentHashMap<>();
 
     @Scheduled(fixedDelay = 1000)
     public void processLimitOrders() {
+        if (!ordersService.openKoreanMarket()) return;
         List<Orders> pendingOrders = ordersRepository
                 .findByStatusAndOrderTypeOrderByCreatedAtAsc(OrderStatus.PENDING, OrderType.LIMIT);
 

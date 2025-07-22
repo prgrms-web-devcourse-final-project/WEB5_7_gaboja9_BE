@@ -10,10 +10,7 @@ import io.gaboja9.mockstock.domain.orders.dto.request.OrdersMarketTypeRequestDto
 import io.gaboja9.mockstock.domain.orders.dto.response.OrderResponseDto;
 import io.gaboja9.mockstock.domain.orders.entity.OrderType;
 import io.gaboja9.mockstock.domain.orders.entity.Orders;
-import io.gaboja9.mockstock.domain.orders.exception.InvalidSellQuantityException;
-import io.gaboja9.mockstock.domain.orders.exception.NotEnoughCashException;
-import io.gaboja9.mockstock.domain.orders.exception.OrderProcessingInterruptedException;
-import io.gaboja9.mockstock.domain.orders.exception.OrderProcessingTimeoutException;
+import io.gaboja9.mockstock.domain.orders.exception.*;
 import io.gaboja9.mockstock.domain.orders.repository.OrdersRepository;
 import io.gaboja9.mockstock.domain.portfolios.entity.Portfolios;
 import io.gaboja9.mockstock.domain.portfolios.exception.NotFoundPortfolioException;
@@ -31,6 +28,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.DayOfWeek;
+import java.time.LocalTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
@@ -64,6 +65,9 @@ public class OrdersService {
         try {
             if (lock.tryLock(10, TimeUnit.SECONDS)) {
                 try {
+                    if (!openKoreanMarket()) {
+                        throw new NotOpenKoreanMarketException();
+                    }
                     return task.get();
                 } finally {
                     lock.unlock();
@@ -315,6 +319,20 @@ public class OrdersService {
                         .orElseThrow(() -> new NotFoundMemberException(memberId));
 
         ordersRepository.deleteByMembersId(memberId);
+    }
 
+    public boolean openKoreanMarket() {
+        ZonedDateTime now = ZonedDateTime.now(ZoneId.of("Asia/Seoul"));
+        DayOfWeek dayOfWeek = now.getDayOfWeek();
+        LocalTime currentTime = now.toLocalTime();
+
+        if (dayOfWeek == DayOfWeek.SATURDAY || dayOfWeek == DayOfWeek.SUNDAY) {
+            return false;
+        }
+
+        LocalTime marketOpen = LocalTime.of(9, 0);
+        LocalTime marketClose = LocalTime.of(15, 30);
+
+        return !currentTime.isBefore(marketOpen) && !currentTime.isAfter(marketClose);
     }
 }
