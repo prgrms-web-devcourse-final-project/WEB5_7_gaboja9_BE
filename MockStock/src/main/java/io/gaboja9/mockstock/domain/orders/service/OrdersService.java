@@ -1,7 +1,7 @@
 package io.gaboja9.mockstock.domain.orders.service;
 
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import io.gaboja9.mockstock.domain.members.entity.Members;
 import io.gaboja9.mockstock.domain.members.exception.NotFoundMemberException;
 import io.gaboja9.mockstock.domain.members.repository.MembersRepository;
@@ -48,7 +48,7 @@ public class OrdersService {
     private final PortfoliosRepository portfoliosRepository;
     private final HantuWebSocketHandler hantuWebSocketHandler;
 
-    private final Cache<String, ReentrantLock> stockLocks = CacheBuilder.newBuilder()
+    private final Cache<String, ReentrantLock> stockLocks = Caffeine.newBuilder()
             .expireAfterAccess(30, TimeUnit.MINUTES)
             .build();
 
@@ -56,11 +56,7 @@ public class OrdersService {
      * 종목 코드별로 락을 걸어서 자주 거래되는 종목의 경우 병목현상이 발생할 가능성이 있음..
      */
     private ReentrantLock getStockLock(String stockCode) {
-        try {
-            return stockLocks.get(stockCode, () -> new ReentrantLock());
-        } catch (ExecutionException e) {
-            throw new RuntimeException("Failed to create lock for " + stockCode, e);
-        }
+        return stockLocks.get(stockCode, key -> new ReentrantLock());
     }
 
     private <T> T executeWithStockLock(String stockCode, Supplier<T> task) {
