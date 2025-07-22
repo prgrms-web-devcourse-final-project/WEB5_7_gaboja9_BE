@@ -52,6 +52,9 @@ public class OrdersService {
             .expireAfterAccess(30, TimeUnit.MINUTES)
             .build();
 
+    /**
+     * 종목 코드별로 락을 걸어서 자주 거래되는 종목의 경우 병목현상이 발생할 가능성이 있음..
+     */
     private ReentrantLock getStockLock(String stockCode) {
         try {
             return stockLocks.get(stockCode, () -> new ReentrantLock());

@@ -51,7 +51,7 @@ public class LimitOrdersProcessor {
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void processIndividualOrder(Orders order) {
 
-        Orders currentOrder = ordersRepository.findById(order.getId())
+        Orders currentOrder = ordersRepository.findByIdWithMember(order.getId())
                 .orElseThrow(() -> new RuntimeException("주문을 찾을 수 없습니다."));
 
         if (currentOrder.getStatus() != OrderStatus.PENDING) {
