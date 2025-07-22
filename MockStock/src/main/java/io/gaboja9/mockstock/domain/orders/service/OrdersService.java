@@ -3,6 +3,7 @@ package io.gaboja9.mockstock.domain.orders.service;
 import io.gaboja9.mockstock.domain.members.entity.Members;
 import io.gaboja9.mockstock.domain.members.exception.NotFoundMemberException;
 import io.gaboja9.mockstock.domain.members.repository.MembersRepository;
+import io.gaboja9.mockstock.domain.notifications.service.NotificationsService;
 import io.gaboja9.mockstock.domain.orders.dto.request.OrdersMarketTypeRequestDto;
 import io.gaboja9.mockstock.domain.orders.dto.response.OrderResponseDto;
 import io.gaboja9.mockstock.domain.orders.entity.OrderType;
@@ -20,9 +21,11 @@ import io.gaboja9.mockstock.domain.trades.repository.TradesRepository;
 
 import lombok.RequiredArgsConstructor;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class OrdersService {
@@ -32,6 +35,7 @@ public class OrdersService {
     private final TradesRepository tradesRepository;
     private final PortfoliosService portfoliosService;
     private final PortfoliosRepository portfoliosRepository;
+    private final NotificationsService notificationsService;
 
     @Transactional
     public OrderResponseDto executeMarketBuyOrders(Long memberId, OrdersMarketTypeRequestDto dto) {
@@ -71,6 +75,13 @@ public class OrdersService {
         findMember.setCashBalance(cashBalance - totalPrice);
 
         portfoliosService.updateForBuy(memberId, stockCode, stockName, quantity, currentPrice);
+
+        try {
+            notificationsService.sendTradeNotification(
+                    memberId, stockCode, stockName, TradeType.BUY, quantity, currentPrice);
+        } catch (Exception e) {
+            log.error("매수 알림 발송 실패 - 사용자: {}, 종목: {}", memberId, stockName, e);
+        }
 
         return OrderResponseDto.builder()
                 .executed(true)
@@ -122,6 +133,13 @@ public class OrdersService {
         portfoliosService.updateForSell(memberId, stockCode, quantity);
 
         member.setCashBalance(member.getCashBalance() + totalAmount);
+
+        try {
+            notificationsService.sendTradeNotification(
+                    memberId, stockCode, stockName, TradeType.SELL, quantity, currentPrice);
+        } catch (Exception e) {
+            log.error("매도 알림 발송 실패 - 사용자: {}, 종목: {}", memberId, stockName, e);
+        }
 
         return OrderResponseDto.builder()
                 .executed(true)
