@@ -3,14 +3,15 @@ package io.gaboja9.mockstock.domain.notifications.service;
 import io.gaboja9.mockstock.domain.mails.entity.Mails;
 import io.gaboja9.mockstock.domain.mails.repository.MailsRepository;
 import io.gaboja9.mockstock.domain.members.entity.Members;
-import io.gaboja9.mockstock.domain.members.exception.NotFoundMemberException;
 import io.gaboja9.mockstock.domain.members.repository.MembersRepository;
 import io.gaboja9.mockstock.domain.notifications.entity.Notifications;
 import io.gaboja9.mockstock.domain.notifications.enums.NotificationType;
 import io.gaboja9.mockstock.domain.notifications.repository.NotificationsRepository;
 import io.gaboja9.mockstock.domain.trades.entity.TradeType;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.stereotype.Service;
 
 import java.text.NumberFormat;

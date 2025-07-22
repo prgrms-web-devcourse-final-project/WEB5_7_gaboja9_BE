@@ -20,8 +20,8 @@ import io.gaboja9.mockstock.domain.trades.entity.Trades;
 import io.gaboja9.mockstock.domain.trades.repository.TradesRepository;
 
 import lombok.RequiredArgsConstructor;
-
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
