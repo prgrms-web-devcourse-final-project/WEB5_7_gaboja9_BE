@@ -5,8 +5,11 @@ import io.gaboja9.mockstock.domain.orders.dto.request.OrdersLimitTypeRequestDto;
 import io.gaboja9.mockstock.domain.orders.dto.request.OrdersMarketTypeRequestDto;
 import io.gaboja9.mockstock.domain.orders.dto.response.OrderResponseDto;
 import io.gaboja9.mockstock.domain.orders.service.OrdersService;
+
 import jakarta.validation.Valid;
+
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -47,7 +50,9 @@ public class OrdersController implements OrdersControllerSpec {
     }
 
     @PostMapping("/limit/buy")
-    public ResponseEntity<OrderResponseDto> executeLimitBuy(@Valid @RequestBody OrdersLimitTypeRequestDto requestDto, @AuthenticationPrincipal MembersDetails membersDetails) {
+    public ResponseEntity<OrderResponseDto> executeLimitBuy(
+            @Valid @RequestBody OrdersLimitTypeRequestDto requestDto,
+            @AuthenticationPrincipal MembersDetails membersDetails) {
 
         Long id = membersDetails.getId();
 
@@ -57,7 +62,9 @@ public class OrdersController implements OrdersControllerSpec {
     }
 
     @PostMapping("/limit/sell")
-    public ResponseEntity<OrderResponseDto> executeLimitSell(@Valid @RequestBody OrdersLimitTypeRequestDto requestDto, @AuthenticationPrincipal MembersDetails membersDetails) {
+    public ResponseEntity<OrderResponseDto> executeLimitSell(
+            @Valid @RequestBody OrdersLimitTypeRequestDto requestDto,
+            @AuthenticationPrincipal MembersDetails membersDetails) {
 
         Long id = membersDetails.getId();
 

@@ -48,7 +48,8 @@ public enum ErrorCode {
     INVALID_SELL_QUANTITY(HttpStatus.BAD_REQUEST, "ORDER-001", "매도 수량이 보유 수량보다 많습니다."),
     NOT_ENOUGH_CASH(HttpStatus.BAD_REQUEST, "ORDER-002", "잔액이 부족합니다"),
     ORDER_PROCESSING_TIMEOUT(HttpStatus.REQUEST_TIMEOUT, "ORDER-003", "주문 처리 대기 시간이 초과되었습니다."),
-    ORDER_PROCESSING_INTERRUPTED(HttpStatus.INTERNAL_SERVER_ERROR, "ORDER-004", "주문 처리 중 인터럽트가 발생했습니다."),
+    ORDER_PROCESSING_INTERRUPTED(
+            HttpStatus.INTERNAL_SERVER_ERROR, "ORDER-004", "주문 처리 중 인터럽트가 발생했습니다."),
     NOT_FOUND_ORDER(HttpStatus.NOT_FOUND, "ORDER-005", "주문을 찾을 수 없습니다."),
     NOT_OPEN_KOREAN_MARKET(HttpStatus.BAD_REQUEST, "ORDER-006", "한국장이 닫혀있습니다."),
 

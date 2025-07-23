@@ -2,6 +2,7 @@ package io.gaboja9.mockstock.domain.orders.service;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
+
 import io.gaboja9.mockstock.domain.members.entity.Members;
 import io.gaboja9.mockstock.domain.orders.entity.OrderStatus;
 import io.gaboja9.mockstock.domain.orders.entity.OrderType;
@@ -14,8 +15,10 @@ import io.gaboja9.mockstock.domain.trades.entity.Trades;
 import io.gaboja9.mockstock.domain.trades.repository.TradesRepository;
 import io.gaboja9.mockstock.global.websocket.HantuWebSocketHandler;
 import io.gaboja9.mockstock.global.websocket.dto.StockPrice;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
@@ -36,16 +39,18 @@ public class LimitOrdersProcessor {
     private final OrdersService ordersService;
 
     // 동시성 제어를 위한 락 매니저
-    private final Cache<String, Object> memberLocks = Caffeine.newBuilder()
-            .maximumSize(10000)
-            .expireAfterAccess(30, TimeUnit.MINUTES)
-            .build();
+    private final Cache<String, Object> memberLocks =
+            Caffeine.newBuilder()
+                    .maximumSize(10000)
+                    .expireAfterAccess(30, TimeUnit.MINUTES)
+                    .build();
 
     @Scheduled(fixedDelay = 1000)
     public void processLimitOrders() {
         if (!ordersService.openKoreanMarket()) return;
-        List<Orders> pendingOrders = ordersRepository
-                .findByStatusAndOrderTypeOrderByCreatedAtAsc(OrderStatus.PENDING, OrderType.LIMIT);
+        List<Orders> pendingOrders =
+                ordersRepository.findByStatusAndOrderTypeOrderByCreatedAtAsc(
+                        OrderStatus.PENDING, OrderType.LIMIT);
 
         for (Orders order : pendingOrders) {
             try {
@@ -59,19 +64,20 @@ public class LimitOrdersProcessor {
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void processIndividualOrder(Orders order) {
 
-        Orders currentOrder = ordersRepository.findByIdWithMember(order.getId())
-                .orElseThrow(() -> new NotFoundOrderException());
+        Orders currentOrder =
+                ordersRepository
+                        .findByIdWithMember(order.getId())
+                        .orElseThrow(() -> new NotFoundOrderException());
 
         if (currentOrder.getStatus() != OrderStatus.PENDING) {
-            log.debug("이미 처리된 주문입니다. orderId={}, status={}",
-                    order.getId(), currentOrder.getStatus());
+            log.debug(
+                    "이미 처리된 주문입니다. orderId={}, status={}", order.getId(), currentOrder.getStatus());
             return;
         }
 
         StockPrice price = hantuWebSocketHandler.getLatestPrice(order.getStockCode());
         if (price == null) {
-            log.warn("실시간 가격 정보 없음. orderId={}, stockCode={}",
-                    order.getId(), order.getStockCode());
+            log.warn("실시간 가격 정보 없음. orderId={}, stockCode={}", order.getId(), order.getStockCode());
             return;
         }
 
@@ -118,14 +124,14 @@ public class LimitOrdersProcessor {
         ordersRepository.save(order);
         Members member = order.getMembers();
 
-        Trades trade = new Trades(
-                order.getStockCode(),
-                order.getStockName(),
-                order.getTradeType(),
-                order.getQuantity(),
-                executionPrice,
-                member
-        );
+        Trades trade =
+                new Trades(
+                        order.getStockCode(),
+                        order.getStockName(),
+                        order.getTradeType(),
+                        order.getQuantity(),
+                        executionPrice,
+                        member);
         tradesRepository.save(trade);
 
         if (order.getTradeType() == TradeType.BUY) {
@@ -134,7 +140,12 @@ public class LimitOrdersProcessor {
             int refundAmount = frozenAmount - actualAmount;
 
             member.setCashBalance(member.getCashBalance() + refundAmount);
-            portfoliosService.updateForBuy(member.getId(), order.getStockCode(), order.getStockName(), order.getQuantity(), executionPrice);
+            portfoliosService.updateForBuy(
+                    member.getId(),
+                    order.getStockCode(),
+                    order.getStockName(),
+                    order.getQuantity(),
+                    executionPrice);
         } else if (order.getTradeType() == TradeType.SELL) {
             int actualAmount = executionPrice * order.getQuantity();
             member.setCashBalance(member.getCashBalance() + actualAmount);

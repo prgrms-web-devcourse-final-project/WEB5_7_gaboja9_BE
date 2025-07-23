@@ -174,7 +174,8 @@ class PortfoliosServiceTest {
         Portfolios portfolio = new Portfolios(stockCode, stockName, 10, 150, member);
 
         given(membersRepository.findById(memberId)).willReturn(Optional.of(member));
-        given(portfoliosRepository.findByMembersIdAndStockCodeWithLock(memberId, stockCode)).willReturn(Optional.of(portfolio));
+        given(portfoliosRepository.findByMembersIdAndStockCodeWithLock(memberId, stockCode))
+                .willReturn(Optional.of(portfolio));
 
         // when
         portfoliosService.updateForBuy(memberId, stockCode, stockName, quantity, price);
@@ -206,7 +207,8 @@ class PortfoliosServiceTest {
                         LocalDateTime.now());
 
         given(membersRepository.findById(memberId)).willReturn(Optional.of(member));
-        given(portfoliosRepository.findByMembersIdAndStockCodeWithLock(memberId, stockCode)).willReturn(Optional.empty());
+        given(portfoliosRepository.findByMembersIdAndStockCodeWithLock(memberId, stockCode))
+                .willReturn(Optional.empty());
 
         // when
         portfoliosService.updateForBuy(memberId, stockCode, stockName, quantity, price);
@@ -236,7 +238,8 @@ class PortfoliosServiceTest {
         Portfolios portfolio = new Portfolios(stockCode, "애플", 10, 150, member);
 
         given(membersRepository.findById(memberId)).willReturn(Optional.of(member));
-        given(portfoliosRepository.findByMembersIdAndStockCodeWithLock(memberId, stockCode)).willReturn(Optional.of(portfolio));
+        given(portfoliosRepository.findByMembersIdAndStockCodeWithLock(memberId, stockCode))
+                .willReturn(Optional.of(portfolio));
 
         // when
         portfoliosService.updateForSell(memberId, stockCode, quantityToSell);
@@ -268,7 +271,8 @@ class PortfoliosServiceTest {
         Portfolios portfolio = new Portfolios(stockCode, "애플", 10, 150, member);
 
         given(membersRepository.findById(memberId)).willReturn(Optional.of(member));
-        given(portfoliosRepository.findByMembersIdAndStockCodeWithLock(memberId, stockCode)).willReturn(Optional.of(portfolio));
+        given(portfoliosRepository.findByMembersIdAndStockCodeWithLock(memberId, stockCode))
+                .willReturn(Optional.of(portfolio));
 
         // when
         portfoliosService.updateForSell(memberId, stockCode, quantityToSell);

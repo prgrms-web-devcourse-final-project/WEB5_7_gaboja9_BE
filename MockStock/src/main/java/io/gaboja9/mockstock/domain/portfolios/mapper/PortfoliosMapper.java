@@ -2,12 +2,12 @@ package io.gaboja9.mockstock.domain.portfolios.mapper;
 
 import io.gaboja9.mockstock.domain.portfolios.dto.response.PortfolioResponseDto;
 import io.gaboja9.mockstock.domain.portfolios.entity.Portfolios;
-
 import io.gaboja9.mockstock.global.websocket.HantuWebSocketHandler;
 import io.gaboja9.mockstock.global.websocket.dto.StockPrice;
-import lombok.RequiredArgsConstructor;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;
@@ -23,7 +23,8 @@ public class PortfoliosMapper {
         int quantity = p.getQuantity();
         int avgPrice = p.getAvgPrice();
 
-        Optional<StockPrice> optionalPrice = Optional.ofNullable(hantuWebSocketHandler.getLatestPrice(p.getStockCode()));
+        Optional<StockPrice> optionalPrice =
+                Optional.ofNullable(hantuWebSocketHandler.getLatestPrice(p.getStockCode()));
 
         if (optionalPrice.isEmpty()) {
             log.warn("실시간 가격 정보 없음 - stockCode={}", p.getStockCode());

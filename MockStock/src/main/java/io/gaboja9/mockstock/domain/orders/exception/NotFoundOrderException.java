@@ -5,6 +5,6 @@ import io.gaboja9.mockstock.global.exception.ErrorCode;
 
 public class NotFoundOrderException extends BaseException {
     public NotFoundOrderException() {
-        super(ErrorCode.NOT_FOUND_ORDER,"주문을 찾을 수 없습니다.");
+        super(ErrorCode.NOT_FOUND_ORDER, "주문을 찾을 수 없습니다.");
     }
 }

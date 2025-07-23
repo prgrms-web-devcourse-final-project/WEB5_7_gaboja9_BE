@@ -56,7 +56,6 @@ public class HantuWebSocketHandler extends TextWebSocketHandler {
     private final Map<String, String> subscribedStocks = new ConcurrentHashMap<>();
     private final Map<String, StockPrice> latestPrices = new ConcurrentHashMap<>();
 
-
     // 웹소켓 세션이 열렸을 때 호출됨
 
     @Override

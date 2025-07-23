@@ -3,7 +3,9 @@ package io.gaboja9.mockstock.domain.orders.entity;
 import io.gaboja9.mockstock.domain.members.entity.Members;
 import io.gaboja9.mockstock.domain.trades.entity.TradeType;
 import io.gaboja9.mockstock.global.common.BaseEntity;
+
 import jakarta.persistence.*;
+
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,9 +17,8 @@ import java.time.LocalDateTime;
 @Table(
         name = "orders",
         indexes = {
-                @Index(name = "idx_status_type_createdAt", columnList = "status, orderType, createdAt")
-        }
-)
+            @Index(name = "idx_status_type_createdAt", columnList = "status, orderType, createdAt")
+        })
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Orders extends BaseEntity {
 
@@ -46,8 +47,14 @@ public class Orders extends BaseEntity {
     @JoinColumn(name = "members_id")
     private Members members;
 
-    public Orders(String stockCode, String stockName, OrderType orderType,
-                  TradeType tradeType, int quantity, int price, Members members) {
+    public Orders(
+            String stockCode,
+            String stockName,
+            OrderType orderType,
+            TradeType tradeType,
+            int quantity,
+            int price,
+            Members members) {
         this.stockCode = stockCode;
         this.stockName = stockName;
         this.orderType = orderType;

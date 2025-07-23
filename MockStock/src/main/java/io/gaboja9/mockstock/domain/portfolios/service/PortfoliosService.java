@@ -118,8 +118,10 @@ public class PortfoliosService {
                 .findById(memberId)
                 .orElseThrow(() -> new NotFoundMemberException(memberId));
 
-        Portfolios portfolio = portfoliosRepository.findByMembersIdAndStockCodeWithLock(memberId, stockCode)
-                .orElseThrow(() -> new NotFoundPortfolioException());
+        Portfolios portfolio =
+                portfoliosRepository
+                        .findByMembersIdAndStockCodeWithLock(memberId, stockCode)
+                        .orElseThrow(() -> new NotFoundPortfolioException());
 
         portfolio.updateForSell(quantity);
 
