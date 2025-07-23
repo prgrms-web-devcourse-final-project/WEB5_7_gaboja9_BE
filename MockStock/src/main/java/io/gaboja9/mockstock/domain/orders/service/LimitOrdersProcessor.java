@@ -1,5 +1,7 @@
 package io.gaboja9.mockstock.domain.orders.service;
 
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import io.gaboja9.mockstock.domain.members.entity.Members;
 import io.gaboja9.mockstock.domain.orders.entity.OrderStatus;
 import io.gaboja9.mockstock.domain.orders.entity.OrderType;
@@ -19,12 +21,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.DayOfWeek;
-import java.time.LocalTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
 @Component
 @RequiredArgsConstructor
@@ -38,7 +36,10 @@ public class LimitOrdersProcessor {
     private final OrdersService ordersService;
 
     // 동시성 제어를 위한 락 매니저
-    private final ConcurrentHashMap<String, Object> memberLocks = new ConcurrentHashMap<>();
+    private final Cache<String, Object> memberLocks = Caffeine.newBuilder()
+            .maximumSize(10000)
+            .expireAfterAccess(30, TimeUnit.MINUTES)
+            .build();
 
     @Scheduled(fixedDelay = 1000)
     public void processLimitOrders() {
@@ -94,7 +95,9 @@ public class LimitOrdersProcessor {
     private void executeOrderWithLock(Orders order, int executionPrice) {
         String memberKey = "member_" + order.getMembers().getId();
 
-        synchronized (memberLocks.computeIfAbsent(memberKey, k -> new Object())) {
+        Object lock = memberLocks.get(memberKey, k -> new Object());
+
+        synchronized (lock) {
             try {
                 StockPrice refreshed = hantuWebSocketHandler.getLatestPrice(order.getStockCode());
                 if (refreshed == null) return;
@@ -104,10 +107,8 @@ public class LimitOrdersProcessor {
                     return;
                 }
                 executeOrder(order, executionPrice);
-            } finally {
-                if (memberLocks.size() > 1000) {
-                    memberLocks.clear();
-                }
+            } catch (Exception e) {
+                log.error("주문 실행 중 오류 발생: {}", e.getMessage(), e);
             }
         }
     }
