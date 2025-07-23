@@ -96,6 +96,13 @@ public class LimitOrdersProcessor {
 
         synchronized (memberLocks.computeIfAbsent(memberKey, k -> new Object())) {
             try {
+                StockPrice refreshed = hantuWebSocketHandler.getLatestPrice(order.getStockCode());
+                if (refreshed == null) return;
+                int currentPrice = refreshed.getCurrentPrice();
+                if (!shouldExecuteOrder(order, currentPrice)) {
+                    log.debug("가격 재확인 후 조건 불만족으로 주문 보류.");
+                    return;
+                }
                 executeOrder(order, executionPrice);
             } finally {
                 if (memberLocks.size() > 1000) {
