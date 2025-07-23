@@ -33,8 +33,17 @@ public enum ErrorCode {
     JWT_SIGNATURE_INVALID(HttpStatus.UNAUTHORIZED, "JWT-004", "토큰 서명이 유효하지 않습니다."),
     JWT_TOKEN_UNSUPPORTED(HttpStatus.UNAUTHORIZED, "JWT-005", "지원되지 않는 토큰입니다."),
 
+    INVALID_CREDENTIALS(HttpStatus.UNAUTHORIZED, "AUTH-001", "이메일 또는 비밀번호가 올바르지 않습니다."),
+    EMAIL_ALREADY_EXISTS(HttpStatus.CONFLICT, "AUTH-002", "이미 존재하는 이메일입니다."),
+    PASSWORD_MISMATCH(HttpStatus.BAD_REQUEST, "AUTH-003", "비밀번호가 일치하지 않습니다."),
+    INVALID_VERIFICATION_CODE(HttpStatus.BAD_REQUEST, "AUTH-004", "인증코드가 올바르지 않습니다."),
+    VERIFICATION_CODE_EXPIRED(HttpStatus.BAD_REQUEST, "AUTH-005", "인증코드가 만료되었습니다."),
+    WEAK_PASSWORD(HttpStatus.BAD_REQUEST, "AUTH-006", "비밀번호 강도가 부족합니다."),
+    AUTH_RESEND_TOO_EARLY(HttpStatus.BAD_REQUEST, "AUTH-007", "인증코드는 {0}초 후에 재발송할 수 있습니다."),
+    SOCIAL_LOGIN_REQUIRED(HttpStatus.BAD_REQUEST, "AUTH-006", "{0} 계정이 존재합니다. {0} 로그인을 이용해주세요."),
+
     // 주식 관련 에러
-    NOT_FOUNT_STOCK(HttpStatus.NOT_FOUND, "STOCK-001", "존재하지 않는 주식입니다."),
+    NOT_FOUND_STOCK(HttpStatus.NOT_FOUND, "STOCK-001", "존재하지 않는 주식입니다."),
     INVALID_STOCK_CODE(HttpStatus.BAD_REQUEST, "STOCK-002", "유효하지 않은 주식 코드입니다."),
     // 관심 종목 에러
     NOT_FOUND_FAVORITE(HttpStatus.NOT_FOUND, "FAVORITE-001", "등록되지 않은 관심종목입니다."),

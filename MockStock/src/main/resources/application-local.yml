@@ -56,6 +56,18 @@ spring:
               - email
               - profile
 
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${GOOGLE_MAIL_USERNAME}
+    password: ${GOOGLE_MAIL_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
   influx:
     url: http://localhost:8086
     token: ${INFLUX_TOKEN}
