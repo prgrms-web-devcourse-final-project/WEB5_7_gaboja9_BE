@@ -1,8 +1,10 @@
 package io.gaboja9.mockstock.domain.notifications.scheduler;
 
 import io.gaboja9.mockstock.domain.notifications.service.NotificationsService;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.stereotype.Component;
 
 import java.time.DayOfWeek;

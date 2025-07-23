@@ -109,7 +109,7 @@ public class NotificationsService {
 
         int sentCount = 0;
         for (Members member : targetMembers) {
-            try{
+            try {
                 Mails mail = new Mails(subject, content, true, null, member);
                 mailsRepository.save(mail);
                 sentCount++;
@@ -120,7 +120,6 @@ public class NotificationsService {
 
         log.info("시장 개장 알림 발송 완료 - 총 {}명", sentCount);
     }
-
 
     // 2. 시장 마감 알림
     public void sendMarketCloseNotification() {
@@ -136,7 +135,7 @@ public class NotificationsService {
 
         int sentCount = 0;
         for (Members member : targetMembers) {
-            try{
+            try {
                 Mails mail = new Mails(subject, content, true, null, member);
                 mailsRepository.save(mail);
                 sentCount++;
@@ -148,11 +147,9 @@ public class NotificationsService {
         log.info("시장 마감 알림 발송 완료 - 총 {}명", sentCount);
     }
 
-
     // 3. 시장 시간 알림이 활성화된 회원 조회
     private List<Members> getMarketNotificationEnabledMembers() {
-        return membersRepository.findAll()
-                .stream()
+        return membersRepository.findAll().stream()
                 .filter(member -> marketNotificationEnabled(member.getId()))
                 .toList();
     }
@@ -165,15 +162,12 @@ public class NotificationsService {
                 .orElse(true);
     }
 
-
     // 4. 시장 시작 알림 제목 생성
     private String createMarketOpenSubject() {
         String today = LocalDate.now().format(DateTimeFormatter.ofPattern("M월 d일"));
 
-        return String.format("%s %s 주식시장이 10분 후 개장합니다.",
-                NotificationType.MARKET_TIME.getPrefix(),
-                today
-                );
+        return String.format(
+                "%s %s 주식시장이 10분 후 개장합니다.", NotificationType.MARKET_TIME.getPrefix(), today);
     }
 
     // 5. 시장 시작 알림 내용 생성
@@ -196,10 +190,8 @@ public class NotificationsService {
     private String createMarketCloseSubject() {
         String today = LocalDate.now().format(DateTimeFormatter.ofPattern("M월 d일"));
 
-        return String.format("%s %s 주식시장이 10분 후 마감합니다.",
-                NotificationType.MARKET_TIME.getPrefix(),
-                today
-        );
+        return String.format(
+                "%s %s 주식시장이 10분 후 마감합니다.", NotificationType.MARKET_TIME.getPrefix(), today);
     }
 
     // 7. 시장 마감 알림 내용 생성
@@ -218,5 +210,4 @@ public class NotificationsService {
 
         return content.toString();
     }
-
 }
