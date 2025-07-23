@@ -10,7 +10,7 @@ jobs:
     env:
       PROJECT_DIR: MockStock
       APP_BASE_URL: ${{ secrets.APP_BASE_URL }}
-      INFLUX_TOKEN: ${{ secrets.INFLUX_TOKEN }}sad
+      INFLUX_TOKEN: ${{ secrets.INFLUX_TOKEN }}
       HANTU_APPKEY: ${{ secrets.HANTU_APPKEY }}
       HANTU_APPSECRET: ${{ secrets.HANTU_APPSECRET }}
       KAKAO_SECRET_KEY: ${{ secrets.KAKAO_SECRET_KEY }}
