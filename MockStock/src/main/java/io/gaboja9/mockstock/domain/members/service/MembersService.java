@@ -2,9 +2,11 @@ package io.gaboja9.mockstock.domain.members.service;
 
 import io.gaboja9.mockstock.domain.members.dto.request.MemosCreateRequestDto;
 import io.gaboja9.mockstock.domain.members.dto.response.MemberInfoDto;
+import io.gaboja9.mockstock.domain.members.dto.response.MemoResponseDto;
 import io.gaboja9.mockstock.domain.members.entity.Members;
 import io.gaboja9.mockstock.domain.members.exception.NotFoundMemberException;
 import io.gaboja9.mockstock.domain.members.repository.MembersRepository;
+import io.gaboja9.mockstock.domain.orders.service.OrdersService;
 import io.gaboja9.mockstock.domain.portfolios.dto.response.PortfoliosResponseDto;
 import io.gaboja9.mockstock.domain.portfolios.service.PortfoliosService;
 import io.gaboja9.mockstock.domain.ranks.service.RanksService;
@@ -26,6 +28,7 @@ public class MembersService {
     private final TradesRepository tradesRepository;
     private final RanksService ranksService;
     private final PortfoliosService portfoliosService;
+    private final OrdersService ordersService;
 
     @Transactional(readOnly = true)
     public MemberInfoDto getMemberInfoDto(Long memberId, PortfoliosResponseDto portfolios) {
@@ -38,6 +41,7 @@ public class MembersService {
         // int ranking = ranksService.getRankByMemberId(memberId); // TODO : 랭킹 로직 개발되면 추가
         int period =
                 (int) ChronoUnit.DAYS.between(member.getCreatedAt().toLocalDate(), LocalDate.now());
+        int bankruptcyCnt = member.getBankruptcyCnt();
 
         return MemberInfoDto.builder()
                 .nickname(member.getNickname())
@@ -47,6 +51,7 @@ public class MembersService {
                 .tradeCnt(tradeCnt)
                 // .ranking(ranking)
                 .period(period)
+                .bankruptcyCnt(bankruptcyCnt)
                 .build();
     }
 
@@ -59,19 +64,9 @@ public class MembersService {
                         .orElseThrow(() -> new NotFoundMemberException(memberId));
 
         portfoliosService.remove(memberId);
+        ordersService.remove(memberId);
         findMember.setCashBalance(30_000_000);
         findMember.setBankruptcyCnt(findMember.getBankruptcyCnt() + 1);
-    }
-
-    @Transactional(readOnly = true)
-    public int getBankruptcyCnt(Long memberId) {
-
-        Members findMember =
-                membersRepository
-                        .findById(memberId)
-                        .orElseThrow(() -> new NotFoundMemberException(memberId));
-
-        return findMember.getBankruptcyCnt();
     }
 
     @Transactional
@@ -86,13 +81,13 @@ public class MembersService {
     }
 
     @Transactional(readOnly = true)
-    public String getMemo(Long memberId) {
+    public MemoResponseDto getMemo(Long memberId) {
 
         Members findMember =
                 membersRepository
                         .findById(memberId)
                         .orElseThrow(() -> new NotFoundMemberException(memberId));
 
-        return findMember.getMemo();
+        return MemoResponseDto.builder().memo(findMember.getMemo()).build();
     }
 }

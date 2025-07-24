@@ -1,8 +1,10 @@
 package io.gaboja9.mockstock.domain.members.controller;
 
+import io.gaboja9.mockstock.domain.auth.dto.MembersDetails;
 import io.gaboja9.mockstock.domain.mails.dto.response.MailsResponseDto;
 import io.gaboja9.mockstock.domain.members.dto.request.MemosCreateRequestDto;
 import io.gaboja9.mockstock.domain.members.dto.response.MemberInfoDto;
+import io.gaboja9.mockstock.domain.members.dto.response.MemoResponseDto;
 import io.gaboja9.mockstock.domain.portfolios.dto.response.PortfoliosResponseDto;
 import io.gaboja9.mockstock.domain.trades.dto.request.TradesRequestDto;
 import io.gaboja9.mockstock.domain.trades.dto.response.TradesResponseDto;
@@ -14,6 +16,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "마이페이지 컨트롤러", description = "마이페이지 API입니다.")
@@ -33,7 +36,8 @@ public interface MembersControllerSpec {
                                             schema =
                                                     @Schema(implementation = MemberInfoDto.class))))
     @GetMapping("/info")
-    ResponseEntity<MemberInfoDto> getMemberInfo();
+    ResponseEntity<MemberInfoDto> getMemberInfo(
+            @AuthenticationPrincipal MembersDetails membersDetails);
 
     @Operation(
             summary = "포트폴리오를 불러옵니다.",
@@ -50,7 +54,8 @@ public interface MembersControllerSpec {
                                                             implementation =
                                                                     PortfoliosResponseDto.class))))
     @GetMapping("/portfolios")
-    ResponseEntity<PortfoliosResponseDto> getPortfolios();
+    ResponseEntity<PortfoliosResponseDto> getPortfolios(
+            @AuthenticationPrincipal MembersDetails membersDetails);
 
     @Operation(
             summary = "전체 거래내역을 불러옵니다.",
@@ -69,6 +74,7 @@ public interface MembersControllerSpec {
                                                                     TradesResponseDto.class))))
     @GetMapping("/trades")
     ResponseEntity<Page<TradesResponseDto>> getTrades(
+            @AuthenticationPrincipal MembersDetails membersDetails,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size);
 
@@ -89,6 +95,7 @@ public interface MembersControllerSpec {
                                                                     TradesResponseDto.class))))
     @GetMapping("/trades/search")
     ResponseEntity<Page<TradesResponseDto>> getTradesWithOption(
+            @AuthenticationPrincipal MembersDetails membersDetails,
             @ModelAttribute TradesRequestDto dto,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size);
@@ -105,7 +112,9 @@ public interface MembersControllerSpec {
                                             mediaType = "application/json",
                                             schema = @Schema(implementation = String.class))))
     @PostMapping("/memos")
-    ResponseEntity<String> createMemos(@RequestBody MemosCreateRequestDto dto);
+    ResponseEntity<String> createMemos(
+            @RequestBody MemosCreateRequestDto dto,
+            @AuthenticationPrincipal MembersDetails membersDetails);
 
     @Operation(
             summary = "메모를 불러옵니다.",
@@ -117,9 +126,13 @@ public interface MembersControllerSpec {
                             content =
                                     @Content(
                                             mediaType = "application/json",
-                                            schema = @Schema(implementation = String.class))))
+                                            schema =
+                                                    @Schema(
+                                                            implementation =
+                                                                    MemoResponseDto.class))))
     @GetMapping("/memos")
-    ResponseEntity<String> getMemos();
+    ResponseEntity<MemoResponseDto> getMemos(
+            @AuthenticationPrincipal MembersDetails membersDetails);
 
     @Operation(
             summary = "메일을 불러옵니다.",
@@ -138,6 +151,7 @@ public interface MembersControllerSpec {
                                                                     MailsResponseDto.class))))
     @GetMapping("/mails")
     ResponseEntity<Page<MailsResponseDto>> getMails(
+            @AuthenticationPrincipal MembersDetails membersDetails,
             @RequestParam(required = false) Boolean unread,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size);
@@ -151,19 +165,5 @@ public interface MembersControllerSpec {
                             description = "성공적으로 파산 신청이 되었습니다.",
                             content = @Content(schema = @Schema(hidden = true))))
     @PostMapping("/bankruptcy")
-    ResponseEntity<Void> declareBankruptcy();
-
-    @Operation(
-            summary = "파산 횟수를 불러옵니다.",
-            description = "사용자의 파산 신청 횟수를 불러옵니다.",
-            responses =
-                    @ApiResponse(
-                            responseCode = "200",
-                            description = "성공적으로 파산 횟수를 불러왔습니다.",
-                            content =
-                                    @Content(
-                                            mediaType = "application/json",
-                                            schema = @Schema(implementation = Integer.class))))
-    @GetMapping("/bankruptcy")
-    ResponseEntity<Integer> getBankruptcy();
+    ResponseEntity<Void> declareBankruptcy(@AuthenticationPrincipal MembersDetails membersDetails);
 }

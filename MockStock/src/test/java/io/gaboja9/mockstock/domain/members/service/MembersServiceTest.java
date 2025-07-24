@@ -12,9 +12,11 @@ import static org.mockito.Mockito.verify;
 
 import io.gaboja9.mockstock.domain.members.dto.request.MemosCreateRequestDto;
 import io.gaboja9.mockstock.domain.members.dto.response.MemberInfoDto;
+import io.gaboja9.mockstock.domain.members.dto.response.MemoResponseDto;
 import io.gaboja9.mockstock.domain.members.entity.Members;
 import io.gaboja9.mockstock.domain.members.exception.NotFoundMemberException;
 import io.gaboja9.mockstock.domain.members.repository.MembersRepository;
+import io.gaboja9.mockstock.domain.orders.service.OrdersService;
 import io.gaboja9.mockstock.domain.portfolios.dto.response.PortfoliosResponseDto;
 import io.gaboja9.mockstock.domain.portfolios.service.PortfoliosService;
 import io.gaboja9.mockstock.domain.ranks.service.RanksService;
@@ -41,6 +43,8 @@ class MembersServiceTest {
     @Mock private RanksService ranksService;
 
     @Mock private PortfoliosService portfoliosService;
+
+    @Mock private OrdersService ordersService;
 
     @Test
     void getMemberInfoDto_정상() {
@@ -79,6 +83,7 @@ class MembersServiceTest {
         assertThat(result.getTotalEvaluationAmount()).isEqualTo(50000);
         assertThat(result.getTradeCnt()).isEqualTo(5);
         assertThat(result.getPeriod()).isEqualTo(15);
+        assertThat(result.getBankruptcyCnt()).isEqualTo(0);
     }
 
     @Test
@@ -125,6 +130,7 @@ class MembersServiceTest {
         // then
         verify(membersRepository).findById(memberId);
         verify(portfoliosService).remove(memberId);
+        verify(ordersService).remove(memberId);
         assertThat(member.getCashBalance()).isEqualTo(30_000_000);
         assertThat(member.getBankruptcyCnt()).isEqualTo(3);
     }
@@ -139,41 +145,6 @@ class MembersServiceTest {
         assertThrows(
                 NotFoundMemberException.class, () -> membersService.processBankruptcy(memberId));
         verify(portfoliosService, never()).remove(any());
-    }
-
-    @Test
-    void getBankruptcyCnt_정상조회() {
-        // given
-        Long memberId = 1L;
-        Members member =
-                new Members(
-                        memberId,
-                        "test@example.com",
-                        "nickname",
-                        "google",
-                        "profile.png",
-                        30_000_000,
-                        2,
-                        LocalDateTime.now());
-
-        given(membersRepository.findById(memberId)).willReturn(Optional.of(member));
-
-        // when
-        int result = membersService.getBankruptcyCnt(memberId);
-
-        // then
-        assertThat(result).isEqualTo(2);
-    }
-
-    @Test
-    void getBankruptcyCnt_회원없음_예외발생() {
-        // given
-        Long memberId = 999L;
-        given(membersRepository.findById(memberId)).willReturn(Optional.empty());
-
-        // when & then
-        assertThrows(
-                NotFoundMemberException.class, () -> membersService.getBankruptcyCnt(memberId));
     }
 
     @Test
@@ -239,10 +210,10 @@ class MembersServiceTest {
 
         // when
         membersService.createMemo(memberId, dto);
-        String memo = membersService.getMemo(memberId);
+        MemoResponseDto responseDto = membersService.getMemo(memberId);
 
         // then
-        assertThat(dto.getMemo()).isEqualTo(memo);
+        assertThat(dto.getMemo()).isEqualTo(responseDto.getMemo());
         then(membersRepository).should(times(2)).findById(memberId);
     }
 }
