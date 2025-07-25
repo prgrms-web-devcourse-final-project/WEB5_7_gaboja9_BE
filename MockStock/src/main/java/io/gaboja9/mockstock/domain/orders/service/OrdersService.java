@@ -1,8 +1,5 @@
 package io.gaboja9.mockstock.domain.orders.service;
 
-import com.github.benmanes.caffeine.cache.Cache;
-import com.github.benmanes.caffeine.cache.Caffeine;
-
 import io.gaboja9.mockstock.domain.members.entity.Members;
 import io.gaboja9.mockstock.domain.members.exception.NotFoundMemberException;
 import io.gaboja9.mockstock.domain.members.repository.MembersRepository;
@@ -25,7 +22,6 @@ import io.gaboja9.mockstock.global.websocket.dto.StockPrice;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,8 +29,9 @@ import java.time.DayOfWeek;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Supplier;
 
 @Service
@@ -49,25 +46,24 @@ public class OrdersService {
     private final PortfoliosRepository portfoliosRepository;
     private final HantuWebSocketHandler hantuWebSocketHandler;
 
-    private final Cache<String, ReentrantLock> stockLocks =
-            Caffeine.newBuilder().expireAfterAccess(30, TimeUnit.MINUTES).build();
+    private final ConcurrentHashMap<String, Semaphore> stockSemaphores = new ConcurrentHashMap<>();
 
-    /** 종목 코드별로 락을 걸어서 자주 거래되는 종목의 경우 병목현상이 발생할 가능성이 있음.. */
-    private ReentrantLock getStockLock(String stockCode) {
-        return stockLocks.get(stockCode, key -> new ReentrantLock());
+    private Semaphore getStockSemaphore(String stockCode) {
+        return stockSemaphores.computeIfAbsent(stockCode, k -> new Semaphore(1));
     }
 
-    private <T> T executeWithStockLock(String stockCode, Supplier<T> task) {
-        ReentrantLock lock = getStockLock(stockCode);
+    private <T> T executeWithStockSemaphore(String stockCode, Supplier<T> task) {
+        Semaphore semaphore = getStockSemaphore(stockCode);
+
         try {
-            if (lock.tryLock(10, TimeUnit.SECONDS)) {
+            if (semaphore.tryAcquire(30, TimeUnit.SECONDS)) {
                 try {
                     if (!openKoreanMarket()) {
                         throw new NotOpenKoreanMarketException();
                     }
                     return task.get();
                 } finally {
-                    lock.unlock();
+                    semaphore.release();
                 }
             } else {
                 throw new OrderProcessingTimeoutException();
@@ -80,296 +76,237 @@ public class OrdersService {
 
     @Transactional
     public OrderResponseDto executeMarketBuyOrders(Long memberId, OrdersMarketTypeRequestDto dto) {
-        return executeWithStockLock(
-                dto.getStockCode(),
-                () -> {
-                    Members findMember =
-                            membersRepository
-                                    .findByIdWithLock(memberId)
-                                    .orElseThrow(() -> new NotFoundMemberException(memberId));
+        return executeWithStockSemaphore(dto.getStockCode(), () -> {
+            Members findMember =
+                    membersRepository
+                            .findByIdWithLock(memberId)
+                            .orElseThrow(() -> new NotFoundMemberException(memberId));
 
-                    String stockCode = dto.getStockCode();
-                    String stockName = dto.getStockName();
-                    int quantity = dto.getQuantity();
+            String stockCode = dto.getStockCode();
+            String stockName = dto.getStockName();
+            int quantity = dto.getQuantity();
 
-                    Integer currentPrice = getCurrentPriceOrNull(stockCode);
-                    if (currentPrice == null) {
-                        return OrderResponseDto.builder()
-                                .executed(false)
-                                .message("시장가 매수 실패: 현재 가격 정보를 불러올 수 없습니다.")
-                                .build();
-                    }
+            Integer currentPrice = getCurrentPriceOrNull(stockCode);
+            if (currentPrice == null) {
+                return OrderResponseDto.builder()
+                        .executed(false)
+                        .message("시장가 매수 실패: 현재 가격 정보를 불러올 수 없습니다.")
+                        .build();
+            }
 
-                    int totalPrice = currentPrice * quantity;
-                    int cashBalance = findMember.getCashBalance();
+            int totalPrice = currentPrice * quantity;
+            int cashBalance = findMember.getCashBalance();
 
-                    if (cashBalance < totalPrice) {
-                        throw new NotEnoughCashException(cashBalance);
-                    }
+            if (cashBalance < totalPrice) {
+                throw new NotEnoughCashException(cashBalance);
+            }
 
-                    Orders order =
-                            new Orders(
-                                    stockCode,
-                                    stockName,
-                                    OrderType.MARKET,
-                                    TradeType.BUY,
-                                    quantity,
-                                    currentPrice,
-                                    findMember);
-                    order.execute();
-                    ordersRepository.save(order);
+            Orders order = new Orders(stockCode, stockName, OrderType.MARKET, TradeType.BUY, quantity, currentPrice, findMember);
+            order.execute();
+            ordersRepository.save(order);
 
-                    Trades trade =
-                            new Trades(
-                                    stockCode,
-                                    stockName,
-                                    TradeType.BUY,
-                                    quantity,
-                                    currentPrice,
-                                    findMember);
-                    tradesRepository.save(trade);
+            Trades trade = new Trades(stockCode, stockName, TradeType.BUY, quantity, currentPrice, findMember);
+            tradesRepository.save(trade);
 
-                    findMember.setCashBalance(findMember.getCashBalance() - totalPrice);
+            findMember.setCashBalance(findMember.getCashBalance() - totalPrice);
 
-                    portfoliosService.updateForBuy(
-                            memberId, stockCode, stockName, quantity, currentPrice);
+            portfoliosService.updateForBuy(memberId, stockCode, stockName, quantity, currentPrice);
 
-                    return OrderResponseDto.builder()
-                            .executed(true)
-                            .message("시장가 매수 완료")
-                            .price(currentPrice)
-                            .build();
-                });
+            log.info("시장가 매수 완료. memberId={}, stockCode={}, quantity={}, price={}",
+                    memberId, stockCode, quantity, currentPrice);
+
+            return OrderResponseDto.builder()
+                    .executed(true)
+                    .message("시장가 매수 완료")
+                    .price(currentPrice)
+                    .build();
+        });
     }
 
     @Transactional
     public OrderResponseDto executeMarketSellOrders(Long memberId, OrdersMarketTypeRequestDto dto) {
-        return executeWithStockLock(
-                dto.getStockCode(),
-                () -> {
-                    Members findMember =
-                            membersRepository
-                                    .findByIdWithLock(memberId)
-                                    .orElseThrow(() -> new NotFoundMemberException(memberId));
+        return executeWithStockSemaphore(dto.getStockCode(), () -> {
+            Members findMember =
+                    membersRepository
+                            .findByIdWithLock(memberId)
+                            .orElseThrow(() -> new NotFoundMemberException(memberId));
 
-                    String stockCode = dto.getStockCode();
-                    String stockName = dto.getStockName();
-                    int quantity = dto.getQuantity();
+            String stockCode = dto.getStockCode();
+            String stockName = dto.getStockName();
+            int quantity = dto.getQuantity();
 
-                    Portfolios portfolio =
-                            portfoliosRepository
-                                    .findByMembersIdAndStockCodeWithLock(memberId, stockCode)
-                                    .orElseThrow(() -> new NotFoundPortfolioException());
+            Portfolios portfolio = portfoliosRepository.findByMembersIdAndStockCodeWithLock(memberId, stockCode)
+                    .orElseThrow(() -> new NotFoundPortfolioException());
 
-                    if (portfolio.getQuantity() < quantity) {
-                        throw new InvalidSellQuantityException(quantity);
-                    }
+            if (portfolio.getQuantity() < quantity) {
+                throw new InvalidSellQuantityException(quantity);
+            }
 
-                    Integer currentPrice = getCurrentPriceOrNull(stockCode);
-                    if (currentPrice == null) {
-                        return OrderResponseDto.builder()
-                                .executed(false)
-                                .message("시장가 매도 실패: 현재 가격 정보를 불러올 수 없습니다.")
-                                .build();
-                    }
+            Integer currentPrice = getCurrentPriceOrNull(stockCode);
+            if (currentPrice == null) {
+                return OrderResponseDto.builder()
+                        .executed(false)
+                        .message("시장가 매도 실패: 현재 가격 정보를 불러올 수 없습니다.")
+                        .build();
+            }
 
-                    int totalAmount = currentPrice * quantity;
+            int totalAmount = currentPrice * quantity;
 
-                    Orders order =
-                            new Orders(
-                                    stockCode,
-                                    stockName,
-                                    OrderType.MARKET,
-                                    TradeType.SELL,
-                                    quantity,
-                                    currentPrice,
-                                    findMember);
-                    order.execute();
-                    ordersRepository.save(order);
+            Orders order = new Orders(stockCode, stockName, OrderType.MARKET, TradeType.SELL, quantity, currentPrice, findMember);
+            order.execute();
+            ordersRepository.save(order);
 
-                    Trades trades =
-                            new Trades(
-                                    stockCode,
-                                    stockName,
-                                    TradeType.SELL,
-                                    quantity,
-                                    currentPrice,
-                                    findMember);
-                    tradesRepository.save(trades);
+            Trades trades = new Trades(stockCode, stockName, TradeType.SELL, quantity, currentPrice, findMember);
+            tradesRepository.save(trades);
 
-                    portfoliosService.updateForSell(memberId, stockCode, quantity);
+            portfoliosService.updateForSell(memberId, stockCode, quantity);
 
-                    findMember.setCashBalance(findMember.getCashBalance() + totalAmount);
+            findMember.setCashBalance(findMember.getCashBalance() + totalAmount);
 
-                    return OrderResponseDto.builder()
-                            .executed(true)
-                            .message("시장가 매도 완료")
-                            .price(currentPrice)
-                            .build();
-                });
+            log.info("시장가 매도 완료. memberId={}, stockCode={}, quantity={}, price={}",
+                    memberId, stockCode, quantity, currentPrice);
+
+            return OrderResponseDto.builder()
+                    .executed(true)
+                    .message("시장가 매도 완료")
+                    .price(currentPrice)
+                    .build();
+        });
     }
 
     @Transactional
     public OrderResponseDto executeLimitBuyOrders(Long memberId, OrdersLimitTypeRequestDto dto) {
-        return executeWithStockLock(
-                dto.getStockCode(),
-                () -> {
-                    Members findMember =
-                            membersRepository
-                                    .findByIdWithLock(memberId)
-                                    .orElseThrow(() -> new NotFoundMemberException(memberId));
+        return executeWithStockSemaphore(dto.getStockCode(), () -> {
+            Members findMember =
+                    membersRepository
+                            .findByIdWithLock(memberId)
+                            .orElseThrow(() -> new NotFoundMemberException(memberId));
 
-                    String stockCode = dto.getStockCode();
-                    String stockName = dto.getStockName();
-                    int limitPrice = dto.getPrice();
-                    int quantity = dto.getQuantity();
-                    int cashBalance = findMember.getCashBalance();
+            String stockCode = dto.getStockCode();
+            String stockName = dto.getStockName();
+            int limitPrice = dto.getPrice();
+            int quantity = dto.getQuantity();
+            int cashBalance = findMember.getCashBalance();
 
-                    int totalAmount = limitPrice * quantity;
+            int totalAmount = limitPrice * quantity;
 
-                    if (cashBalance < totalAmount) {
-                        throw new NotEnoughCashException(cashBalance);
-                    }
+            if (cashBalance < totalAmount) {
+                throw new NotEnoughCashException(cashBalance);
+            }
 
-                    Orders order =
-                            new Orders(
-                                    stockCode,
-                                    stockName,
-                                    OrderType.LIMIT,
-                                    TradeType.BUY,
-                                    quantity,
-                                    limitPrice,
-                                    findMember);
+            Orders order = new Orders(stockCode, stockName, OrderType.LIMIT, TradeType.BUY, quantity, limitPrice, findMember);
 
-                    Integer currentPrice = getCurrentPriceOrNull(stockCode);
-                    if (currentPrice == null) {
-                        return OrderResponseDto.builder()
-                                .executed(false)
-                                .message("지정가 매수 실패: 현재 가격 정보를 불러올 수 없습니다.")
-                                .build();
-                    }
+            Integer currentPrice = getCurrentPriceOrNull(stockCode);
+            if (currentPrice == null) {
+                return OrderResponseDto.builder()
+                        .executed(false)
+                        .message("지정가 매수 실패: 현재 가격 정보를 불러올 수 없습니다.")
+                        .build();
+            }
 
-                    if (currentPrice <= limitPrice) {
-                        // 즉시 체결
-                        order.execute();
-                        ordersRepository.save(order);
+            if (currentPrice <= limitPrice) {
+                // 즉시 체결
+                order.execute();
+                ordersRepository.save(order);
 
-                        // 거래 내역 저장
-                        Trades trade =
-                                new Trades(
-                                        stockCode,
-                                        stockName,
-                                        TradeType.BUY,
-                                        quantity,
-                                        currentPrice,
-                                        findMember);
-                        tradesRepository.save(trade);
+                Trades trade = new Trades(stockCode, stockName, TradeType.BUY, quantity, currentPrice, findMember);
+                tradesRepository.save(trade);
 
-                        // 잔고 차감 (실제 체결가 기준)
-                        int actualAmount = currentPrice * quantity;
-                        findMember.setCashBalance(findMember.getCashBalance() - actualAmount);
+                int actualAmount = currentPrice * quantity;
+                findMember.setCashBalance(findMember.getCashBalance() - actualAmount);
 
-                        // 포트폴리오 업데이트
-                        portfoliosService.updateForBuy(
-                                memberId, stockCode, stockName, quantity, currentPrice);
-                        return OrderResponseDto.builder()
-                                .executed(true)
-                                .message("지정가 매수 즉시 체결 완료")
-                                .price(currentPrice)
-                                .build();
-                    } else {
-                        // 대기 주문으로 등록
-                        ordersRepository.save(order);
+                portfoliosService.updateForBuy(memberId, stockCode, stockName, quantity, currentPrice);
 
-                        // 잔고 동결 (실제 거래소에서는 지정가 금액만큼 동결)
-                        findMember.setCashBalance(findMember.getCashBalance() - totalAmount);
-                        return OrderResponseDto.builder()
-                                .executed(false)
-                                .message("지정가 매수 주문 대기중")
-                                .price(limitPrice)
-                                .build();
-                    }
-                });
+                log.info("지정가 매수 즉시 체결. memberId={}, stockCode={}, limitPrice={}, executedPrice={}, quantity={}",
+                        memberId, stockCode, limitPrice, currentPrice, quantity);
+
+                return OrderResponseDto.builder()
+                        .executed(true)
+                        .message("지정가 매수 즉시 체결 완료")
+                        .price(currentPrice)
+                        .build();
+            } else {
+                // 대기 주문으로 등록
+                ordersRepository.save(order);
+                findMember.setCashBalance(findMember.getCashBalance() - totalAmount);
+
+                log.info("지정가 매수 주문 대기. memberId={}, stockCode={}, limitPrice={}, currentPrice={}, quantity={}",
+                        memberId, stockCode, limitPrice, currentPrice, quantity);
+
+                return OrderResponseDto.builder()
+                        .executed(false)
+                        .message("지정가 매수 주문 대기중")
+                        .price(limitPrice)
+                        .build();
+            }
+        });
     }
 
     @Transactional
     public OrderResponseDto executeLimitSellOrders(Long memberId, OrdersLimitTypeRequestDto dto) {
-        return executeWithStockLock(
-                dto.getStockCode(),
-                () -> {
-                    Members findMember =
-                            membersRepository
-                                    .findByIdWithLock(memberId)
-                                    .orElseThrow(() -> new NotFoundMemberException(memberId));
+        return executeWithStockSemaphore(dto.getStockCode(), () -> {
+            Members findMember =
+                    membersRepository
+                            .findByIdWithLock(memberId)
+                            .orElseThrow(() -> new NotFoundMemberException(memberId));
 
-                    String stockCode = dto.getStockCode();
-                    String stockName = dto.getStockName();
-                    int limitPrice = dto.getPrice();
-                    int quantity = dto.getQuantity();
-                    int cashBalance = findMember.getCashBalance();
+            String stockCode = dto.getStockCode();
+            String stockName = dto.getStockName();
+            int limitPrice = dto.getPrice();
+            int quantity = dto.getQuantity();
+            int cashBalance = findMember.getCashBalance();
 
-                    Portfolios portfolio =
-                            portfoliosRepository
-                                    .findByMembersIdAndStockCodeWithLock(memberId, stockCode)
-                                    .orElseThrow(() -> new NotFoundPortfolioException());
+            Portfolios portfolio = portfoliosRepository.findByMembersIdAndStockCodeWithLock(memberId, stockCode)
+                    .orElseThrow(() -> new NotFoundPortfolioException());
 
-                    if (portfolio.getQuantity() < quantity) {
-                        throw new InvalidSellQuantityException(quantity);
-                    }
-                    Integer currentPrice = getCurrentPriceOrNull(stockCode);
-                    if (currentPrice == null) {
-                        return OrderResponseDto.builder()
-                                .executed(false)
-                                .message("지정가 매도 실패: 현재 가격 정보를 불러올 수 없습니다.")
-                                .build();
-                    }
+            if (portfolio.getQuantity() < quantity) {
+                throw new InvalidSellQuantityException(quantity);
+            }
 
-                    Orders order =
-                            new Orders(
-                                    stockCode,
-                                    stockName,
-                                    OrderType.LIMIT,
-                                    TradeType.SELL,
-                                    quantity,
-                                    limitPrice,
-                                    findMember);
+            Integer currentPrice = getCurrentPriceOrNull(stockCode);
+            if (currentPrice == null) {
+                return OrderResponseDto.builder()
+                        .executed(false)
+                        .message("지정가 매도 실패: 현재 가격 정보를 불러올 수 없습니다.")
+                        .build();
+            }
 
-                    if (currentPrice >= limitPrice) {
-                        order.execute();
-                        ordersRepository.save(order);
+            Orders order = new Orders(stockCode, stockName, OrderType.LIMIT, TradeType.SELL, quantity, limitPrice, findMember);
 
-                        Trades trades =
-                                new Trades(
-                                        stockCode,
-                                        stockName,
-                                        TradeType.SELL,
-                                        quantity,
-                                        currentPrice,
-                                        findMember);
-                        tradesRepository.save(trades);
+            if (currentPrice >= limitPrice) {
+                order.execute();
+                ordersRepository.save(order);
 
-                        int actualAmount = currentPrice * quantity;
-                        findMember.setCashBalance(cashBalance + actualAmount);
+                Trades trades = new Trades(stockCode, stockName, TradeType.SELL, quantity, currentPrice, findMember);
+                tradesRepository.save(trades);
 
-                        portfoliosService.updateForSell(memberId, stockCode, quantity);
+                int actualAmount = currentPrice * quantity;
+                findMember.setCashBalance(cashBalance + actualAmount);
 
-                        return OrderResponseDto.builder()
-                                .executed(true)
-                                .message("지정가 매도 즉시 체결 완료")
-                                .price(currentPrice)
-                                .build();
-                    } else {
-                        ordersRepository.save(order);
+                portfoliosService.updateForSell(memberId, stockCode, quantity);
 
-                        portfoliosService.updateForSell(memberId, stockCode, quantity);
+                log.info("지정가 매도 즉시 체결. memberId={}, stockCode={}, limitPrice={}, executedPrice={}, quantity={}",
+                        memberId, stockCode, limitPrice, currentPrice, quantity);
 
-                        return OrderResponseDto.builder()
-                                .executed(false)
-                                .message("지정가 매도 주문 대기중")
-                                .price(limitPrice)
-                                .build();
-                    }
-                });
+                return OrderResponseDto.builder()
+                        .executed(true)
+                        .message("지정가 매도 즉시 체결 완료")
+                        .price(currentPrice)
+                        .build();
+            } else {
+                ordersRepository.save(order);
+                portfoliosService.updateForSell(memberId, stockCode, quantity);
+
+                log.info("지정가 매도 주문 대기. memberId={}, stockCode={}, limitPrice={}, currentPrice={}, quantity={}",
+                        memberId, stockCode, limitPrice, currentPrice, quantity);
+
+                return OrderResponseDto.builder()
+                        .executed(false)
+                        .message("지정가 매도 주문 대기중")
+                        .price(limitPrice)
+                        .build();
+            }
+        });
     }
 
     private Integer getCurrentPriceOrNull(String stockCode) {
@@ -388,7 +325,7 @@ public class OrdersService {
                         .findById(memberId)
                         .orElseThrow(() -> new NotFoundMemberException(memberId));
 
-        ordersRepository.deleteByMembersId(memberId);
+        ordersRepository.deleteByMembersId(findMember.getId());
     }
 
     public boolean openKoreanMarket() {
