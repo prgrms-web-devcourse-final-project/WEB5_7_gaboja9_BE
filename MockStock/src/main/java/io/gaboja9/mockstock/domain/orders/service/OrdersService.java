@@ -1,8 +1,5 @@
 package io.gaboja9.mockstock.domain.orders.service;
 
-import com.github.benmanes.caffeine.cache.Cache;
-import com.github.benmanes.caffeine.cache.Caffeine;
-
 import io.gaboja9.mockstock.domain.members.entity.Members;
 import io.gaboja9.mockstock.domain.members.exception.NotFoundMemberException;
 import io.gaboja9.mockstock.domain.members.repository.MembersRepository;
@@ -33,8 +30,9 @@ import java.time.DayOfWeek;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Supplier;
 
 @Service
@@ -49,25 +47,24 @@ public class OrdersService {
     private final PortfoliosRepository portfoliosRepository;
     private final HantuWebSocketHandler hantuWebSocketHandler;
 
-    private final Cache<String, ReentrantLock> stockLocks =
-            Caffeine.newBuilder().expireAfterAccess(30, TimeUnit.MINUTES).build();
+    private final ConcurrentHashMap<String, Semaphore> stockSemaphores = new ConcurrentHashMap<>();
 
-    /** 종목 코드별로 락을 걸어서 자주 거래되는 종목의 경우 병목현상이 발생할 가능성이 있음.. */
-    private ReentrantLock getStockLock(String stockCode) {
-        return stockLocks.get(stockCode, key -> new ReentrantLock());
+    private Semaphore getStockSemaphore(String stockCode) {
+        return stockSemaphores.computeIfAbsent(stockCode, k -> new Semaphore(1));
     }
 
-    private <T> T executeWithStockLock(String stockCode, Supplier<T> task) {
-        ReentrantLock lock = getStockLock(stockCode);
+    private <T> T executeWithStockSemaphore(String stockCode, Supplier<T> task) {
+        Semaphore semaphore = getStockSemaphore(stockCode);
+
         try {
-            if (lock.tryLock(10, TimeUnit.SECONDS)) {
+            if (semaphore.tryAcquire(30, TimeUnit.SECONDS)) {
                 try {
                     if (!openKoreanMarket()) {
                         throw new NotOpenKoreanMarketException();
                     }
                     return task.get();
                 } finally {
-                    lock.unlock();
+                    semaphore.release();
                 }
             } else {
                 throw new OrderProcessingTimeoutException();
@@ -80,7 +77,7 @@ public class OrdersService {
 
     @Transactional
     public OrderResponseDto executeMarketBuyOrders(Long memberId, OrdersMarketTypeRequestDto dto) {
-        return executeWithStockLock(
+        return executeWithStockSemaphore(
                 dto.getStockCode(),
                 () -> {
                     Members findMember =
@@ -134,6 +131,13 @@ public class OrdersService {
                     portfoliosService.updateForBuy(
                             memberId, stockCode, stockName, quantity, currentPrice);
 
+                    log.info(
+                            "시장가 매수 완료. memberId={}, stockCode={}, quantity={}, price={}",
+                            memberId,
+                            stockCode,
+                            quantity,
+                            currentPrice);
+
                     return OrderResponseDto.builder()
                             .executed(true)
                             .message("시장가 매수 완료")
@@ -144,7 +148,7 @@ public class OrdersService {
 
     @Transactional
     public OrderResponseDto executeMarketSellOrders(Long memberId, OrdersMarketTypeRequestDto dto) {
-        return executeWithStockLock(
+        return executeWithStockSemaphore(
                 dto.getStockCode(),
                 () -> {
                     Members findMember =
@@ -201,6 +205,13 @@ public class OrdersService {
 
                     findMember.setCashBalance(findMember.getCashBalance() + totalAmount);
 
+                    log.info(
+                            "시장가 매도 완료. memberId={}, stockCode={}, quantity={}, price={}",
+                            memberId,
+                            stockCode,
+                            quantity,
+                            currentPrice);
+
                     return OrderResponseDto.builder()
                             .executed(true)
                             .message("시장가 매도 완료")
@@ -211,7 +222,7 @@ public class OrdersService {
 
     @Transactional
     public OrderResponseDto executeLimitBuyOrders(Long memberId, OrdersLimitTypeRequestDto dto) {
-        return executeWithStockLock(
+        return executeWithStockSemaphore(
                 dto.getStockCode(),
                 () -> {
                     Members findMember =
@@ -254,7 +265,6 @@ public class OrdersService {
                         order.execute();
                         ordersRepository.save(order);
 
-                        // 거래 내역 저장
                         Trades trade =
                                 new Trades(
                                         stockCode,
@@ -265,13 +275,21 @@ public class OrdersService {
                                         findMember);
                         tradesRepository.save(trade);
 
-                        // 잔고 차감 (실제 체결가 기준)
                         int actualAmount = currentPrice * quantity;
                         findMember.setCashBalance(findMember.getCashBalance() - actualAmount);
 
-                        // 포트폴리오 업데이트
                         portfoliosService.updateForBuy(
                                 memberId, stockCode, stockName, quantity, currentPrice);
+
+                        log.info(
+                                "지정가 매수 즉시 체결. memberId={}, stockCode={}, limitPrice={},"
+                                    + " executedPrice={}, quantity={}",
+                                memberId,
+                                stockCode,
+                                limitPrice,
+                                currentPrice,
+                                quantity);
+
                         return OrderResponseDto.builder()
                                 .executed(true)
                                 .message("지정가 매수 즉시 체결 완료")
@@ -280,9 +298,17 @@ public class OrdersService {
                     } else {
                         // 대기 주문으로 등록
                         ordersRepository.save(order);
-
-                        // 잔고 동결 (실제 거래소에서는 지정가 금액만큼 동결)
                         findMember.setCashBalance(findMember.getCashBalance() - totalAmount);
+
+                        log.info(
+                                "지정가 매수 주문 대기. memberId={}, stockCode={}, limitPrice={},"
+                                    + " currentPrice={}, quantity={}",
+                                memberId,
+                                stockCode,
+                                limitPrice,
+                                currentPrice,
+                                quantity);
+
                         return OrderResponseDto.builder()
                                 .executed(false)
                                 .message("지정가 매수 주문 대기중")
@@ -294,7 +320,7 @@ public class OrdersService {
 
     @Transactional
     public OrderResponseDto executeLimitSellOrders(Long memberId, OrdersLimitTypeRequestDto dto) {
-        return executeWithStockLock(
+        return executeWithStockSemaphore(
                 dto.getStockCode(),
                 () -> {
                     Members findMember =
@@ -316,6 +342,7 @@ public class OrdersService {
                     if (portfolio.getQuantity() < quantity) {
                         throw new InvalidSellQuantityException(quantity);
                     }
+
                     Integer currentPrice = getCurrentPriceOrNull(stockCode);
                     if (currentPrice == null) {
                         return OrderResponseDto.builder()
@@ -353,6 +380,15 @@ public class OrdersService {
 
                         portfoliosService.updateForSell(memberId, stockCode, quantity);
 
+                        log.info(
+                                "지정가 매도 즉시 체결. memberId={}, stockCode={}, limitPrice={},"
+                                    + " executedPrice={}, quantity={}",
+                                memberId,
+                                stockCode,
+                                limitPrice,
+                                currentPrice,
+                                quantity);
+
                         return OrderResponseDto.builder()
                                 .executed(true)
                                 .message("지정가 매도 즉시 체결 완료")
@@ -360,8 +396,16 @@ public class OrdersService {
                                 .build();
                     } else {
                         ordersRepository.save(order);
-
                         portfoliosService.updateForSell(memberId, stockCode, quantity);
+
+                        log.info(
+                                "지정가 매도 주문 대기. memberId={}, stockCode={}, limitPrice={},"
+                                    + " currentPrice={}, quantity={}",
+                                memberId,
+                                stockCode,
+                                limitPrice,
+                                currentPrice,
+                                quantity);
 
                         return OrderResponseDto.builder()
                                 .executed(false)
@@ -388,7 +432,7 @@ public class OrdersService {
                         .findById(memberId)
                         .orElseThrow(() -> new NotFoundMemberException(memberId));
 
-        ordersRepository.deleteByMembersId(memberId);
+        ordersRepository.deleteByMembersId(findMember.getId());
     }
 
     public boolean openKoreanMarket() {
