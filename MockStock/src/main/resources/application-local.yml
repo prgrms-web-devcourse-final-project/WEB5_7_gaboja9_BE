@@ -143,3 +143,7 @@ logging:
     org.springframework.web.client: DEBUG
     org.springframework.web.SimpLogging: INFO
 
+holiday-api:
+  base-url: http://apis.data.go.kr/B090041/openapi/service/SpcdeInfoService
+  service-key: ${HOLIDAY_API_KEY}
+  timeout: 5000

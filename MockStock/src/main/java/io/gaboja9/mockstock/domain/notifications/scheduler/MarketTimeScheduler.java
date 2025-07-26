@@ -1,5 +1,6 @@
 package io.gaboja9.mockstock.domain.notifications.scheduler;
 
+import io.gaboja9.mockstock.domain.notifications.service.HolidayService;
 import io.gaboja9.mockstock.domain.notifications.service.NotificationsService;
 
 import lombok.RequiredArgsConstructor;
@@ -15,8 +16,9 @@ import java.time.LocalDate;
 @RequiredArgsConstructor
 public class MarketTimeScheduler {
     private final NotificationsService notificationsService;
+    private final HolidayService holidayService;
 
-    /** 매일 오전 8시 50분 - 개장 10분 전 알림 평일(월~금)에만 실행 */
+    // 매일 오전 8시 50분 - 개장 10분 전 알림 평일(월~금)에만 실행
     public void sendMarketOpenNotification() {
         if (!isTradingDay()) {
             log.info("오늘은 거래일이 아닙니다.");
@@ -33,7 +35,7 @@ public class MarketTimeScheduler {
         }
     }
 
-    /** 매일 오후 3시 20분 - 마감 10분 전 알림 평일(월~금)에만 실행 */
+    // 매일 오후 3시 20분 - 마감 10분 전 알림 평일(월~금)에만 실행
     public void sendMarketCloseNotification() {
         if (!isTradingDay()) {
             log.info("오늘은 거래일이 아닙니다.");
@@ -57,7 +59,11 @@ public class MarketTimeScheduler {
         if (dayOfWeek == DayOfWeek.SATURDAY || dayOfWeek == DayOfWeek.SUNDAY) {
             return false;
         }
-        // TODO: 공휴일 체크 필요
+
+        if (holidayService.isHoliday(today)) {
+            log.info("오늘({})은 공휴일입니다.", today);
+            return false;
+        }
 
         return true;
     }
