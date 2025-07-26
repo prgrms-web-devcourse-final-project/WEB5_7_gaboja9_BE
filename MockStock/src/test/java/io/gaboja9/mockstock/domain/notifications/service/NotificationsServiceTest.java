@@ -1,5 +1,9 @@
 package io.gaboja9.mockstock.domain.notifications.service;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.*;
+
 import io.gaboja9.mockstock.domain.mails.entity.Mails;
 import io.gaboja9.mockstock.domain.mails.repository.MailsRepository;
 import io.gaboja9.mockstock.domain.members.entity.Members;
@@ -7,6 +11,7 @@ import io.gaboja9.mockstock.domain.members.repository.MembersRepository;
 import io.gaboja9.mockstock.domain.notifications.entity.Notifications;
 import io.gaboja9.mockstock.domain.notifications.repository.NotificationsRepository;
 import io.gaboja9.mockstock.domain.trades.entity.TradeType;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -19,10 +24,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-
-import static org.mockito.BDDMockito.given;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class NotificationsServiceTest {
