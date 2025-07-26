@@ -2,6 +2,7 @@ package io.gaboja9.mockstock.domain.notifications.dto;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
 import java.util.List;
 
 @Getter

@@ -1,18 +1,17 @@
 package io.gaboja9.mockstock.domain.notifications.service;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.time.LocalDate;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 @SpringBootTest
 class HolidayServiceTest {
 
-    @Autowired
-    private HolidayService holidayService;
+    @Autowired private HolidayService holidayService;
 
     @Test
     void 평일은_공휴일이_아니다() {

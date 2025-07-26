@@ -1,19 +1,15 @@
 package io.gaboja9.mockstock.domain.notifications.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import io.gaboja9.mockstock.domain.notifications.dto.HolidayApiResponseDto;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -41,7 +37,6 @@ public class HolidayService {
 
             HolidayApiResponseDto response = getHolidays(date.getYear(), date.getMonthValue());
 
-
             if (response == null) {
                 return false;
             }
@@ -60,11 +55,12 @@ public class HolidayService {
 
             int targetDate = Integer.parseInt(date.format(DateTimeFormatter.ofPattern("yyyyMMdd")));
 
-            boolean result = response.getResponse().getBody().getItems().getItem().stream()
-                    .anyMatch(
-                            item ->
-                                    "Y".equals(item.getIsHoliday())
-                                            && item.getLocdate() == targetDate);
+            boolean result =
+                    response.getResponse().getBody().getItems().getItem().stream()
+                            .anyMatch(
+                                    item ->
+                                            "Y".equals(item.getIsHoliday())
+                                                    && item.getLocdate() == targetDate);
 
             return result;
 
@@ -76,13 +72,10 @@ public class HolidayService {
 
     private HolidayApiResponseDto getHolidays(int year, int month) {
         try {
-            String url = String.format(
-                    "%s/getRestDeInfo?serviceKey=%s&solYear=%d&solMonth=%02d&_type=json",
-                    baseUrl,
-                    serviceKey,
-                    year,
-                    month
-            );
+            String url =
+                    String.format(
+                            "%s/getRestDeInfo?serviceKey=%s&solYear=%d&solMonth=%02d&_type=json",
+                            baseUrl, serviceKey, year, month);
 
             URL apiUrl = new URL(url);
             HttpURLConnection conn = (HttpURLConnection) apiUrl.openConnection();
