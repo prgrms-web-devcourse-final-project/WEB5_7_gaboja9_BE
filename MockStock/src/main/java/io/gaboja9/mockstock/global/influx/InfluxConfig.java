@@ -1,4 +1,4 @@
-package io.gaboja9.mockstock.global.Influx;
+package io.gaboja9.mockstock.global.influx;
 
 import com.influxdb.client.InfluxDBClient;
 import com.influxdb.client.InfluxDBClientFactory;
