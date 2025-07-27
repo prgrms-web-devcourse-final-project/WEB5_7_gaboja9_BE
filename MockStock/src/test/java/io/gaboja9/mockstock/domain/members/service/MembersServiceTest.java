@@ -16,6 +16,7 @@ import io.gaboja9.mockstock.domain.members.dto.response.MemoResponseDto;
 import io.gaboja9.mockstock.domain.members.entity.Members;
 import io.gaboja9.mockstock.domain.members.exception.NotFoundMemberException;
 import io.gaboja9.mockstock.domain.members.repository.MembersRepository;
+import io.gaboja9.mockstock.domain.orders.service.OrdersService;
 import io.gaboja9.mockstock.domain.portfolios.dto.response.PortfoliosResponseDto;
 import io.gaboja9.mockstock.domain.portfolios.service.PortfoliosService;
 import io.gaboja9.mockstock.domain.ranks.service.RanksService;
@@ -42,6 +43,8 @@ class MembersServiceTest {
     @Mock private RanksService ranksService;
 
     @Mock private PortfoliosService portfoliosService;
+
+    @Mock private OrdersService ordersService;
 
     @Test
     void getMemberInfoDto_정상() {
@@ -127,6 +130,7 @@ class MembersServiceTest {
         // then
         verify(membersRepository).findById(memberId);
         verify(portfoliosService).remove(memberId);
+        verify(ordersService).remove(memberId);
         assertThat(member.getCashBalance()).isEqualTo(30_000_000);
         assertThat(member.getBankruptcyCnt()).isEqualTo(3);
     }
