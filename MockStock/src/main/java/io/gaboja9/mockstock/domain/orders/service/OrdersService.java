@@ -283,7 +283,7 @@ public class OrdersService {
 
                         log.info(
                                 "지정가 매수 즉시 체결. memberId={}, stockCode={}, limitPrice={},"
-                                    + " executedPrice={}, quantity={}",
+                                        + " executedPrice={}, quantity={}",
                                 memberId,
                                 stockCode,
                                 limitPrice,
@@ -302,7 +302,7 @@ public class OrdersService {
 
                         log.info(
                                 "지정가 매수 주문 대기. memberId={}, stockCode={}, limitPrice={},"
-                                    + " currentPrice={}, quantity={}",
+                                        + " currentPrice={}, quantity={}",
                                 memberId,
                                 stockCode,
                                 limitPrice,
@@ -382,7 +382,7 @@ public class OrdersService {
 
                         log.info(
                                 "지정가 매도 즉시 체결. memberId={}, stockCode={}, limitPrice={},"
-                                    + " executedPrice={}, quantity={}",
+                                        + " executedPrice={}, quantity={}",
                                 memberId,
                                 stockCode,
                                 limitPrice,
@@ -400,7 +400,7 @@ public class OrdersService {
 
                         log.info(
                                 "지정가 매도 주문 대기. memberId={}, stockCode={}, limitPrice={},"
-                                    + " currentPrice={}, quantity={}",
+                                        + " currentPrice={}, quantity={}",
                                 memberId,
                                 stockCode,
                                 limitPrice,
