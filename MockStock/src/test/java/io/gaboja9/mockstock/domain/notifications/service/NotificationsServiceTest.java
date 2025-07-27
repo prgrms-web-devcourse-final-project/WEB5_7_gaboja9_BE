@@ -18,6 +18,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
@@ -31,6 +32,7 @@ class NotificationsServiceTest {
     @Mock private NotificationsRepository notificationsRepository;
     @Mock private MembersRepository membersRepository;
     @Mock private MailsRepository mailsRepository;
+    @Mock private SimpMessagingTemplate messagingTemplate;
 
     @InjectMocks private NotificationsService notificationsService;
 
@@ -77,7 +79,15 @@ class NotificationsServiceTest {
         notificationsService.sendTradeNotification(1L, "005930", "삼성전자", TradeType.BUY, 10, 80000);
 
         // then
+        // 메일 저장 확인
         verify(mailsRepository).save(any(Mails.class));
+
+        // WebSocket 알림 발송 확인
+        verify(messagingTemplate).convertAndSendToUser(
+                eq("1"),
+                eq("/queue/notifications"),
+                any()
+        );
     }
 
     @Test
@@ -91,6 +101,7 @@ class NotificationsServiceTest {
 
         // then
         verify(mailsRepository, never()).save(any(Mails.class));
+        verify(messagingTemplate, never()).convertAndSendToUser(anyString(), anyString(), any());
     }
 
     @Test
@@ -104,6 +115,11 @@ class NotificationsServiceTest {
 
         // then
         verify(mailsRepository).save(any(Mails.class));
+        verify(messagingTemplate).convertAndSendToUser(
+                eq("1"),
+                eq("/queue/notifications"),
+                any()
+        );
     }
 
     @Test
@@ -119,6 +135,11 @@ class NotificationsServiceTest {
 
         // then
         verify(mailsRepository).save(any(Mails.class));
+        verify(messagingTemplate).convertAndSendToUser(
+                eq("1"),
+                eq("/queue/notifications"),
+                any()
+        );
     }
 
     @Test
@@ -134,6 +155,7 @@ class NotificationsServiceTest {
 
         // then
         verify(mailsRepository, never()).save(any(Mails.class));
+        verify(messagingTemplate, never()).convertAndSendToUser(anyString(), anyString(), any());
     }
 
     @Test
@@ -146,6 +168,7 @@ class NotificationsServiceTest {
 
         // then
         verify(mailsRepository, never()).save(any(Mails.class));
+        verify(messagingTemplate, never()).convertAndSendToUser(anyString(), anyString(), any());
     }
 
     @Test
@@ -161,6 +184,11 @@ class NotificationsServiceTest {
 
         // then
         verify(mailsRepository).save(any(Mails.class));
+        verify(messagingTemplate).convertAndSendToUser(
+                eq("1"),
+                eq("/queue/notifications"),
+                any()
+        );
     }
 
     @Test
@@ -176,6 +204,7 @@ class NotificationsServiceTest {
 
         // then
         verify(mailsRepository, never()).save(any(Mails.class));
+        verify(messagingTemplate, never()).convertAndSendToUser(anyString(), anyString(), any());
     }
 
     @Test
@@ -190,5 +219,10 @@ class NotificationsServiceTest {
 
         // then
         verify(mailsRepository).save(any(Mails.class));
+        verify(messagingTemplate).convertAndSendToUser(
+                eq("1"),
+                eq("/queue/notifications"),
+                any()
+        );
     }
 }

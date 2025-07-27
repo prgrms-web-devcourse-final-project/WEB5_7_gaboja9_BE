@@ -4,7 +4,12 @@ import io.gaboja9.mockstock.domain.mails.entity.Mails;
 import io.gaboja9.mockstock.domain.mails.repository.MailsRepository;
 import io.gaboja9.mockstock.domain.members.entity.Members;
 import io.gaboja9.mockstock.domain.members.repository.MembersRepository;
+import io.gaboja9.mockstock.domain.notifications.dto.MarketNotificationDataDto;
+import io.gaboja9.mockstock.domain.notifications.dto.NotificationDto;
+import io.gaboja9.mockstock.domain.notifications.dto.TradeNotificationDataDto;
 import io.gaboja9.mockstock.domain.notifications.entity.Notifications;
+import io.gaboja9.mockstock.domain.notifications.enums.MarketStatus;
+import io.gaboja9.mockstock.domain.notifications.enums.NotificationEventType;
 import io.gaboja9.mockstock.domain.notifications.enums.NotificationType;
 import io.gaboja9.mockstock.domain.notifications.repository.NotificationsRepository;
 import io.gaboja9.mockstock.domain.trades.entity.TradeType;
@@ -12,10 +17,13 @@ import io.gaboja9.mockstock.domain.trades.entity.TradeType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import java.text.NumberFormat;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Locale;
@@ -29,6 +37,7 @@ public class NotificationsService {
     private final NotificationsRepository notificationsRepository;
     private final MembersRepository membersRepository;
     private final MailsRepository mailsRepository;
+    private final SimpMessagingTemplate messagingTemplate;
 
     // 매매 알림
     // 1. 매매 완료시 메일 발송
@@ -52,6 +61,36 @@ public class NotificationsService {
 
         Mails mail = new Mails(subject, content, true, null, member.get());
         mailsRepository.save(mail);
+
+        try {
+            TradeNotificationDataDto tradeData = TradeNotificationDataDto.builder()
+                    .stockCode(stockCode)
+                    .stockName(stockName)
+                    .tradeType(tradeType)
+                    .quantity(quantity)
+                    .price(price)
+                    .totalAmount(price * quantity)
+                    .build();
+
+            NotificationDto notification = NotificationDto.builder()
+                    .type(NotificationEventType.TRADE)
+                    .title(subject)
+                    .message(content)
+                    .timestamp(LocalDateTime.now())
+                    .data(tradeData)
+                    .build();
+
+            messagingTemplate.convertAndSendToUser(
+                    String.valueOf(memberId),
+                    "/queue/notifications",
+                    notification
+            );
+
+            log.info("실시간 알림 발송 완료 - 사용자: {}, 종목: {}, 타입: {}",
+                    memberId, stockName, tradeType.name());
+            } catch (Exception e) {
+                log.error("실시간 알림 발송 실패 - 사용자: {}, 종목: {}", memberId, stockName, e);
+        }
 
         log.info("매매 알림 발송 완료 - 사용자: {}, 종목: {}, 타입: {}", memberId, stockName, tradeType.name());
     }
@@ -112,6 +151,26 @@ public class NotificationsService {
             try {
                 Mails mail = new Mails(subject, content, true, null, member);
                 mailsRepository.save(mail);
+
+                MarketNotificationDataDto marketData = MarketNotificationDataDto.builder()
+                        .marketStatus(MarketStatus.OPENING_SOON)
+                        .marketTime(LocalTime.of(8, 50))
+                        .build();
+
+                NotificationDto notification = NotificationDto.builder()
+                        .type(NotificationEventType.MARKET_OPEN)
+                        .title(subject)
+                        .message(content)
+                        .timestamp(LocalDateTime.now())
+                        .data(marketData)
+                        .build();
+
+                messagingTemplate.convertAndSendToUser(
+                        String.valueOf(member.getId()),
+                        "/queue/notifications",
+                        notification
+                );
+
                 sentCount++;
             } catch (Exception e) {
                 log.error("시장 개장 알림 발송 실패 - 사용자: {}", member.getId(), e);
@@ -138,6 +197,26 @@ public class NotificationsService {
             try {
                 Mails mail = new Mails(subject, content, true, null, member);
                 mailsRepository.save(mail);
+
+                MarketNotificationDataDto marketData = MarketNotificationDataDto.builder()
+                        .marketStatus(MarketStatus.CLOSING_SOON)
+                        .marketTime(LocalTime.of(15, 20))
+                        .build();
+
+                NotificationDto notification = NotificationDto.builder()
+                        .type(NotificationEventType.MARKET_CLOSE)
+                        .title(subject)
+                        .message(content)
+                        .timestamp(LocalDateTime.now())
+                        .data(marketData)
+                        .build();
+
+                messagingTemplate.convertAndSendToUser(
+                        String.valueOf(member.getId()),
+                        "/queue/notifications",
+                        notification
+                );
+
                 sentCount++;
             } catch (Exception e) {
                 log.error("시장 마감 알림 발송 실패 - 사용자: {}", member.getId(), e);
