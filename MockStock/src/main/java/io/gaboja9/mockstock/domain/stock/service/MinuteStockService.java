@@ -60,13 +60,14 @@ public class MinuteStockService {
 
     // 단일 종목의 분봉 데이터를 가져와 InfluxDB에 저장합니다.
     public void fetchAndSaveMinuteData(
-            String marketCode, String stockCode, String date, String startHour, String periodCode) {
+            String marketCode, String stockCode, String date, String startHour, String includePastData) {
         log.info(
                 "단일 종목 분봉 데이터 수집 시작 - 시장: {}, 종목: {}, 날짜: {}, 시간: {}",
                 marketCode,
                 stockCode,
                 date,
-                startHour);
+                startHour
+        );
 
         String accessToken = hantuAuthService.getValidAccessToken();
         if (accessToken == null) {
@@ -75,7 +76,7 @@ public class MinuteStockService {
         }
 
         String responseBody =
-                getStockMinuteData(marketCode, stockCode, date, startHour, accessToken);
+                getStockMinuteData(marketCode, stockCode, date, startHour, includePastData , accessToken);
 
         if (responseBody != null) {
             saveMinuteStockDataToInflux(responseBody, stockCode);
@@ -85,7 +86,7 @@ public class MinuteStockService {
     }
 
     private String getStockMinuteData(
-            String marketCode, String stockCode, String date, String time, String accessToken) {
+            String marketCode, String stockCode, String date, String time, String includePastData ,String accessToken) {
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -106,7 +107,7 @@ public class MinuteStockService {
                         .queryParam("FID_INPUT_DATE_1", date)
                         .queryParam("FID_INPUT_HOUR_1", time)
                         // 과거 데이터 포함 여부. "N"으로 설정 시 해당 시간에 데이터가 없으면 미포함
-                        .queryParam("FID_PW_DATA_INCU_YN", "Y")
+                        .queryParam("FID_PW_DATA_INCU_YN", includePastData)
                         .queryParam("FID_FAKE_TICK_INCU_YN", ""); // 명세에 따라 "공백" 값을 전송
 
         HttpEntity<?> entity = new HttpEntity<>(headers);
