@@ -7,7 +7,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class HantuTokenResponse { // 이름 변경
+public class HantuTokenResponse {
 
     @JsonProperty("access_token")
     private String accessToken;

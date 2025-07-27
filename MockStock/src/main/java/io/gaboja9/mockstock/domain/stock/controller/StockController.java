@@ -20,7 +20,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
-/** 주식 데이터 수집을 위한 컨트롤러 */
+// 주식 데이터 수집을 위한 컨트롤러
 @Slf4j
 @RestController
 @RequestMapping("/api/stocks")

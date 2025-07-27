@@ -31,7 +31,7 @@ public class StocksWeeklyRepository {
         this.dailyInfluxDBClient = dailyInfluxDBClient;
     }
 
-    /** 초기 차트 데이터 로드 (저장된 주봉 데이터 조회) 데이터가 없으면 자동으로 실시간 집계로 전환 */
+    //초기 차트 데이터 로드 (저장된 주봉 데이터 조회) 데이터가 없으면 자동으로 실시간 집계로 전환
     public List<DailyStockPrice> findLatestWeeklyPrices(String stockCode, int limit) {
         // 먼저 저장된 주봉 데이터 조회 시도
         List<DailyStockPrice> weeklyData = findStoredWeeklyPrices(stockCode, limit);
