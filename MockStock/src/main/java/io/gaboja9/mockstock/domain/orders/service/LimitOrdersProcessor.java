@@ -1,6 +1,7 @@
 package io.gaboja9.mockstock.domain.orders.service;
 
 import io.gaboja9.mockstock.domain.members.entity.Members;
+import io.gaboja9.mockstock.domain.notifications.service.NotificationsService;
 import io.gaboja9.mockstock.domain.orders.entity.OrderStatus;
 import io.gaboja9.mockstock.domain.orders.entity.OrderType;
 import io.gaboja9.mockstock.domain.orders.entity.Orders;
@@ -34,6 +35,7 @@ public class LimitOrdersProcessor {
     private final PortfoliosService portfoliosService;
     private final HantuWebSocketHandler hantuWebSocketHandler;
     private final OrdersService ordersService;
+    private final NotificationsService notificationsService;
 
     // Virtual Thread 환경에서는 단순한 Semaphore 기반 동시성 제어가 더 효율적
     private final ConcurrentHashMap<String, Semaphore> memberSemaphores = new ConcurrentHashMap<>();
@@ -187,6 +189,23 @@ public class LimitOrdersProcessor {
         } else if (order.getTradeType() == TradeType.SELL) {
             int actualAmount = executionPrice * order.getQuantity();
             member.setCashBalance(member.getCashBalance() + actualAmount);
+        }
+
+        try {
+            notificationsService.sendTradeNotification(
+                    member.getId(),
+                    order.getStockCode(),
+                    order.getStockName(),
+                    order.getTradeType(),
+                    order.getQuantity(),
+                    executionPrice);
+        } catch (Exception e) {
+            log.error(
+                    "지정가 {} 알림 발송 실패 - 사용자: {}, 종목: {}",
+                    order.getTradeType(),
+                    member.getId(),
+                    order.getStockCode(),
+                    e);
         }
 
         log.info(
