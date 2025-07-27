@@ -83,11 +83,7 @@ class NotificationsServiceTest {
         verify(mailsRepository).save(any(Mails.class));
 
         // WebSocket 알림 발송 확인
-        verify(messagingTemplate).convertAndSendToUser(
-                eq("1"),
-                eq("/queue/notifications"),
-                any()
-        );
+        verify(messagingTemplate).convertAndSendToUser(eq("1"), eq("/queue/notifications"), any());
     }
 
     @Test
@@ -115,11 +111,7 @@ class NotificationsServiceTest {
 
         // then
         verify(mailsRepository).save(any(Mails.class));
-        verify(messagingTemplate).convertAndSendToUser(
-                eq("1"),
-                eq("/queue/notifications"),
-                any()
-        );
+        verify(messagingTemplate).convertAndSendToUser(eq("1"), eq("/queue/notifications"), any());
     }
 
     @Test
@@ -135,11 +127,7 @@ class NotificationsServiceTest {
 
         // then
         verify(mailsRepository).save(any(Mails.class));
-        verify(messagingTemplate).convertAndSendToUser(
-                eq("1"),
-                eq("/queue/notifications"),
-                any()
-        );
+        verify(messagingTemplate).convertAndSendToUser(eq("1"), eq("/queue/notifications"), any());
     }
 
     @Test
@@ -184,11 +172,7 @@ class NotificationsServiceTest {
 
         // then
         verify(mailsRepository).save(any(Mails.class));
-        verify(messagingTemplate).convertAndSendToUser(
-                eq("1"),
-                eq("/queue/notifications"),
-                any()
-        );
+        verify(messagingTemplate).convertAndSendToUser(eq("1"), eq("/queue/notifications"), any());
     }
 
     @Test
@@ -219,10 +203,6 @@ class NotificationsServiceTest {
 
         // then
         verify(mailsRepository).save(any(Mails.class));
-        verify(messagingTemplate).convertAndSendToUser(
-                eq("1"),
-                eq("/queue/notifications"),
-                any()
-        );
+        verify(messagingTemplate).convertAndSendToUser(eq("1"), eq("/queue/notifications"), any());
     }
 }

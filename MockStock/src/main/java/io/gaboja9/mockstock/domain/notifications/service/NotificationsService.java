@@ -63,33 +63,35 @@ public class NotificationsService {
         mailsRepository.save(mail);
 
         try {
-            TradeNotificationDataDto tradeData = TradeNotificationDataDto.builder()
-                    .stockCode(stockCode)
-                    .stockName(stockName)
-                    .tradeType(tradeType)
-                    .quantity(quantity)
-                    .price(price)
-                    .totalAmount(price * quantity)
-                    .build();
+            TradeNotificationDataDto tradeData =
+                    TradeNotificationDataDto.builder()
+                            .stockCode(stockCode)
+                            .stockName(stockName)
+                            .tradeType(tradeType)
+                            .quantity(quantity)
+                            .price(price)
+                            .totalAmount(price * quantity)
+                            .build();
 
-            NotificationDto notification = NotificationDto.builder()
-                    .type(NotificationEventType.TRADE)
-                    .title(subject)
-                    .message(content)
-                    .timestamp(LocalDateTime.now())
-                    .data(tradeData)
-                    .build();
+            NotificationDto notification =
+                    NotificationDto.builder()
+                            .type(NotificationEventType.TRADE)
+                            .title(subject)
+                            .message(content)
+                            .timestamp(LocalDateTime.now())
+                            .data(tradeData)
+                            .build();
 
             messagingTemplate.convertAndSendToUser(
-                    String.valueOf(memberId),
-                    "/queue/notifications",
-                    notification
-            );
+                    String.valueOf(memberId), "/queue/notifications", notification);
 
-            log.info("실시간 알림 발송 완료 - 사용자: {}, 종목: {}, 타입: {}",
-                    memberId, stockName, tradeType.name());
-            } catch (Exception e) {
-                log.error("실시간 알림 발송 실패 - 사용자: {}, 종목: {}", memberId, stockName, e);
+            log.info(
+                    "실시간 알림 발송 완료 - 사용자: {}, 종목: {}, 타입: {}",
+                    memberId,
+                    stockName,
+                    tradeType.name());
+        } catch (Exception e) {
+            log.error("실시간 알림 발송 실패 - 사용자: {}, 종목: {}", memberId, stockName, e);
         }
 
         log.info("매매 알림 발송 완료 - 사용자: {}, 종목: {}, 타입: {}", memberId, stockName, tradeType.name());
@@ -152,24 +154,23 @@ public class NotificationsService {
                 Mails mail = new Mails(subject, content, true, null, member);
                 mailsRepository.save(mail);
 
-                MarketNotificationDataDto marketData = MarketNotificationDataDto.builder()
-                        .marketStatus(MarketStatus.OPENING_SOON)
-                        .marketTime(LocalTime.of(8, 50))
-                        .build();
+                MarketNotificationDataDto marketData =
+                        MarketNotificationDataDto.builder()
+                                .marketStatus(MarketStatus.OPENING_SOON)
+                                .marketTime(LocalTime.of(8, 50))
+                                .build();
 
-                NotificationDto notification = NotificationDto.builder()
-                        .type(NotificationEventType.MARKET_OPEN)
-                        .title(subject)
-                        .message(content)
-                        .timestamp(LocalDateTime.now())
-                        .data(marketData)
-                        .build();
+                NotificationDto notification =
+                        NotificationDto.builder()
+                                .type(NotificationEventType.MARKET_OPEN)
+                                .title(subject)
+                                .message(content)
+                                .timestamp(LocalDateTime.now())
+                                .data(marketData)
+                                .build();
 
                 messagingTemplate.convertAndSendToUser(
-                        String.valueOf(member.getId()),
-                        "/queue/notifications",
-                        notification
-                );
+                        String.valueOf(member.getId()), "/queue/notifications", notification);
 
                 sentCount++;
             } catch (Exception e) {
@@ -198,24 +199,23 @@ public class NotificationsService {
                 Mails mail = new Mails(subject, content, true, null, member);
                 mailsRepository.save(mail);
 
-                MarketNotificationDataDto marketData = MarketNotificationDataDto.builder()
-                        .marketStatus(MarketStatus.CLOSING_SOON)
-                        .marketTime(LocalTime.of(15, 20))
-                        .build();
+                MarketNotificationDataDto marketData =
+                        MarketNotificationDataDto.builder()
+                                .marketStatus(MarketStatus.CLOSING_SOON)
+                                .marketTime(LocalTime.of(15, 20))
+                                .build();
 
-                NotificationDto notification = NotificationDto.builder()
-                        .type(NotificationEventType.MARKET_CLOSE)
-                        .title(subject)
-                        .message(content)
-                        .timestamp(LocalDateTime.now())
-                        .data(marketData)
-                        .build();
+                NotificationDto notification =
+                        NotificationDto.builder()
+                                .type(NotificationEventType.MARKET_CLOSE)
+                                .title(subject)
+                                .message(content)
+                                .timestamp(LocalDateTime.now())
+                                .data(marketData)
+                                .build();
 
                 messagingTemplate.convertAndSendToUser(
-                        String.valueOf(member.getId()),
-                        "/queue/notifications",
-                        notification
-                );
+                        String.valueOf(member.getId()), "/queue/notifications", notification);
 
                 sentCount++;
             } catch (Exception e) {

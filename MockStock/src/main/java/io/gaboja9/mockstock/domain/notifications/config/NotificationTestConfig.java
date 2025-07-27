@@ -1,16 +1,16 @@
-//package io.gaboja9.mockstock.domain.notifications.config;
+// package io.gaboja9.mockstock.domain.notifications.config;
 //
-//import io.gaboja9.mockstock.domain.notifications.service.NotificationsService;
-//import lombok.RequiredArgsConstructor;
-//import lombok.extern.slf4j.Slf4j;
-//import org.springframework.boot.ApplicationRunner;
-//import org.springframework.context.annotation.Bean;
-//import org.springframework.context.annotation.Configuration;
+// import io.gaboja9.mockstock.domain.notifications.service.NotificationsService;
+// import lombok.RequiredArgsConstructor;
+// import lombok.extern.slf4j.Slf4j;
+// import org.springframework.boot.ApplicationRunner;
+// import org.springframework.context.annotation.Bean;
+// import org.springframework.context.annotation.Configuration;
 //
-//@Slf4j
-//@Configuration
-//@RequiredArgsConstructor
-//public class NotificationTestConfig {
+// @Slf4j
+// @Configuration
+// @RequiredArgsConstructor
+// public class NotificationTestConfig {
 //
 //    private final NotificationsService notificationsService;
 //
@@ -43,4 +43,4 @@
 //            }).start();
 //        };
 //    }
-//}
+// }

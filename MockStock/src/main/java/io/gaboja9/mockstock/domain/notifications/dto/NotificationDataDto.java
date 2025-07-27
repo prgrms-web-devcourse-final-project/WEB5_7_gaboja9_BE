@@ -2,6 +2,7 @@ package io.gaboja9.mockstock.domain.notifications.dto;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+
 import lombok.Data;
 
 @Data
