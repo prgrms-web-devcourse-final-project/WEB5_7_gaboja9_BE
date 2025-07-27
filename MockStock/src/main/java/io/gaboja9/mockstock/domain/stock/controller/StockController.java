@@ -6,8 +6,6 @@ import io.gaboja9.mockstock.domain.stock.service.MinuteStockService;
 import io.gaboja9.mockstock.domain.stock.service.StocksService;
 import io.gaboja9.mockstock.domain.stock.service.TodayMinuteStockService;
 
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -18,6 +16,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 /** 주식 데이터 수집을 위한 컨트롤러 */
@@ -34,11 +34,11 @@ public class StockController implements StockControllerSpec {
 
     @GetMapping("/long-term-daily")
     public ResponseEntity<?> fetchLongTermDailyStockData(
-        @RequestParam(defaultValue = "J") String marketCode,
-        @RequestParam String stockCode,
-        @RequestParam String startDate,  // 20240701 형태로 받기
-        @RequestParam String endDate,    // 20240731 형태로 받기
-        @RequestParam(defaultValue = "D") String periodCode) {
+            @RequestParam(defaultValue = "J") String marketCode,
+            @RequestParam String stockCode,
+            @RequestParam String startDate, // 20240701 형태로 받기
+            @RequestParam String endDate, // 20240731 형태로 받기
+            @RequestParam(defaultValue = "D") String periodCode) {
 
         log.info("장기간 일봉 데이터 수집 요청: {}, 기간: {} ~ {}", stockCode, startDate, endDate);
 
@@ -68,9 +68,7 @@ public class StockController implements StockControllerSpec {
                     String batchEndStr = batchEnd.format(formatter);
 
                     dailyStockService.fetchAndSaveDailyData(
-                        marketCode, stockCode,
-                        batchStartStr, batchEndStr,
-                        periodCode);
+                            marketCode, stockCode, batchStartStr, batchEndStr, periodCode);
                     successCount++;
 
                 } catch (Exception batchException) {
@@ -85,26 +83,27 @@ public class StockController implements StockControllerSpec {
                 }
             }
 
-            String resultMessage = String.format(
-                "장기간 일봉 데이터 수집 완료 - 총 배치: %d개, 성공: %d개, 실패: %d개",
-                batchCount, successCount, failCount);
+            String resultMessage =
+                    String.format(
+                            "장기간 일봉 데이터 수집 완료 - 총 배치: %d개, 성공: %d개, 실패: %d개",
+                            batchCount, successCount, failCount);
 
             return ResponseEntity.ok(resultMessage);
 
         } catch (Exception e) {
             log.error("장기간 일봉 데이터 수집 중 오류 발생", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body("장기간 일봉 데이터 수집 실패: " + e.getMessage());
+                    .body("장기간 일봉 데이터 수집 실패: " + e.getMessage());
         }
     }
 
     @GetMapping("/long-term-minute")
     public ResponseEntity<?> fetchLongTermMinuteStockData(
-        @RequestParam(defaultValue = "J") String marketCode,
-        @RequestParam String stockCode,
-        @RequestParam String startDate,  // 20240722
-        @RequestParam String endDate,    // 20240726
-        @RequestParam(defaultValue = "Y") String includePastData ) {  // 실제로는 FID_PW_DATA_INCU_YN
+            @RequestParam(defaultValue = "J") String marketCode,
+            @RequestParam String stockCode,
+            @RequestParam String startDate, // 20240722
+            @RequestParam String endDate, // 20240726
+            @RequestParam(defaultValue = "Y") String includePastData) { // 실제로는 FID_PW_DATA_INCU_YN
 
         log.info("장기간 분봉 데이터 수집 요청: {}, 기간: {} ~ {}", stockCode, startDate, endDate);
 
@@ -120,10 +119,10 @@ public class StockController implements StockControllerSpec {
 
             // 2시간 단위로 분할
             String[] timeSlots = {
-                "110000",  // 09:00~11:00
-                "130000",  // 11:00~13:00
-                "150000",  // 13:00~15:00
-                "153000"   // 15:00~15:30
+                "110000", // 09:00~11:00
+                "130000", // 11:00~13:00
+                "150000", // 13:00~15:00
+                "153000" // 15:00~15:30
             };
 
             while (current.isBefore(end) || current.isEqual(end)) {
@@ -143,30 +142,35 @@ public class StockController implements StockControllerSpec {
 
                     try {
                         minuteStockService.fetchAndSaveMinuteData(
-                            marketCode, stockCode, dateStr, startHour, includePastData);
+                                marketCode, stockCode, dateStr, startHour, includePastData);
                         successCount++;
                         Thread.sleep(1000);
 
                     } catch (Exception batchException) {
                         failCount++;
-                        log.error("분봉 배치 {} 실패: {} {} - {}",
-                            totalBatchCount, dateStr, startHour, batchException.getMessage());
+                        log.error(
+                                "분봉 배치 {} 실패: {} {} - {}",
+                                totalBatchCount,
+                                dateStr,
+                                startHour,
+                                batchException.getMessage());
                     }
                 }
 
                 current = current.plusDays(1);
             }
 
-            String resultMessage = String.format(
-                "장기간 분봉 데이터 수집 완료 - 총 배치: %d개, 성공: %d개, 실패: %d개",
-                totalBatchCount, successCount, failCount);
+            String resultMessage =
+                    String.format(
+                            "장기간 분봉 데이터 수집 완료 - 총 배치: %d개, 성공: %d개, 실패: %d개",
+                            totalBatchCount, successCount, failCount);
 
             return ResponseEntity.ok(resultMessage);
 
         } catch (Exception e) {
             log.error("장기간 분봉 데이터 수집 중 오류 발생", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body("장기간 분봉 데이터 수집 실패: " + e.getMessage());
+                    .body("장기간 분봉 데이터 수집 실패: " + e.getMessage());
         }
     }
 

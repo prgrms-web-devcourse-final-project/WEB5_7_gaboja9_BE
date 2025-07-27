@@ -60,14 +60,17 @@ public class MinuteStockService {
 
     // 단일 종목의 분봉 데이터를 가져와 InfluxDB에 저장합니다.
     public void fetchAndSaveMinuteData(
-            String marketCode, String stockCode, String date, String startHour, String includePastData) {
+            String marketCode,
+            String stockCode,
+            String date,
+            String startHour,
+            String includePastData) {
         log.info(
                 "단일 종목 분봉 데이터 수집 시작 - 시장: {}, 종목: {}, 날짜: {}, 시간: {}",
                 marketCode,
                 stockCode,
                 date,
-                startHour
-        );
+                startHour);
 
         String accessToken = hantuAuthService.getValidAccessToken();
         if (accessToken == null) {
@@ -76,7 +79,8 @@ public class MinuteStockService {
         }
 
         String responseBody =
-                getStockMinuteData(marketCode, stockCode, date, startHour, includePastData , accessToken);
+                getStockMinuteData(
+                        marketCode, stockCode, date, startHour, includePastData, accessToken);
 
         if (responseBody != null) {
             saveMinuteStockDataToInflux(responseBody, stockCode);
@@ -86,7 +90,12 @@ public class MinuteStockService {
     }
 
     private String getStockMinuteData(
-            String marketCode, String stockCode, String date, String time, String includePastData ,String accessToken) {
+            String marketCode,
+            String stockCode,
+            String date,
+            String time,
+            String includePastData,
+            String accessToken) {
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
