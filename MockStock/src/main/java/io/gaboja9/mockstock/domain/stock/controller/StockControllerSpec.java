@@ -115,7 +115,7 @@ public interface StockControllerSpec {
                                                 name = "수집 성공",
                                                 value =
                                                         "장기간 일봉 데이터 수집 완료 - 총 배치: 11개, 성공: 11개, 실패:"
-                                                            + " 0개"))),
+                                                                + " 0개"))),
         @ApiResponse(
                 responseCode = "500",
                 description = "데이터 수집 실패",
@@ -175,7 +175,7 @@ public interface StockControllerSpec {
                                                 name = "수집 성공",
                                                 value =
                                                         "장기간 분봉 데이터 수집 완료 - 총 배치: 20개, 성공: 20개, 실패:"
-                                                            + " 0개"))),
+                                                                + " 0개"))),
         @ApiResponse(
                 responseCode = "500",
                 description = "분봉 데이터 수집 실패",
