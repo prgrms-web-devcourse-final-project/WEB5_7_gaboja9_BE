@@ -17,6 +17,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 @Slf4j
 @Service
@@ -37,19 +38,15 @@ public class HolidayService {
 
             HolidayApiResponseDto response = getHolidays(date.getYear(), date.getMonthValue());
 
-            if (response == null) {
+            if (!isValidResponse(response)) {
+                log.info("=== 공휴일 정보 없음 또는 API 응답 오류: {} ===", date);
                 return false;
             }
 
-            if (response.getResponse() == null) {
-                return false;
-            }
+            List<HolidayApiResponseDto.HolidayItem> holidays = extractHolidayItems(response);
 
-            if (response.getResponse().getBody() == null) {
-                return false;
-            }
-
-            if (response.getResponse().getBody().getItems() == null) {
+            if (holidays.isEmpty()) {
+                log.info("=== 해당 월({}/{})에 공휴일 없음 ===", date.getYear(), date.getMonthValue());
                 return false;
             }
 
@@ -62,11 +59,47 @@ public class HolidayService {
                                             "Y".equals(item.getIsHoliday())
                                                     && item.getLocdate() == targetDate);
 
+            if (result) {
+                log.info("=== 공휴일입니다: {} ===", date);
+            } else {
+                log.info("=== 평일입니다: {} ===", date);
+            }
+
             return result;
 
         } catch (Exception e) {
             log.error("=== 공휴일 확인 중 오류 발생: {} ===", date, e);
             return false;
+        }
+    }
+
+    private boolean isValidResponse(HolidayApiResponseDto response) {
+        return response != null &&
+                response.getResponse() != null &&
+                response.getResponse().getBody() != null;
+    }
+
+    private List<HolidayApiResponseDto.HolidayItem> extractHolidayItems(HolidayApiResponseDto response) {
+        try {
+            var body = response.getResponse().getBody();
+
+            // items가 null인 경우
+            if (body.getItems() == null) {
+                log.info("=== API 응답에 items가 없음 (해당 월에 공휴일 없음) ===");
+                return List.of();
+            }
+
+            // item 리스트가 null인 경우
+            if (body.getItems().getItem() == null) {
+                log.info("=== API 응답에 item 리스트가 없음 (해당 월에 공휴일 없음) ===");
+                return List.of();
+            }
+
+            return body.getItems().getItem();
+
+        } catch (Exception e) {
+            log.warn("=== 공휴일 목록 추출 중 오류 발생, 빈 목록 반환 ===", e);
+            return List.of();
         }
     }
 
@@ -97,9 +130,15 @@ public class HolidayService {
             rd.close();
             conn.disconnect();
 
-            ObjectMapper mapper = new ObjectMapper();
-            return mapper.readValue(sb.toString(), HolidayApiResponseDto.class);
+            String responseBody = sb.toString();
+            log.debug("=== API 원본 응답: {} ===", responseBody);
 
+            String cleanedResponse = responseBody.replace("\"items\":\"\"", "\"items\":null");
+            log.debug("=== API 정리된 응답: {} ===", cleanedResponse);
+
+            ObjectMapper mapper = new ObjectMapper();
+
+            return mapper.readValue(cleanedResponse, HolidayApiResponseDto.class);
         } catch (Exception e) {
             log.error("API 호출 실패", e);
             return null;

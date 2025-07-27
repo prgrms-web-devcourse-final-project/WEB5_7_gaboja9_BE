@@ -3,6 +3,7 @@ package io.gaboja9.mockstock.domain.auth.repository;
 import io.gaboja9.mockstock.domain.auth.entity.EmailVerification;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -22,6 +23,7 @@ public interface EmailVerificationRepository extends JpaRepository<EmailVerifica
     boolean existsByEmailAndVerifiedTrue(String email);
 
     // 만료된 인증 데이터 삭제
+    @Modifying
     @Query("DELETE FROM EmailVerification e WHERE e.expiredAt < :now")
     void deleteExpiredVerifications(@Param("now") LocalDateTime now);
 }
