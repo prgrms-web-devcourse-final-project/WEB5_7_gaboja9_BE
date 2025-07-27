@@ -74,12 +74,13 @@ public class HolidayService {
     }
 
     private boolean isValidResponse(HolidayApiResponseDto response) {
-        return response != null &&
-                response.getResponse() != null &&
-                response.getResponse().getBody() != null;
+        return response != null
+                && response.getResponse() != null
+                && response.getResponse().getBody() != null;
     }
 
-    private List<HolidayApiResponseDto.HolidayItem> extractHolidayItems(HolidayApiResponseDto response) {
+    private List<HolidayApiResponseDto.HolidayItem> extractHolidayItems(
+            HolidayApiResponseDto response) {
         try {
             var body = response.getResponse().getBody();
 
