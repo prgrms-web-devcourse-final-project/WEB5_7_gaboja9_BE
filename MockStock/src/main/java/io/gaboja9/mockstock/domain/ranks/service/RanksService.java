@@ -2,6 +2,8 @@ package io.gaboja9.mockstock.domain.ranks.service;
 
 import io.gaboja9.mockstock.domain.members.entity.Members;
 import io.gaboja9.mockstock.domain.members.repository.MembersRepository;
+import io.gaboja9.mockstock.domain.notifications.scheduler.MarketTimeScheduler;
+import io.gaboja9.mockstock.domain.notifications.service.HolidayService;
 import io.gaboja9.mockstock.domain.payments.entity.PaymentHistory;
 import io.gaboja9.mockstock.domain.payments.entity.PaymentStatus;
 import io.gaboja9.mockstock.domain.payments.repository.PaymentHistoryRepository;
@@ -21,10 +23,7 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
-import java.time.DayOfWeek;
-import java.time.Duration;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
+import java.time.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -40,16 +39,16 @@ public class RanksService {
     private final PaymentHistoryRepository paymentHistoryRepository;
     private final PortfoliosRepository portfoliosRepository;
     private final RedisTemplate<String, Object> redisTemplate;
+    private final MarketTimeScheduler marketTimeScheduler;
 
     private static final String RANKING_KEY_PREFIX = "ranking:";
     private static final String LAST_UPDATE_KEY = "ranking:last_update";
 
     private boolean isMarketOpen() {
         LocalDateTime now = LocalDateTime.now();
-        DayOfWeek dayOfWeek = now.getDayOfWeek();
         LocalTime currentTime = now.toLocalTime();
 
-        if (dayOfWeek == DayOfWeek.SATURDAY || dayOfWeek == DayOfWeek.SUNDAY) {
+        if(marketTimeScheduler.isTradingDay()){
             return false;
         }
 
