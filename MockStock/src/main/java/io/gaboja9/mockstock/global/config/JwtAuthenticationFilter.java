@@ -67,7 +67,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     private boolean shouldSkipAuthentication(String requestURI) {
-        return requestURI.startsWith("/auth/")
+        return requestURI.startsWith("/auth/signup")
+                || requestURI.equals("/auth/login")
+                || requestURI.equals("/auth/email")
+                || requestURI.equals("/auth/refresh")
                 || requestURI.startsWith("/swagger-ui/")
                 || requestURI.startsWith("/v3/api-docs/")
                 || requestURI.startsWith("/actuator/")

@@ -2,12 +2,17 @@ package io.gaboja9.mockstock.domain.auth.service;
 
 import io.gaboja9.mockstock.domain.auth.dto.TokenPair;
 import io.gaboja9.mockstock.domain.auth.dto.request.LoginRequestDto;
+import io.gaboja9.mockstock.domain.auth.dto.request.PasswordResetRequestDto;
 import io.gaboja9.mockstock.domain.auth.dto.request.SignUpRequestDto;
 import io.gaboja9.mockstock.domain.auth.exception.AuthException;
+import io.gaboja9.mockstock.domain.auth.util.PasswordUtil;
 import io.gaboja9.mockstock.domain.members.entity.Members;
 import io.gaboja9.mockstock.domain.members.enums.Role;
+import io.gaboja9.mockstock.domain.members.exception.NotFoundMemberException;
 import io.gaboja9.mockstock.domain.members.repository.MembersRepository;
 
+import io.gaboja9.mockstock.global.exception.BaseException;
+import io.gaboja9.mockstock.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -15,6 +20,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @Slf4j
@@ -96,16 +102,47 @@ public class FormAuthService {
     }
 
     // 비밀번호 재설정
-    public void resetPassword(String email, String newPassword) {
-        Optional<Members> member = membersRepository.findByEmail(email);
+    public void resetPassword(Long memberId, PasswordResetRequestDto dto) {
+        Members member = membersRepository.findById(memberId)
+                .orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUNT_MEMBER));
 
-        if (!"LOCAL".equals(member.get().getProvider())) {
-            throw new IllegalStateException("소셜 로그인 계정은 비밀번호 재설정이 불가능합니다.");
+
+        validatePasswordReset(member, dto);
+
+        String encodedPassword = passwordEncoder.encode(dto.getNewPassword());
+        member.setPassword(encodedPassword);
+        membersRepository.save(member);
+
+        log.info("비밀번호 재설정 완료: {}", memberId);
+    }
+
+    // 비밀번호 재설정 검증
+    public void validatePasswordReset(Members member, PasswordResetRequestDto dto) {
+
+        if (!member.getProvider().equals("LOCAL")) {
+            throw AuthException.cannotResetPasswordForSocialUser();
         }
 
-        String encodedPassword = passwordEncoder.encode(newPassword);
-        member.get().setPassword(encodedPassword);
+        if (!passwordEncoder.matches(dto.getPresentPassword(), member.getPassword())) {
+            throw AuthException.invalidCurrentPassword();
+        }
 
-        log.info("비밀번호 재설정 완료: {}", email);
+        if (!dto.getNewPassword().equals(dto.getPasswordConfirm())) {
+            throw AuthException.newPasswordMismatch();
+        }
+
+        if (passwordEncoder.matches(dto.getNewPassword(), member.getPassword())) {
+            throw AuthException.sameAsCurrentPassword();
+        }
+
+        if (!isValidPassword(dto.getNewPassword())) {
+            throw AuthException.weakPassword();
+        }
+
     }
+
+        private boolean isValidPassword(String password) {
+            return PasswordUtil.PASSWORD_PATTERN.matcher(password).matches();
+        }
+
 }
