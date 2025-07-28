@@ -74,7 +74,10 @@ public enum ErrorCode {
     STOCK_DATA_FETCH_FAILED(
             HttpStatus.INTERNAL_SERVER_ERROR, "STOCK-CHART-004", "주식 데이터 조회에 실패했습니다."),
     INFLUXDB_CONNECTION_ERROR(
-            HttpStatus.INTERNAL_SERVER_ERROR, "STOCK-CHART-005", "데이터베이스 연결에 실패했습니다.");
+            HttpStatus.INTERNAL_SERVER_ERROR, "STOCK-CHART-005", "데이터베이스 연결에 실패했습니다."),
+
+    // 알림 관련 에러
+    NOTIFICATION_SETTING_UPDATE_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "NOTIFICATION-001", "알림 설정 업데이트에 실패했습니다.");
 
     private final HttpStatus status;
     private final String code;

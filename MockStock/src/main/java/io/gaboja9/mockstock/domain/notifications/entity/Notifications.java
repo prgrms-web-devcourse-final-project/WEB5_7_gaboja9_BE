@@ -22,10 +22,6 @@ public class Notifications extends BaseEntity {
 
     @Setter @Builder.Default private boolean marketNotificationEnabled = true;
 
-    @Setter @Builder.Default private int marketOpenNotificationMinute = 10;
-
-    @Setter @Builder.Default private int marketCloseNotificationMinute = 10;
-
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "members_id", unique = true)
     private Members members;
