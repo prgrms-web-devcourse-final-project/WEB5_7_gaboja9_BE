@@ -9,15 +9,16 @@ import io.gaboja9.mockstock.domain.portfolios.entity.Portfolios;
 import io.gaboja9.mockstock.domain.portfolios.repository.PortfoliosRepository;
 import io.gaboja9.mockstock.domain.ranks.dto.PaginationInfo;
 import io.gaboja9.mockstock.domain.ranks.dto.RankingRequest;
-import io.gaboja9.mockstock.domain.ranks.dto.RanksDto;
 import io.gaboja9.mockstock.domain.ranks.dto.RankingResponse;
+import io.gaboja9.mockstock.domain.ranks.dto.RanksDto;
 import io.gaboja9.mockstock.domain.ranks.entity.RanksType;
 import io.gaboja9.mockstock.global.websocket.HantuWebSocketHandler;
 import io.gaboja9.mockstock.global.websocket.dto.StockPrice;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -27,7 +28,6 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -53,15 +53,15 @@ public class RanksService {
             return false;
         }
 
-        LocalTime marketOpen = LocalTime.of(9,0);
-        LocalTime marketClose = LocalTime.of(15,30);
+        LocalTime marketOpen = LocalTime.of(9, 0);
+        LocalTime marketClose = LocalTime.of(15, 30);
 
         return !currentTime.isBefore(marketOpen) && !currentTime.isAfter(marketClose);
     }
 
     @Scheduled(cron = "0 0,30 9-15 * * MON-FRI")
-    public void updateRanksScheduled(){
-        if(!isMarketOpen()){
+    public void updateRanksScheduled() {
+        if (!isMarketOpen()) {
             log.info("시장 마감 시간입니다. 랭킹 업데이트를 건너뜁니다.");
             return;
         }
@@ -90,17 +90,18 @@ public class RanksService {
         List<RanksDto> sortedRanks = new ArrayList<>(allRanks);
 
         switch (ranksType) {
-            case RETURN_RATE :
-                sortedRanks.sort((a,b)->Double.compare(b.getReturnRate(), a.getReturnRate()));
+            case RETURN_RATE:
+                sortedRanks.sort((a, b) -> Double.compare(b.getReturnRate(), a.getReturnRate()));
                 break;
             case PROFIT:
-                sortedRanks.sort((a,b)->Double.compare(b.getTotalProfit(), a.getTotalProfit()));
+                sortedRanks.sort((a, b) -> Double.compare(b.getTotalProfit(), a.getTotalProfit()));
                 break;
             case ASSET:
-                sortedRanks.sort((a,b)-> Long.compare(b.getTotalAsset(),a.getTotalAsset()));
+                sortedRanks.sort((a, b) -> Long.compare(b.getTotalAsset(), a.getTotalAsset()));
                 break;
             case BANKRUPTCY:
-                sortedRanks.sort((a,b)-> Integer.compare(b.getBankruptcyCount(),a.getBankruptcyCount()));
+                sortedRanks.sort(
+                        (a, b) -> Integer.compare(b.getBankruptcyCount(), a.getBankruptcyCount()));
                 break;
         }
 
@@ -124,17 +125,17 @@ public class RanksService {
         return buildPaginatedRankingResponse(cachedRanks, memberId, request);
     }
 
-    private RankingResponse buildPaginatedRankingResponse(List<RanksDto> allRanks, Long memberId, RankingRequest request) {
+    private RankingResponse buildPaginatedRankingResponse(
+            List<RanksDto> allRanks, Long memberId, RankingRequest request) {
         // 상위 5명 추출
-        List<RanksDto> topRankers = allRanks.stream()
-                .limit(5)
-                .collect(Collectors.toList());
+        List<RanksDto> topRankers = allRanks.stream().limit(5).collect(Collectors.toList());
 
         // 내 랭킹 찾기
-        RanksDto myRanking = allRanks.stream()
-                .filter(ranking -> ranking.getMemberId().equals(memberId))
-                .findFirst()
-                .orElse(null);
+        RanksDto myRanking =
+                allRanks.stream()
+                        .filter(ranking -> ranking.getMemberId().equals(memberId))
+                        .findFirst()
+                        .orElse(null);
 
         // 페이지네이션 처리
         int totalElements = allRanks.size();
@@ -148,17 +149,19 @@ public class RanksService {
         }
 
         // 페이지네이션 정보 생성
-        PaginationInfo paginationInfo = PaginationInfo.builder()
-                .currentPage(request.getPage())
-                .pageSize(request.getSize())
-                .totalElements(totalElements)
-                .totalPages(totalPages)
-                .hasNext(request.getPage() < totalPages - 1)
-                .hasPrevious(request.getPage() > 0)
-                .build();
+        PaginationInfo paginationInfo =
+                PaginationInfo.builder()
+                        .currentPage(request.getPage())
+                        .pageSize(request.getSize())
+                        .totalElements(totalElements)
+                        .totalPages(totalPages)
+                        .hasNext(request.getPage() < totalPages - 1)
+                        .hasPrevious(request.getPage() > 0)
+                        .build();
 
         // 마지막 업데이트 시간 조회
-        LocalDateTime lastUpdated = (LocalDateTime) redisTemplate.opsForValue().get(LAST_UPDATE_KEY);
+        LocalDateTime lastUpdated =
+                (LocalDateTime) redisTemplate.opsForValue().get(LAST_UPDATE_KEY);
         if (lastUpdated == null) {
             lastUpdated = LocalDateTime.now();
         }
@@ -187,7 +190,8 @@ public class RanksService {
                 allRanks.sort((a, b) -> Long.compare(b.getTotalAsset(), a.getTotalAsset()));
                 break;
             case BANKRUPTCY:
-                allRanks.sort((a, b) -> Integer.compare(b.getBankruptcyCount(), a.getBankruptcyCount()));
+                allRanks.sort(
+                        (a, b) -> Integer.compare(b.getBankruptcyCount(), a.getBankruptcyCount()));
                 break;
         }
 
@@ -201,24 +205,21 @@ public class RanksService {
         }
     }
 
-    private List<RanksDto> calculateAllMemberRankings(){
+    private List<RanksDto> calculateAllMemberRankings() {
         List<Members> allMembers = membersRepository.findAll();
 
-        return allMembers.stream()
-                .map(this::calculateMemberRanking)
-                .collect(Collectors.toList());
+        return allMembers.stream().map(this::calculateMemberRanking).collect(Collectors.toList());
     }
 
-
-    private RanksDto calculateMemberRanking(Members member){
+    private RanksDto calculateMemberRanking(Members member) {
         long totalInvestment = calculateTotalInvestment(member.getId());
 
         long totalAsset = calculateTotalAsset(member);
 
         long totalProfit = totalAsset - totalInvestment;
 
-        double returnRate = totalInvestment > 0?
-                ((double) totalProfit / totalInvestment) + 100 : 0.0;
+        double returnRate =
+                totalInvestment > 0 ? ((double) totalProfit / totalInvestment) + 100 : 0.0;
 
         return RanksDto.builder()
                 .memberId(member.getId())
@@ -235,45 +236,49 @@ public class RanksService {
     private long calculateTotalInvestment(Long memberId) {
         long basicAmount = 30_000_000;
 
-        long totalChargeAmount = paymentHistoryRepository
-                .findByMembersIdAndStatus(memberId, PaymentStatus.APPROVED)
-                .stream()
-                .mapToLong(PaymentHistory::getAmount)
-                .sum();
+        long totalChargeAmount =
+                paymentHistoryRepository
+                        .findByMembersIdAndStatus(memberId, PaymentStatus.APPROVED)
+                        .stream()
+                        .mapToLong(PaymentHistory::getAmount)
+                        .sum();
 
         return basicAmount + totalChargeAmount;
     }
+
     // 총 자산 (현금 + 보유 주식)
 
-    private long calculateTotalAsset(Members member){
+    private long calculateTotalAsset(Members member) {
         long cashBalance = member.getCashBalance();
         long stockValue = calculateStockValue(member.getId());
 
         return cashBalance + stockValue;
     }
+
     // 보유 주식 현재 가격
 
     private long calculateStockValue(Long memberId) {
-        List<Portfolios> portfolios = portfoliosRepository
-                .findByMembersId(memberId);
+        List<Portfolios> portfolios = portfoliosRepository.findByMembersId(memberId);
 
         return portfolios.stream()
-                .mapToLong(portfolio -> {
-                    int currentPrice = getCurrentPriceOrNull(portfolio.getStockCode());
-                    return (long) portfolio.getQuantity() * currentPrice;
-                })
+                .mapToLong(
+                        portfolio -> {
+                            int currentPrice = getCurrentPriceOrNull(portfolio.getStockCode());
+                            return (long) portfolio.getQuantity() * currentPrice;
+                        })
                 .sum();
     }
-    private RankingResponse buildRankingResponse(List<RanksDto> allRanks, Long memberId, RanksType type) {
 
-        List<RanksDto> topRankers = allRanks.stream()
-                .limit(5)
-                .toList();
+    private RankingResponse buildRankingResponse(
+            List<RanksDto> allRanks, Long memberId, RanksType type) {
 
-        RanksDto myRanking = allRanks.stream()
-                .filter(ranking -> ranking.getMemberId().equals(memberId))
-                .findFirst()
-                .orElse(null);
+        List<RanksDto> topRankers = allRanks.stream().limit(5).toList();
+
+        RanksDto myRanking =
+                allRanks.stream()
+                        .filter(ranking -> ranking.getMemberId().equals(memberId))
+                        .findFirst()
+                        .orElse(null);
 
         return RankingResponse.builder()
                 .topRankers(topRankers)

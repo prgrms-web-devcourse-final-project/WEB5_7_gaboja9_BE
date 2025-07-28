@@ -1,6 +1,7 @@
 package io.gaboja9.mockstock.domain.ranks.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+
 import lombok.*;
 
 @Getter
@@ -34,5 +35,4 @@ public class RanksDto {
     @Setter
     @Schema(description = "랭킹 순위", example = "1", minimum = "1")
     private int rank;
-
 }

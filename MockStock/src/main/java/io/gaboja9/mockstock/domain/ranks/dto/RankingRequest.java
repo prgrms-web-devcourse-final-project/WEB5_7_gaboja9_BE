@@ -2,6 +2,7 @@ package io.gaboja9.mockstock.domain.ranks.dto;
 
 import io.gaboja9.mockstock.domain.ranks.entity.RanksType;
 import io.swagger.v3.oas.annotations.media.Schema;
+
 import lombok.Builder;
 import lombok.Getter;
 
@@ -10,7 +11,9 @@ import lombok.Getter;
 @Schema(description = "랭킹 조회 요청 정보")
 public class RankingRequest {
 
-    @Schema(description = "랭킹 유형", example = "RETURN_RATE",
+    @Schema(
+            description = "랭킹 유형",
+            example = "RETURN_RATE",
             allowableValues = {"RETURN_RATE", "PROFIT", "ASSET", "BANKRUPTCY"})
     private RanksType ranksType;
 
