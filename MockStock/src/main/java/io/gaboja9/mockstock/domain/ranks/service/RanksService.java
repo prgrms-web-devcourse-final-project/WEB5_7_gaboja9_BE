@@ -47,7 +47,7 @@ public class RanksService {
         LocalDateTime now = LocalDateTime.now();
         LocalTime currentTime = now.toLocalTime();
 
-        if(!marketTimeScheduler.isTradingDay()){
+        if (!marketTimeScheduler.isTradingDay()) {
             return false;
         }
 
