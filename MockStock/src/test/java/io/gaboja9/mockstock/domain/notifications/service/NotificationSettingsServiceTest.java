@@ -1,5 +1,8 @@
 package io.gaboja9.mockstock.domain.notifications.service;
 
+import static org.assertj.core.api.Assertions.*;
+import static org.mockito.BDDMockito.given;
+
 import io.gaboja9.mockstock.domain.members.entity.Members;
 import io.gaboja9.mockstock.domain.members.repository.MembersRepository;
 import io.gaboja9.mockstock.domain.notifications.dto.request.NotificationSettingsUpdateRequestDto;
@@ -9,6 +12,7 @@ import io.gaboja9.mockstock.domain.notifications.exception.NotificationException
 import io.gaboja9.mockstock.domain.notifications.repository.NotificationsRepository;
 import io.gaboja9.mockstock.global.exception.BaseException;
 import io.gaboja9.mockstock.global.exception.ErrorCode;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -17,9 +21,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.dao.DataAccessException;
 
 import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.*;
-import static org.mockito.BDDMockito.given;
 
 @ExtendWith(MockitoExtension.class)
 class NotificationSettingsServiceTest {
