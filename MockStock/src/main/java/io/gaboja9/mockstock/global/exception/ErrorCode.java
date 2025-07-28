@@ -41,10 +41,12 @@ public enum ErrorCode {
     WEAK_PASSWORD(HttpStatus.BAD_REQUEST, "AUTH-006", "비밀번호는 최소 8자 이상이며, 영문, 숫자, 특수문자를 포함해야 합니다."),
     AUTH_RESEND_TOO_EARLY(HttpStatus.BAD_REQUEST, "AUTH-007", "인증코드는 {0}초 후에 재발송할 수 있습니다."),
     SOCIAL_LOGIN_REQUIRED(HttpStatus.BAD_REQUEST, "AUTH-008", "{0} 계정이 존재합니다. {0} 로그인을 이용해주세요."),
-    SOCIAL_CANNOT_PASSWORD_RESET(HttpStatus.BAD_REQUEST, "AUTH-009", "소셜 로그인 계정은 비밀번호 재설정이 불가능합니다."),
+    SOCIAL_CANNOT_PASSWORD_RESET(
+            HttpStatus.BAD_REQUEST, "AUTH-009", "소셜 로그인 계정은 비밀번호 재설정이 불가능합니다."),
     SAME_AS_CURRENT_PASSWORD(HttpStatus.BAD_REQUEST, "AUTH-010", "새 비밀번호는 현재 비밀번호와 달라야 합니다."),
     CURRENT_PASSWORD_INCORRECT(HttpStatus.BAD_REQUEST, "AUTH-011", "현재 비밀번호가 올바르지 않습니다."),
-    NEW_PASSWORD_CONFIRM_MISMATCH(HttpStatus.BAD_REQUEST, "AUTH-012", "새 비밀번호와 비밀번호 확인이 일치하지 않습니다."),
+    NEW_PASSWORD_CONFIRM_MISMATCH(
+            HttpStatus.BAD_REQUEST, "AUTH-012", "새 비밀번호와 비밀번호 확인이 일치하지 않습니다."),
 
     // 주식 관련 에러
     NOT_FOUND_STOCK(HttpStatus.NOT_FOUND, "STOCK-001", "존재하지 않는 주식입니다."),

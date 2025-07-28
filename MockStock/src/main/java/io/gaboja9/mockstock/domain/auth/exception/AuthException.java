@@ -40,7 +40,7 @@ public class AuthException extends BaseException {
     }
 
     public static AuthException sameAsCurrentPassword() {
-            return new AuthException(ErrorCode.SAME_AS_CURRENT_PASSWORD);
+        return new AuthException(ErrorCode.SAME_AS_CURRENT_PASSWORD);
     }
 
     public static AuthException invalidCurrentPassword() {

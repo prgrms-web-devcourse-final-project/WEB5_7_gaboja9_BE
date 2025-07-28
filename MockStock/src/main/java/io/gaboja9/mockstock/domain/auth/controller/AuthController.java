@@ -68,21 +68,19 @@ public class AuthController {
 
     @PostMapping("/passwordReset")
     public ResponseEntity<AuthResponseDto> resetPassword(
-            @Valid @RequestBody PasswordResetRequestDto dto,
-            Authentication authentication) {
+            @Valid @RequestBody PasswordResetRequestDto dto, Authentication authentication) {
 
         log.info("비밀번호 재설정 요청");
 
         MembersDetails membersDetails = (MembersDetails) authentication.getPrincipal();
         Long memberId = membersDetails.getId();
 
-        try{
+        try {
             formAuthService.resetPassword(memberId, dto);
             return ResponseEntity.ok(AuthResponseDto.success("비밀번호가 재설정되었습니다."));
         } catch (Exception e) {
             log.error("비밀번호 재설정 처리 중 오류 발생", e);
-            return ResponseEntity.badRequest()
-                    .body(AuthResponseDto.fail(e.getMessage()));
+            return ResponseEntity.badRequest().body(AuthResponseDto.fail(e.getMessage()));
         }
     }
 
