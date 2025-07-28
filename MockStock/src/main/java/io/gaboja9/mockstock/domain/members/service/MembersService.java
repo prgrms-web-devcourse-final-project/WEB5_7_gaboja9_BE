@@ -6,6 +6,7 @@ import io.gaboja9.mockstock.domain.members.dto.response.MemoResponseDto;
 import io.gaboja9.mockstock.domain.members.entity.Members;
 import io.gaboja9.mockstock.domain.members.exception.NotFoundMemberException;
 import io.gaboja9.mockstock.domain.members.repository.MembersRepository;
+import io.gaboja9.mockstock.domain.orders.service.OrdersService;
 import io.gaboja9.mockstock.domain.portfolios.dto.response.PortfoliosResponseDto;
 import io.gaboja9.mockstock.domain.portfolios.service.PortfoliosService;
 import io.gaboja9.mockstock.domain.ranks.service.RanksService;
@@ -27,6 +28,7 @@ public class MembersService {
     private final TradesRepository tradesRepository;
     private final RanksService ranksService;
     private final PortfoliosService portfoliosService;
+    private final OrdersService ordersService;
 
     @Transactional(readOnly = true)
     public MemberInfoDto getMemberInfoDto(Long memberId, PortfoliosResponseDto portfolios) {
@@ -62,6 +64,7 @@ public class MembersService {
                         .orElseThrow(() -> new NotFoundMemberException(memberId));
 
         portfoliosService.remove(memberId);
+        ordersService.remove(memberId);
         findMember.setCashBalance(30_000_000);
         findMember.setBankruptcyCnt(findMember.getBankruptcyCnt() + 1);
     }

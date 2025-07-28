@@ -5,6 +5,7 @@ import static org.mockito.Mockito.*;
 
 import io.gaboja9.mockstock.domain.members.entity.Members;
 import io.gaboja9.mockstock.domain.members.repository.MembersRepository;
+import io.gaboja9.mockstock.domain.notifications.service.NotificationsService;
 import io.gaboja9.mockstock.domain.orders.dto.request.OrdersMarketTypeRequestDto;
 import io.gaboja9.mockstock.domain.orders.dto.response.OrderResponseDto;
 import io.gaboja9.mockstock.domain.orders.entity.Orders;
@@ -17,10 +18,12 @@ import io.gaboja9.mockstock.domain.portfolios.exception.NotFoundPortfolioExcepti
 import io.gaboja9.mockstock.domain.portfolios.repository.PortfoliosRepository;
 import io.gaboja9.mockstock.domain.portfolios.service.PortfoliosService;
 import io.gaboja9.mockstock.domain.trades.repository.TradesRepository;
+import io.gaboja9.mockstock.global.websocket.HantuWebSocketHandler;
+import io.gaboja9.mockstock.global.websocket.dto.StockPrice;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -29,8 +32,6 @@ import java.util.Optional;
 
 @ExtendWith(MockitoExtension.class)
 class OrdersServiceTest {
-
-    @InjectMocks private OrdersService ordersService;
 
     @Mock private MembersRepository membersRepository;
 
@@ -41,6 +42,28 @@ class OrdersServiceTest {
     @Mock private PortfoliosService portfoliosService;
 
     @Mock private PortfoliosRepository portfoliosRepository;
+
+    @Mock private HantuWebSocketHandler hantuWebSocketHandler;
+
+    @Mock private NotificationsService notificationsService;
+
+    private OrdersService ordersService;
+
+    @BeforeEach
+    void setUp() {
+        ordersService =
+                spy(
+                        new OrdersService(
+                                membersRepository,
+                                ordersRepository,
+                                tradesRepository,
+                                portfoliosService,
+                                portfoliosRepository,
+                                hantuWebSocketHandler,
+                                notificationsService));
+
+        doReturn(true).when(ordersService).openKoreanMarket();
+    }
 
     @Test
     void executeMarketBuyOrders_성공() {
@@ -64,7 +87,10 @@ class OrdersServiceTest {
                         .quantity(5)
                         .build();
 
-        when(membersRepository.findById(memberId)).thenReturn(Optional.of(member));
+        StockPrice mockPrice = StockPrice.builder().stockCode("AAPL").currentPrice(100_000).build();
+
+        when(membersRepository.findByIdWithLock(memberId)).thenReturn(Optional.of(member));
+        when(hantuWebSocketHandler.getLatestPrice("AAPL")).thenReturn(mockPrice);
 
         OrderResponseDto response = ordersService.executeMarketBuyOrders(memberId, dto);
 
@@ -98,7 +124,10 @@ class OrdersServiceTest {
                         .quantity(2)
                         .build();
 
-        when(membersRepository.findById(memberId)).thenReturn(Optional.of(member));
+        StockPrice mockPrice = StockPrice.builder().stockCode("AAPL").currentPrice(100_000).build();
+
+        when(membersRepository.findByIdWithLock(memberId)).thenReturn(Optional.of(member));
+        when(hantuWebSocketHandler.getLatestPrice("AAPL")).thenReturn(mockPrice);
 
         assertThatThrownBy(() -> ordersService.executeMarketBuyOrders(memberId, dto))
                 .isInstanceOf(NotEnoughCashException.class);
@@ -126,11 +155,14 @@ class OrdersServiceTest {
                         .quantity(3)
                         .build();
 
+        StockPrice mockPrice = StockPrice.builder().stockCode("AAPL").currentPrice(100_000).build();
+
         Portfolios portfolio = new Portfolios("AAPL", "애플", 5, 100000, member);
 
-        when(membersRepository.findById(memberId)).thenReturn(Optional.of(member));
-        when(portfoliosRepository.findByMembersIdAndStockCode(memberId, "AAPL"))
+        when(membersRepository.findByIdWithLock(memberId)).thenReturn(Optional.of(member));
+        when(portfoliosRepository.findByMembersIdAndStockCodeWithLock(memberId, "AAPL"))
                 .thenReturn(Optional.of(portfolio));
+        when(hantuWebSocketHandler.getLatestPrice("AAPL")).thenReturn(mockPrice);
 
         OrderResponseDto response = ordersService.executeMarketSellOrders(memberId, dto);
 
@@ -165,8 +197,8 @@ class OrdersServiceTest {
 
         Portfolios portfolio = new Portfolios("AAPL", "애플", 5, 100000, member);
 
-        when(membersRepository.findById(memberId)).thenReturn(Optional.of(member));
-        when(portfoliosRepository.findByMembersIdAndStockCode(memberId, "AAPL"))
+        when(membersRepository.findByIdWithLock(memberId)).thenReturn(Optional.of(member));
+        when(portfoliosRepository.findByMembersIdAndStockCodeWithLock(memberId, "AAPL"))
                 .thenReturn(Optional.of(portfolio));
 
         assertThatThrownBy(() -> ordersService.executeMarketSellOrders(memberId, dto))
@@ -194,8 +226,8 @@ class OrdersServiceTest {
                         .quantity(3)
                         .build();
 
-        when(membersRepository.findById(memberId)).thenReturn(Optional.of(member));
-        when(portfoliosRepository.findByMembersIdAndStockCode(memberId, "AAPL"))
+        when(membersRepository.findByIdWithLock(memberId)).thenReturn(Optional.of(member));
+        when(portfoliosRepository.findByMembersIdAndStockCodeWithLock(memberId, "AAPL"))
                 .thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> ordersService.executeMarketSellOrders(memberId, dto))

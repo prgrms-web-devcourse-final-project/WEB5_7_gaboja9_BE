@@ -2,6 +2,7 @@ package io.gaboja9.mockstock.domain.stock.controller;
 
 import io.gaboja9.mockstock.domain.stock.dto.StockResponse;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
@@ -11,6 +12,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 
@@ -83,4 +85,121 @@ public interface StockControllerSpec {
                                                         """)))
     })
     ResponseEntity<List<StockResponse>> getAllStocks();
+
+    @Operation(
+            summary = "장기간 일봉 데이터 대량 수집",
+            description =
+                    """
+                    지정된 기간의 일봉 데이터를 100일 단위로 분할하여 대량 수집합니다.
+
+                    **주요 특징:**
+                    - 100일 단위 자동 분할 처리
+                    - API 제한 회피를 위한 1초 딜레이 적용
+                    - 배치별 성공/실패 로깅
+                    - 중간 실패 시에도 나머지 배치 계속 진행
+
+                    **사용 예시:**
+                    - 3년치 데이터: 약 11개 배치, 12초 소요
+                    - 1년치 데이터: 약 4개 배치, 5초 소요
+                    """,
+            tags = {"주식 데이터 수집"})
+    @ApiResponses({
+        @ApiResponse(
+                responseCode = "200",
+                description = "일봉 데이터 수집 완료",
+                content =
+                        @Content(
+                                mediaType = "text/plain",
+                                examples =
+                                        @ExampleObject(
+                                                name = "수집 성공",
+                                                value =
+                                                        "장기간 일봉 데이터 수집 완료 - 총 배치: 11개, 성공: 11개, 실패:"
+                                                                + " 0개"))),
+        @ApiResponse(
+                responseCode = "500",
+                description = "데이터 수집 실패",
+                content =
+                        @Content(
+                                mediaType = "text/plain",
+                                examples =
+                                        @ExampleObject(
+                                                name = "수집 실패",
+                                                value = "장기간 일봉 데이터 수집 실패: 토큰 발급 실패")))
+    })
+    ResponseEntity<?> fetchLongTermDailyStockData(
+            @Parameter(description = "시장 구분 코드 (J: KRX)", example = "J")
+                    @RequestParam(defaultValue = "J")
+                    String marketCode,
+            @Parameter(description = "종목 코드", example = "005930", required = true) @RequestParam
+                    String stockCode,
+            @Parameter(description = "시작 날짜 (yyyyMMdd 형식)", example = "20220101", required = true)
+                    @RequestParam
+                    String startDate,
+            @Parameter(description = "종료 날짜 (yyyyMMdd 형식)", example = "20241231", required = true)
+                    @RequestParam
+                    String endDate,
+            @Parameter(description = "기간 구분 코드 (D: 일봉)", example = "D")
+                    @RequestParam(defaultValue = "D")
+                    String periodCode);
+
+    @Operation(
+            summary = "장기간 분봉 데이터 대량 수집",
+            description =
+                    """
+                    지정된 기간의 분봉 데이터를 날짜별 시간대별로 분할하여 수집합니다.
+
+                    **처리 방식:**
+                    - 하루 4개 시간대로 분할: 09:00-11:00, 11:00-13:00, 13:00-15:00, 15:00-15:30
+                    - 주말 자동 제외 (토요일, 일요일 스킵)
+                    - 각 배치당 1초 딜레이 적용
+
+                    **예상 배치 수:**
+                    - 1주일 (5일): 20개 배치
+                    - 1개월 (약 22일): 88개 배치
+
+                    **주의사항:**
+                    - 분봉 데이터는 당일부터 과거 데이터까지 수집 가능
+                    - 미래 날짜 요청 시 해당 날짜는 데이터 없음으로 처리
+                    """,
+            tags = {"주식 데이터 수집"})
+    @ApiResponses({
+        @ApiResponse(
+                responseCode = "200",
+                description = "분봉 데이터 수집 완료",
+                content =
+                        @Content(
+                                mediaType = "text/plain",
+                                examples =
+                                        @ExampleObject(
+                                                name = "수집 성공",
+                                                value =
+                                                        "장기간 분봉 데이터 수집 완료 - 총 배치: 20개, 성공: 20개, 실패:"
+                                                                + " 0개"))),
+        @ApiResponse(
+                responseCode = "500",
+                description = "분봉 데이터 수집 실패",
+                content =
+                        @Content(
+                                mediaType = "text/plain",
+                                examples =
+                                        @ExampleObject(
+                                                name = "수집 실패",
+                                                value = "장기간 분봉 데이터 수집 실패: API 호출 한도 초과")))
+    })
+    ResponseEntity<?> fetchLongTermMinuteStockData(
+            @Parameter(description = "시장 구분 코드 (J: KRX)", example = "J")
+                    @RequestParam(defaultValue = "J")
+                    String marketCode,
+            @Parameter(description = "종목 코드", example = "035420", required = true) @RequestParam
+                    String stockCode,
+            @Parameter(description = "시작 날짜 (yyyyMMdd 형식)", example = "20240722", required = true)
+                    @RequestParam
+                    String startDate,
+            @Parameter(description = "종료 날짜 (yyyyMMdd 형식)", example = "20240726", required = true)
+                    @RequestParam
+                    String endDate,
+            @Parameter(description = "과거 데이터 포함 여부 (Y: 포함, N: 미포함)", example = "Y")
+                    @RequestParam(defaultValue = "Y")
+                    String includePastData);
 }

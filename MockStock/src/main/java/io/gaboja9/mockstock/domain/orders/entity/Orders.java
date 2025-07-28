@@ -2,6 +2,7 @@ package io.gaboja9.mockstock.domain.orders.entity;
 
 import io.gaboja9.mockstock.domain.members.entity.Members;
 import io.gaboja9.mockstock.domain.trades.entity.TradeType;
+import io.gaboja9.mockstock.global.common.BaseEntity;
 
 import jakarta.persistence.*;
 
@@ -13,8 +14,13 @@ import java.time.LocalDateTime;
 
 @Getter
 @Entity
+@Table(
+        name = "orders",
+        indexes = {
+            @Index(name = "idx_status_type_createdAt", columnList = "status, orderType, createdAt")
+        })
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Orders {
+public class Orders extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -62,5 +68,9 @@ public class Orders {
     public void execute() {
         this.status = OrderStatus.EXECUTED;
         this.executedAt = LocalDateTime.now();
+    }
+
+    public void cancel() {
+        this.status = OrderStatus.CANCELLED;
     }
 }

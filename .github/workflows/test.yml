@@ -13,6 +13,7 @@ jobs:
       INFLUX_TOKEN: ${{ secrets.INFLUX_TOKEN }}
       HANTU_APPKEY: ${{ secrets.HANTU_APPKEY }}
       HANTU_APPSECRET: ${{ secrets.HANTU_APPSECRET }}
+      HOLIDAY_API_KEY: ${{ secrets.HOLIDAY_API_KEY }}
       KAKAO_SECRET_KEY: ${{ secrets.KAKAO_SECRET_KEY }}
       KAKAO_CLIENT_ID: ${{ secrets.KAKAO_CLIENT_ID }}
       KAKAO_CLIENT_SECRET: ${{ secrets.KAKAO_CLIENT_SECRET }}
@@ -22,6 +23,8 @@ jobs:
       GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
       JWT_ORIGIN_KEY: ${{ secrets.JWT_ORIGIN_KEY }}
       JWT_APP_KEY: ${{ secrets.JWT_APP_KEY }}
+      GOOGLE_MAIL_USERNAME: ${{ secrets.GOOGLE_MAIL_USERNAME }}
+      GOOGLE_MAIL_PASSWORD: ${{ secrets.GOOGLE_MAIL_PASSWORD }}
     steps:
       - uses: actions/checkout@v4
 
@@ -30,7 +33,7 @@ jobs:
         with:
           java-version: '21'
           distribution: 'temurin'
-      
+
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
 
