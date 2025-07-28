@@ -53,16 +53,19 @@ public class LimitOrdersProcessor {
             return;
         }
 
-        List<CompletableFuture<Void>> futures = pendingOrders.stream()
-                .map(order -> CompletableFuture.runAsync(
-                        () -> processIndividualOrder(order),
-                        virtualThreadExecutor))
-                .toList();
+        List<CompletableFuture<Void>> futures =
+                pendingOrders.stream()
+                        .map(
+                                order ->
+                                        CompletableFuture.runAsync(
+                                                () -> processIndividualOrder(order),
+                                                virtualThreadExecutor))
+                        .toList();
 
         try {
             // 모든 작업 완료 대기 (타임아웃 30초)
-            CompletableFuture<Void> allOf = CompletableFuture.allOf(
-                    futures.toArray(new CompletableFuture[0]));
+            CompletableFuture<Void> allOf =
+                    CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]));
 
             allOf.get(30, TimeUnit.SECONDS);
 
