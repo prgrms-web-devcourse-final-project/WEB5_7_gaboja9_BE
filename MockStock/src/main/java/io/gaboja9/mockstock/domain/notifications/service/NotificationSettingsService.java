@@ -13,7 +13,6 @@ import io.gaboja9.mockstock.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -49,9 +48,10 @@ public class NotificationSettingsService {
 
         Members member = getMemberById(memberId);
 
-        Notifications notifications = notificationsRepository
-                .findByMembersId(memberId)
-                .orElseGet(() -> createDefaultNotifications(member));
+        Notifications notifications =
+                notificationsRepository
+                        .findByMembersId(memberId)
+                        .orElseGet(() -> createDefaultNotifications(member));
 
         updateNotificationFields(notifications, requestDto);
 
