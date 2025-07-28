@@ -12,8 +12,6 @@ import io.gaboja9.mockstock.domain.auth.service.FormAuthService;
 import io.gaboja9.mockstock.domain.auth.service.JwtTokenProvider;
 
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
