@@ -13,6 +13,7 @@ jobs:
       INFLUX_TOKEN: ${{ secrets.INFLUX_TOKEN }}
       HANTU_APPKEY: ${{ secrets.HANTU_APPKEY }}
       HANTU_APPSECRET: ${{ secrets.HANTU_APPSECRET }}
+      HOLIDAY_API_KEY: ${{ secrets.HOLIDAY_API_KEY }}
       KAKAO_SECRET_KEY: ${{ secrets.KAKAO_SECRET_KEY }}
       KAKAO_CLIENT_ID: ${{ secrets.KAKAO_CLIENT_ID }}
       KAKAO_CLIENT_SECRET: ${{ secrets.KAKAO_CLIENT_SECRET }}
