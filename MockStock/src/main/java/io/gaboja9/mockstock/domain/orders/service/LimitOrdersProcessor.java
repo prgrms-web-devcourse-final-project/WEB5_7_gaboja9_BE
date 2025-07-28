@@ -36,6 +36,7 @@ public class LimitOrdersProcessor {
     private final HantuWebSocketHandler hantuWebSocketHandler;
     private final OrdersService ordersService;
     private final NotificationsService notificationsService;
+    private final ExecutorService virtualThreadExecutor;
 
     // Virtual Thread 환경에서는 단순한 Semaphore 기반 동시성 제어가 더 효율적
     private final ConcurrentHashMap<String, Semaphore> memberSemaphores = new ConcurrentHashMap<>();
@@ -52,31 +53,32 @@ public class LimitOrdersProcessor {
             return;
         }
 
-        // Virtual Thread를 사용한 구조화된 동시성으로 모든 주문을 병렬 처리
-        try (var scope = new StructuredTaskScope.ShutdownOnFailure()) {
+        List<CompletableFuture<Void>> futures = pendingOrders.stream()
+                .map(order -> CompletableFuture.runAsync(
+                        () -> processIndividualOrder(order),
+                        virtualThreadExecutor))
+                .toList();
 
-            // 각 주문을 Virtual Thread로 병렬 처리
-            List<StructuredTaskScope.Subtask<Object>> tasks =
-                    pendingOrders.stream()
-                            .map(
-                                    order ->
-                                            scope.fork(
-                                                    () -> {
-                                                        processIndividualOrder(order);
-                                                        return null;
-                                                    }))
-                            .toList();
+        try {
+            // 모든 작업 완료 대기 (타임아웃 30초)
+            CompletableFuture<Void> allOf = CompletableFuture.allOf(
+                    futures.toArray(new CompletableFuture[0]));
 
-            scope.join(); // 모든 작업 완료 대기
-            scope.throwIfFailed(); // 실패한 작업이 있으면 예외 발생
+            allOf.get(30, TimeUnit.SECONDS);
 
-            log.debug("처리된 주문 수: {}", tasks.size());
+            log.debug("처리된 주문 수: {}", futures.size());
 
+        } catch (TimeoutException e) {
+            log.warn("주문 처리 타임아웃 발생. 처리 중인 주문이 있을 수 있습니다.", e);
+            // 타임아웃이 발생해도 실행 중인 작업들은 계속 진행됨
+        } catch (ExecutionException e) {
+            log.error("주문 처리 중 오류 발생", e.getCause());
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             log.error("주문 처리 중 인터럽트 발생", e);
-        } catch (Exception e) {
-            log.error("주문 처리 중 오류 발생", e);
+
+            // 실행 중인 모든 작업 취소 시도
+            futures.forEach(future -> future.cancel(true));
         }
     }
 
@@ -86,7 +88,7 @@ public class LimitOrdersProcessor {
             Orders currentOrder =
                     ordersRepository
                             .findByIdWithMember(order.getId())
-                            .orElseThrow(() -> new NotFoundOrderException());
+                            .orElseThrow(NotFoundOrderException::new);
 
             if (currentOrder.getStatus() != OrderStatus.PENDING) {
                 log.debug(

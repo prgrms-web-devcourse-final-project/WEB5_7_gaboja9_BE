@@ -6,6 +6,9 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 @Configuration
 public class VirtualThreadConfig {
 
@@ -14,10 +17,16 @@ public class VirtualThreadConfig {
     public TaskScheduler virtualThreadTaskScheduler() {
         ThreadPoolTaskScheduler scheduler = new ThreadPoolTaskScheduler();
         scheduler.setThreadFactory(Thread.ofVirtual().name("virtual-scheduler-").factory());
-        scheduler.setPoolSize(50);
+        int coreCount = Runtime.getRuntime().availableProcessors();
+        scheduler.setPoolSize(2 * coreCount);
         scheduler.setWaitForTasksToCompleteOnShutdown(true);
         scheduler.setAwaitTerminationSeconds(60);
         scheduler.initialize();
         return scheduler;
+    }
+
+    @Bean
+    public ExecutorService virtualThreadExecutor() {
+        return Executors.newVirtualThreadPerTaskExecutor();
     }
 }
