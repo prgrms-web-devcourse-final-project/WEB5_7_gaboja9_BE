@@ -3,7 +3,6 @@ package io.gaboja9.mockstock.domain.ranks.service;
 import io.gaboja9.mockstock.domain.members.entity.Members;
 import io.gaboja9.mockstock.domain.members.repository.MembersRepository;
 import io.gaboja9.mockstock.domain.notifications.scheduler.MarketTimeScheduler;
-import io.gaboja9.mockstock.domain.notifications.service.HolidayService;
 import io.gaboja9.mockstock.domain.payments.entity.PaymentHistory;
 import io.gaboja9.mockstock.domain.payments.entity.PaymentStatus;
 import io.gaboja9.mockstock.domain.payments.repository.PaymentHistoryRepository;
@@ -48,7 +47,7 @@ public class RanksService {
         LocalDateTime now = LocalDateTime.now();
         LocalTime currentTime = now.toLocalTime();
 
-        if(marketTimeScheduler.isTradingDay()){
+        if (marketTimeScheduler.isTradingDay()) {
             return false;
         }
 
