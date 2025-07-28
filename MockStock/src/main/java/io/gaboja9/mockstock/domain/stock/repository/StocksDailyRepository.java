@@ -26,7 +26,6 @@ public class StocksDailyRepository {
     @Value("${spring.influx.bucket.daily}")
     private String dailyBucket;
 
-    // 수동 생성자 - 당신이 보여준 패턴과 동일
     public StocksDailyRepository(
             @Qualifier("dailyInfluxDBClient") InfluxDBClient dailyInfluxDBClient) {
         this.dailyInfluxDBClient = dailyInfluxDBClient;
