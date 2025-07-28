@@ -132,3 +132,8 @@ kakaopay:
 
 app:
   base-url: ${APP_BASE_URL}
+
+holiday-api:
+  base-url: http://apis.data.go.kr/B090041/openapi/service/SpcdeInfoService
+  service-key: ${HOLIDAY_API_KEY}
+  timeout: 5000

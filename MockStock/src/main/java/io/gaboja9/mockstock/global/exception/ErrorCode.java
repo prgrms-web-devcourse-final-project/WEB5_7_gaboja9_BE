@@ -63,7 +63,18 @@ public enum ErrorCode {
     NOT_OPEN_KOREAN_MARKET(HttpStatus.BAD_REQUEST, "ORDER-006", "한국장이 닫혀있습니다."),
 
     // 포트폴리오 관련 에러
-    NOT_FOUND_PORTFOLIO(HttpStatus.NOT_FOUND, "PORTFOLIO-001", "보유한 주식이 없습니다.");
+    NOT_FOUND_PORTFOLIO(HttpStatus.NOT_FOUND, "PORTFOLIO-001", "보유한 주식이 없습니다."),
+
+    // 주식 차트 관련 에러
+    // 주식 차트 관련 에러
+    INVALID_STOCK_CODE_REQUIRED(HttpStatus.BAD_REQUEST, "STOCK-CHART-001", "주식 코드는 필수입니다."),
+    INVALID_CHART_LIMIT(
+            HttpStatus.BAD_REQUEST, "STOCK-CHART-002", "조회할 데이터 개수는 1개 이상 1000개 이하여야 합니다."),
+    INVALID_TIMESTAMP_REQUIRED(HttpStatus.BAD_REQUEST, "STOCK-CHART-003", "기준 시점이 필요합니다."),
+    STOCK_DATA_FETCH_FAILED(
+            HttpStatus.INTERNAL_SERVER_ERROR, "STOCK-CHART-004", "주식 데이터 조회에 실패했습니다."),
+    INFLUXDB_CONNECTION_ERROR(
+            HttpStatus.INTERNAL_SERVER_ERROR, "STOCK-CHART-005", "데이터베이스 연결에 실패했습니다.");
 
     private final HttpStatus status;
     private final String code;

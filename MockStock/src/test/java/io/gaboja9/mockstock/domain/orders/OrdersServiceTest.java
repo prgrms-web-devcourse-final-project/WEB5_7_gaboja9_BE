@@ -5,6 +5,7 @@ import static org.mockito.Mockito.*;
 
 import io.gaboja9.mockstock.domain.members.entity.Members;
 import io.gaboja9.mockstock.domain.members.repository.MembersRepository;
+import io.gaboja9.mockstock.domain.notifications.service.NotificationsService;
 import io.gaboja9.mockstock.domain.orders.dto.request.OrdersMarketTypeRequestDto;
 import io.gaboja9.mockstock.domain.orders.dto.response.OrderResponseDto;
 import io.gaboja9.mockstock.domain.orders.entity.Orders;
@@ -44,6 +45,8 @@ class OrdersServiceTest {
 
     @Mock private HantuWebSocketHandler hantuWebSocketHandler;
 
+    @Mock private NotificationsService notificationsService;
+
     private OrdersService ordersService;
 
     @BeforeEach
@@ -56,7 +59,8 @@ class OrdersServiceTest {
                                 tradesRepository,
                                 portfoliosService,
                                 portfoliosRepository,
-                                hantuWebSocketHandler));
+                                hantuWebSocketHandler,
+                                notificationsService));
 
         doReturn(true).when(ordersService).openKoreanMarket();
     }

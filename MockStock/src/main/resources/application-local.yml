@@ -79,11 +79,24 @@ spring:
   autoconfigure:
     exclude: org.springframework.boot.actuate.autoconfigure.metrics.export.influx.InfluxMetricsExportAutoConfiguration
 
+  threads:
+    virtual:
+      enabled: true
+
+  task:
+    scheduling:
+      pool:
+        size: 20
+    execution:
+      pool:
+        core-size: 50
+        max-size: 200
+
 management:
   endpoints:
     web:
       exposure:
-        include: health,info,prometheus
+        include: health,info,prometheus,threaddump
   endpoint:
     health:
       show-details: always
@@ -155,3 +168,7 @@ logging:
     org.springframework.web.client: DEBUG
     org.springframework.web.SimpLogging: INFO
 
+holiday-api:
+  base-url: http://apis.data.go.kr/B090041/openapi/service/SpcdeInfoService
+  service-key: ${HOLIDAY_API_KEY}
+  timeout: 5000
