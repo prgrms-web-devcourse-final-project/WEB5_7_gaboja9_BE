@@ -77,7 +77,8 @@ public enum ErrorCode {
             HttpStatus.INTERNAL_SERVER_ERROR, "STOCK-CHART-005", "데이터베이스 연결에 실패했습니다."),
 
     // 알림 관련 에러
-    NOTIFICATION_SETTING_UPDATE_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "NOTIFICATION-001", "알림 설정 업데이트에 실패했습니다.");
+    NOTIFICATION_SETTING_UPDATE_FAILED(
+            HttpStatus.INTERNAL_SERVER_ERROR, "NOTIFICATION-001", "알림 설정 업데이트에 실패했습니다.");
 
     private final HttpStatus status;
     private final String code;

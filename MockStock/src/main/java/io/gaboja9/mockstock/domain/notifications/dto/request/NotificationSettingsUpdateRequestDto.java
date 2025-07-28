@@ -12,5 +12,4 @@ import lombok.NoArgsConstructor;
 public class NotificationSettingsUpdateRequestDto {
     private Boolean tradeNotificationEnabled;
     private Boolean marketNotificationEnabled;
-
 }

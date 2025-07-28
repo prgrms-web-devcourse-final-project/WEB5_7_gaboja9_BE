@@ -20,5 +20,4 @@ public class NotificationException extends BaseException {
     public static NotificationException updateFailed(String message) {
         return new NotificationException(ErrorCode.NOTIFICATION_SETTING_UPDATE_FAILED, message);
     }
-
 }
