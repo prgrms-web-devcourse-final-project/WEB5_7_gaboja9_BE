@@ -6,11 +6,13 @@ import static org.mockito.Mockito.*;
 
 import io.gaboja9.mockstock.domain.auth.dto.TokenPair;
 import io.gaboja9.mockstock.domain.auth.dto.request.LoginRequestDto;
+import io.gaboja9.mockstock.domain.auth.dto.request.PasswordResetRequestDto;
 import io.gaboja9.mockstock.domain.auth.dto.request.SignUpRequestDto;
 import io.gaboja9.mockstock.domain.auth.exception.AuthException;
 import io.gaboja9.mockstock.domain.members.entity.Members;
 import io.gaboja9.mockstock.domain.members.enums.Role;
 import io.gaboja9.mockstock.domain.members.repository.MembersRepository;
+import io.gaboja9.mockstock.global.exception.BaseException;
 import io.gaboja9.mockstock.global.exception.ErrorCode;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -284,5 +286,251 @@ class FormAuthServiceTest {
         // then
         assertThat(result).isFalse();
         verify(membersRepository).findByEmail(TEST_EMAIL);
+    }
+
+    // 4. 비밀번호 재설정
+    @Test
+    void resetPassword_정상_재설정_성공() {
+        // given
+        Members member =
+                new Members(
+                        1L,
+                        TEST_EMAIL,
+                        "testUser",
+                        "LOCAL",
+                        "profile.png",
+                        30000000,
+                        0,
+                        LocalDateTime.now());
+        member.setPassword("encodedCurrentPassword");
+
+        PasswordResetRequestDto dto =
+                PasswordResetRequestDto.builder()
+                        .presentPassword("currentPassword123!")
+                        .newPassword("newPassword123!")
+                        .passwordConfirm("newPassword123!")
+                        .build();
+
+        when(membersRepository.findById(1L)).thenReturn(Optional.of(member));
+        when(passwordEncoder.matches("currentPassword123!", "encodedCurrentPassword"))
+                .thenReturn(true);
+        when(passwordEncoder.matches("newPassword123!", "encodedCurrentPassword"))
+                .thenReturn(false);
+        when(passwordEncoder.encode("newPassword123!")).thenReturn("encodedNewPassword");
+
+        // when
+        formAuthService.resetPassword(1L, dto);
+
+        // then
+        verify(membersRepository).findById(1L);
+        verify(passwordEncoder).matches("currentPassword123!", "encodedCurrentPassword");
+        verify(passwordEncoder).matches("newPassword123!", "encodedCurrentPassword");
+        verify(passwordEncoder).encode("newPassword123!");
+        verify(membersRepository).save(member);
+        assertThat(member.getPassword()).isEqualTo("encodedNewPassword");
+    }
+
+    @Test
+    void resetPassword_존재하지_않는_사용자_예외발생() {
+        // given
+        PasswordResetRequestDto dto =
+                PasswordResetRequestDto.builder()
+                        .presentPassword("currentPassword123!")
+                        .newPassword("newPassword123!")
+                        .passwordConfirm("newPassword123!")
+                        .build();
+
+        when(membersRepository.findById(999L)).thenReturn(Optional.empty());
+
+        // when & then
+        assertThatThrownBy(() -> formAuthService.resetPassword(999L, dto))
+                .isInstanceOf(BaseException.class)
+                .hasFieldOrPropertyWithValue("errorCode", ErrorCode.NOT_FOUNT_MEMBER);
+
+        verify(membersRepository).findById(999L);
+        verify(passwordEncoder, never()).matches(anyString(), anyString());
+        verify(passwordEncoder, never()).encode(anyString());
+        verify(membersRepository, never()).save(any());
+    }
+
+    @Test
+    void resetPassword_소셜로그인_사용자_예외발생() {
+        // given
+        Members socialMember =
+                new Members(
+                        1L,
+                        TEST_EMAIL,
+                        "socialUser",
+                        "GOOGLE",
+                        "profile.png",
+                        30000000,
+                        0,
+                        LocalDateTime.now());
+
+        PasswordResetRequestDto dto =
+                PasswordResetRequestDto.builder()
+                        .presentPassword("currentPassword123!")
+                        .newPassword("newPassword123!")
+                        .passwordConfirm("newPassword123!")
+                        .build();
+
+        when(membersRepository.findById(1L)).thenReturn(Optional.of(socialMember));
+
+        // when & then
+        assertThatThrownBy(() -> formAuthService.resetPassword(1L, dto))
+                .isInstanceOf(AuthException.class);
+
+        verify(membersRepository).findById(1L);
+        verify(passwordEncoder, never()).matches(anyString(), anyString());
+        verify(passwordEncoder, never()).encode(anyString());
+        verify(membersRepository, never()).save(any());
+    }
+
+    @Test
+    void resetPassword_현재_비밀번호_불일치_예외발생() {
+        // given
+        Members member =
+                new Members(
+                        1L,
+                        TEST_EMAIL,
+                        "testUser",
+                        "LOCAL",
+                        "profile.png",
+                        30000000,
+                        0,
+                        LocalDateTime.now());
+        member.setPassword("encodedCurrentPassword");
+
+        PasswordResetRequestDto dto =
+                PasswordResetRequestDto.builder()
+                        .presentPassword("wrongCurrentPassword")
+                        .newPassword("newPassword123!")
+                        .passwordConfirm("newPassword123!")
+                        .build();
+
+        when(membersRepository.findById(1L)).thenReturn(Optional.of(member));
+        when(passwordEncoder.matches("wrongCurrentPassword", "encodedCurrentPassword"))
+                .thenReturn(false);
+
+        // when & then
+        assertThatThrownBy(() -> formAuthService.resetPassword(1L, dto))
+                .isInstanceOf(AuthException.class);
+
+        verify(membersRepository).findById(1L);
+        verify(passwordEncoder).matches("wrongCurrentPassword", "encodedCurrentPassword");
+        verify(passwordEncoder, never()).encode(anyString());
+        verify(membersRepository, never()).save(any());
+    }
+
+    @Test
+    void resetPassword_새_비밀번호_확인_불일치_예외발생() {
+        // given
+        Members member =
+                new Members(
+                        1L,
+                        TEST_EMAIL,
+                        "testUser",
+                        "LOCAL",
+                        "profile.png",
+                        30000000,
+                        0,
+                        LocalDateTime.now());
+        member.setPassword("encodedCurrentPassword");
+
+        PasswordResetRequestDto dto =
+                PasswordResetRequestDto.builder()
+                        .presentPassword("currentPassword123!")
+                        .newPassword("newPassword123!")
+                        .passwordConfirm("differentPassword123!")
+                        .build();
+
+        when(membersRepository.findById(1L)).thenReturn(Optional.of(member));
+        when(passwordEncoder.matches("currentPassword123!", "encodedCurrentPassword"))
+                .thenReturn(true);
+
+        // when & then
+        assertThatThrownBy(() -> formAuthService.resetPassword(1L, dto))
+                .isInstanceOf(AuthException.class);
+
+        verify(membersRepository).findById(1L);
+        verify(passwordEncoder).matches("currentPassword123!", "encodedCurrentPassword");
+        verify(passwordEncoder, never()).encode(anyString());
+        verify(membersRepository, never()).save(any());
+    }
+
+    @Test
+    void resetPassword_현재_비밀번호와_동일한_새_비밀번호_예외발생() {
+        // given
+        Members member =
+                new Members(
+                        1L,
+                        TEST_EMAIL,
+                        "testUser",
+                        "LOCAL",
+                        "profile.png",
+                        30000000,
+                        0,
+                        LocalDateTime.now());
+        member.setPassword("encodedCurrentPassword");
+
+        PasswordResetRequestDto dto =
+                PasswordResetRequestDto.builder()
+                        .presentPassword("currentPassword123!")
+                        .newPassword("currentPassword123!")
+                        .passwordConfirm("currentPassword123!")
+                        .build();
+
+        when(membersRepository.findById(1L)).thenReturn(Optional.of(member));
+        when(passwordEncoder.matches("currentPassword123!", "encodedCurrentPassword"))
+                .thenReturn(true);
+        when(passwordEncoder.matches("currentPassword123!", "encodedCurrentPassword"))
+                .thenReturn(true);
+
+        // when & then
+        assertThatThrownBy(() -> formAuthService.resetPassword(1L, dto))
+                .isInstanceOf(AuthException.class);
+
+        verify(membersRepository).findById(1L);
+        verify(passwordEncoder, times(2)).matches("currentPassword123!", "encodedCurrentPassword");
+        verify(passwordEncoder, never()).encode(anyString());
+        verify(membersRepository, never()).save(any());
+    }
+
+    @Test
+    void resetPassword_약한_비밀번호_예외발생() {
+        // given
+        Members member =
+                new Members(
+                        1L,
+                        TEST_EMAIL,
+                        "testUser",
+                        "LOCAL",
+                        "profile.png",
+                        30000000,
+                        0,
+                        LocalDateTime.now());
+        member.setPassword("encodedCurrentPassword");
+
+        PasswordResetRequestDto dto =
+                PasswordResetRequestDto.builder()
+                        .presentPassword("currentPassword123!")
+                        .newPassword("weak")
+                        .passwordConfirm("weak")
+                        .build();
+
+        when(membersRepository.findById(1L)).thenReturn(Optional.of(member));
+        when(passwordEncoder.matches("currentPassword123!", "encodedCurrentPassword"))
+                .thenReturn(true);
+        when(passwordEncoder.matches("weak", "encodedCurrentPassword")).thenReturn(false);
+
+        // when & then
+        assertThatThrownBy(() -> formAuthService.resetPassword(1L, dto))
+                .isInstanceOf(AuthException.class);
+
+        verify(membersRepository).findById(1L);
+        verify(passwordEncoder).matches("currentPassword123!", "encodedCurrentPassword");
+        verify(passwordEncoder).matches("weak", "encodedCurrentPassword");
+        verify(passwordEncoder, never()).encode(anyString());
+        verify(membersRepository, never()).save(any());
     }
 }
