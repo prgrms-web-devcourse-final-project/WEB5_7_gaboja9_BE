@@ -1,8 +1,8 @@
 package io.gaboja9.mockstock.domain.payments.repository;
 
 import io.gaboja9.mockstock.domain.payments.entity.PaymentHistory;
-
 import io.gaboja9.mockstock.domain.payments.entity.PaymentStatus;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
