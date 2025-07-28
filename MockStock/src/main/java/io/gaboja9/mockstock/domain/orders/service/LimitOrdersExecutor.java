@@ -12,8 +12,10 @@ import io.gaboja9.mockstock.domain.trades.entity.Trades;
 import io.gaboja9.mockstock.domain.trades.repository.TradesRepository;
 import io.gaboja9.mockstock.global.websocket.HantuWebSocketHandler;
 import io.gaboja9.mockstock.global.websocket.dto.StockPrice;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;

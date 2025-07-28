@@ -24,7 +24,6 @@ public class LimitOrdersProcessor {
     private final ExecutorService virtualThreadExecutor;
     private final LimitOrdersExecutor limitOrdersExecutor;
 
-
     @Scheduled(fixedDelay = 1000)
     public void processLimitOrders() {
         if (!ordersService.openKoreanMarket()) return;
@@ -42,7 +41,9 @@ public class LimitOrdersProcessor {
                         .map(
                                 order ->
                                         CompletableFuture.runAsync(
-                                                () -> limitOrdersExecutor.processIndividualOrder(order),
+                                                () ->
+                                                        limitOrdersExecutor.processIndividualOrder(
+                                                                order),
                                                 virtualThreadExecutor))
                         .toList();
 
