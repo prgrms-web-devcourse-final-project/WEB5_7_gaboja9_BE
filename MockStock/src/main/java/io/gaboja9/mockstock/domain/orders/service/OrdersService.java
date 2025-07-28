@@ -178,7 +178,7 @@ public class OrdersService {
                     Portfolios portfolio =
                             portfoliosRepository
                                     .findByMembersIdAndStockCodeWithLock(memberId, stockCode)
-                                    .orElseThrow(() -> new NotFoundPortfolioException());
+                                    .orElseThrow(NotFoundPortfolioException::new);
 
                     if (portfolio.getQuantity() < quantity) {
                         throw new InvalidSellQuantityException(quantity);
@@ -378,7 +378,7 @@ public class OrdersService {
                     Portfolios portfolio =
                             portfoliosRepository
                                     .findByMembersIdAndStockCodeWithLock(memberId, stockCode)
-                                    .orElseThrow(() -> new NotFoundPortfolioException());
+                                    .orElseThrow(NotFoundPortfolioException::new);
 
                     if (portfolio.getQuantity() < quantity) {
                         throw new InvalidSellQuantityException(quantity);
