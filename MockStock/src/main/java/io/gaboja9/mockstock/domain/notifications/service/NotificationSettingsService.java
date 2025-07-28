@@ -13,6 +13,7 @@ import io.gaboja9.mockstock.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,16 +22,19 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 @Transactional
 public class NotificationSettingsService {
-
     private final NotificationsRepository notificationsRepository;
+
     private final MembersRepository membersRepository;
 
-    @Transactional(readOnly = true)
+    private Members getMemberById(Long memberId) {
+        return membersRepository
+                .findById(memberId)
+                .orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUNT_MEMBER));
+    }
+
     public NotificationSettingsResponseDto getNotificationSettings(Long memberId) {
-        Members member =
-                membersRepository
-                        .findById(memberId)
-                        .orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUNT_MEMBER));
+
+        Members member = getMemberById(memberId);
 
         Notifications notifications =
                 notificationsRepository
@@ -43,31 +47,21 @@ public class NotificationSettingsService {
     public NotificationSettingsResponseDto updateNotificationSettings(
             Long memberId, NotificationSettingsUpdateRequestDto requestDto) {
 
+        Members member = getMemberById(memberId);
+
+        Notifications notifications = notificationsRepository
+                .findByMembersId(memberId)
+                .orElseGet(() -> createDefaultNotifications(member));
+
+        updateNotificationFields(notifications, requestDto);
+
         try {
-            Members member =
-                    membersRepository
-                            .findById(memberId)
-                            .orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUNT_MEMBER));
-
-            Notifications notifications =
-                    notificationsRepository
-                            .findByMembersId(memberId)
-                            .orElseGet(() -> createDefaultNotifications(member));
-
-            updateNotificationFields(notifications, requestDto);
-
             Notifications savedNotifications = notificationsRepository.save(notifications);
-
             log.info("알림 설정 업데이트 완료 - 사용자: {}", memberId);
-
             return mapToResponseDto(savedNotifications);
-
-        } catch (BaseException e) {
-            throw e;
         } catch (Exception e) {
             log.error("알림 설정 업데이트 실패 - 사용자: {}", memberId, e);
-            throw new NotificationException(
-                    ErrorCode.NOTIFICATION_SETTING_UPDATE_FAILED, e.getMessage());
+            throw NotificationException.updateFailed();
         }
     }
 
