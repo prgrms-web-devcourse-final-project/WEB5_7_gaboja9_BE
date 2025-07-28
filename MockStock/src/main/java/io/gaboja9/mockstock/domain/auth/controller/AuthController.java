@@ -12,8 +12,6 @@ import io.gaboja9.mockstock.domain.auth.service.FormAuthService;
 import io.gaboja9.mockstock.domain.auth.service.JwtTokenProvider;
 
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -66,37 +64,6 @@ public class AuthController {
         emailVerificationService.sendVerificationCode(emailVerificationRequestDto.getEmail());
 
         return ResponseEntity.ok(AuthResponseDto.success("인증코드가 발송되었습니다."));
-    }
-
-    @PostMapping("/emailVerify")
-    public ResponseEntity<AuthResponseDto> emailVerify(
-            @Valid @RequestBody EmailVerifyRequestDto dto) {
-        log.info("이메일 인증 요청: {}", dto.getEmail());
-
-        boolean verified =
-                emailVerificationService.verifyCode(dto.getEmail(), dto.getVerificationCode());
-
-        if (verified) {
-            return ResponseEntity.ok(AuthResponseDto.success("이메일 인증이 완료되었습니다."));
-        } else {
-            return ResponseEntity.badRequest()
-                    .body(AuthResponseDto.fail("인증코드가 올바르지 않거나 만료되었습니다."));
-        }
-    }
-
-    @GetMapping("/emailCheck")
-    public ResponseEntity<AuthResponseDto> emailCheck(@RequestParam @NotBlank @Email String email) {
-
-        log.info("이메일 중복 확인 요청: {}", email);
-
-        boolean duplicate = formAuthService.emailCheck(email);
-
-        if (duplicate) {
-            return ResponseEntity.status(HttpStatus.CONFLICT)
-                    .body(AuthResponseDto.fail("이미 사용 중인 이메일입니다."));
-        } else {
-            return ResponseEntity.ok(AuthResponseDto.success("사용 가능한 이메일입니다."));
-        }
     }
 
     @PostMapping("/passwordReset")
