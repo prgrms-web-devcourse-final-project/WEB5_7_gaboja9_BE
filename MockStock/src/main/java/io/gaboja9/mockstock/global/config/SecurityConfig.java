@@ -31,7 +31,11 @@ public class SecurityConfig {
                                                 "/swagger-ui/**",
                                                 "/v3/api-docs/**",
                                                 "/actuator/**",
-                                                "/auth/**",
+                                                "/auth/signup",
+                                                "/auth/login",
+                                                "/auth/email",
+                                                "/auth/passwordReset",
+                                                "/auth/refresh",
                                                 "/api/stocks",
                                                 "/ws-stock",
                                                 "/ws-stock/**")
