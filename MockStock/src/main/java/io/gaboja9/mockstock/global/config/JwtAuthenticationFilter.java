@@ -33,6 +33,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
 
+        String requestURI = request.getRequestURI();
+        if (shouldSkipAuthentication(requestURI)) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         String token = resolveToken(request);
 
         if (token != null && jwtTokenProvider.validate(token)) {
@@ -58,5 +64,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return bearerToken.substring(7);
         }
         return null;
+    }
+
+    private boolean shouldSkipAuthentication(String requestURI) {
+        return requestURI.startsWith("/auth/")
+                || requestURI.startsWith("/swagger-ui/")
+                || requestURI.startsWith("/v3/api-docs/")
+                || requestURI.startsWith("/actuator/")
+                || requestURI.equals("/api/stocks")
+                || requestURI.startsWith("/ws-stock");
     }
 }
