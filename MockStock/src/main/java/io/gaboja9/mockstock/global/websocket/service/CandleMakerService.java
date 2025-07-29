@@ -102,7 +102,6 @@ public class CandleMakerService {
             minuteData.setClosePrice(candle.getClose().longValue());
             minuteData.setAccumTrans(candle.getVolume());
 
-            
             WriteApiBlocking writeApi = minuteInfluxDBClient.getWriteApiBlocking();
             writeApi.writeMeasurement(minuteBucket, Influxorg, WritePrecision.S, minuteData);
 
