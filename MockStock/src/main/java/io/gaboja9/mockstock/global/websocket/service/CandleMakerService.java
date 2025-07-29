@@ -102,7 +102,7 @@ public class CandleMakerService {
             minuteData.setClosePrice(candle.getClose().longValue());
             minuteData.setAccumTrans(candle.getVolume());
 
-            // ✅ 수정: 정의된 변수명 사용
+            
             WriteApiBlocking writeApi = minuteInfluxDBClient.getWriteApiBlocking();
             writeApi.writeMeasurement(minuteBucket, Influxorg, WritePrecision.S, minuteData);
 
