@@ -60,10 +60,7 @@ public class RefreshTokenRepositoryAdapter implements TokenRepository {
     @Override
     public AccessTokenBlackList addAccessTokenBlackList(String accessToken) {
         return accessTokenBlackListRepository.save(
-                AccessTokenBlackList.builder()
-                        .accessToken(accessToken)
-                        .build()
-        );
+                AccessTokenBlackList.builder().accessToken(accessToken).build());
     }
 
     @Override
@@ -75,11 +72,12 @@ public class RefreshTokenRepositoryAdapter implements TokenRepository {
         }
 
         // RefreshToken 블랙리스트 확인
-        String jpql = """
-        SELECT COUNT(rtb) > 0 
-        FROM RefreshTokenBlackList rtb 
-        WHERE rtb.refreshToken.refreshToken = :token
-    """;
+        String jpql =
+                """
+                    SELECT COUNT(rtb) > 0
+                    FROM RefreshTokenBlackList rtb
+                    WHERE rtb.refreshToken.refreshToken = :token
+                """;
 
         return entityManager
                 .createQuery(jpql, Boolean.class)

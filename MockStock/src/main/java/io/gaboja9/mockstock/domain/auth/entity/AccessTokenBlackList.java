@@ -1,7 +1,9 @@
 package io.gaboja9.mockstock.domain.auth.entity;
 
 import io.gaboja9.mockstock.global.common.BaseEntity;
+
 import jakarta.persistence.*;
+
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;

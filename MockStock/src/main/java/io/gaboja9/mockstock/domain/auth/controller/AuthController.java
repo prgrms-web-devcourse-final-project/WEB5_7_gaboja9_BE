@@ -86,14 +86,12 @@ public class AuthController {
 
     @PostMapping("/logout")
     public ResponseEntity<AuthResponseDto> logout(
-            Authentication authentication,
-            HttpServletRequest request) {
+            Authentication authentication, HttpServletRequest request) {
 
         log.info("로그아웃 요청");
 
         if (authentication == null) {
-            return ResponseEntity.badRequest()
-                    .body(AuthResponseDto.fail("인증되지 않은 사용자입니다."));
+            return ResponseEntity.badRequest().body(AuthResponseDto.fail("인증되지 않은 사용자입니다."));
         }
 
         MembersDetails membersDetails = (MembersDetails) authentication.getPrincipal();
