@@ -51,13 +51,13 @@ class EmailVerificationServiceTest {
 
     //    1. 인증코드 발송 테스트
     @Test
-    void sendVerificationCode_정상적인_발송_성공() {
+    void sendVerificationCode_ForSignup_정상적인_발송_성공() {
         // when
         when(membersRepository.findByEmail(TEST_EMAIL)).thenReturn(Optional.empty());
         when(emailVerificationRepository.findTopByEmailOrderByCreatedAtDesc(TEST_EMAIL))
                 .thenReturn(Optional.empty());
 
-        emailVerificationService.sendVerificationCode(TEST_EMAIL);
+        emailVerificationService.sendVerificationCodeForSignup(TEST_EMAIL);
         // then
         verify(membersRepository).findByEmail(TEST_EMAIL);
         verify(emailVerificationRepository).save(any(EmailVerification.class));
@@ -65,7 +65,7 @@ class EmailVerificationServiceTest {
     }
 
     @Test
-    void sendVerificationCode_이메일_중복_예외발생() {
+    void sendVerificationCode_ForSignup_이메일_중복_예외발생() {
         // given
         Members existingMember =
                 new Members(
@@ -80,7 +80,10 @@ class EmailVerificationServiceTest {
         when(membersRepository.findByEmail(EXISTING_EMAIL)).thenReturn(Optional.of(existingMember));
 
         // when & then
-        assertThatThrownBy(() -> emailVerificationService.sendVerificationCode(EXISTING_EMAIL))
+        assertThatThrownBy(
+                        () ->
+                                emailVerificationService.sendVerificationCodeForSignup(
+                                        EXISTING_EMAIL))
                 .isInstanceOf(AuthException.class)
                 .hasMessage(ErrorCode.EMAIL_ALREADY_EXISTS.getMessage());
         verify(emailVerificationRepository, never()).save(any());
@@ -88,7 +91,7 @@ class EmailVerificationServiceTest {
     }
 
     @Test
-    void sendVerificationCode_재발송_쿨다운_예외발생() {
+    void sendVerificationCode_ForSignup_재발송_쿨다운_예외발생() {
         // given
         LocalDateTime recentTime = LocalDateTime.now().minusSeconds(30);
         EmailVerification recentVerification =
@@ -105,13 +108,13 @@ class EmailVerificationServiceTest {
                 .thenReturn(Optional.of(recentVerification));
 
         // when & then
-        assertThatThrownBy(() -> emailVerificationService.sendVerificationCode(TEST_EMAIL))
+        assertThatThrownBy(() -> emailVerificationService.sendVerificationCodeForSignup(TEST_EMAIL))
                 .isInstanceOf(AuthException.class)
                 .hasMessageContaining("초 후에 재발송할 수 있습니다.");
     }
 
     @Test
-    void sendVerificationCode_쿨다운_시간_지난_후_재발송_성공() {
+    void sendVerificationCode_ForSignup_쿨다운_시간_지난_후_재발송_성공() {
         // given
         LocalDateTime oldTime = LocalDateTime.now().minusMinutes(2);
         EmailVerification oldVerification =
@@ -128,7 +131,7 @@ class EmailVerificationServiceTest {
                 .thenReturn(Optional.of(oldVerification));
 
         // when
-        emailVerificationService.sendVerificationCode(TEST_EMAIL);
+        emailVerificationService.sendVerificationCodeForSignup(TEST_EMAIL);
 
         // then
         verify(emailVerificationRepository).save(any(EmailVerification.class));

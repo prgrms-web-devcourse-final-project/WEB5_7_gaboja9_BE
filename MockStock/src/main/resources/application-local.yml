@@ -152,8 +152,8 @@ custom:
       base: https://mock-stock.pages.dev/
 
     validation:
-      access: 600000
-      refresh: 86400000
+      access: 3600000 # 1시간
+      refresh: 86400000 # 24시간
 
     secrets:
       origin-key: ${JWT_ORIGIN_KEY}

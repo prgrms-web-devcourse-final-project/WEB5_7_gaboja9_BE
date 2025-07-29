@@ -31,6 +31,30 @@ public class AuthException extends BaseException {
         return new AuthException(ErrorCode.INVALID_VERIFICATION_CODE);
     }
 
+    public static AuthException cannotResetPasswordForSocialUser() {
+        return new AuthException(ErrorCode.SOCIAL_CANNOT_PASSWORD_RESET);
+    }
+
+    public static AuthException weakPassword() {
+        return new AuthException(ErrorCode.WEAK_PASSWORD);
+    }
+
+    public static AuthException sameAsCurrentPassword() {
+        return new AuthException(ErrorCode.SAME_AS_CURRENT_PASSWORD);
+    }
+
+    public static AuthException invalidCurrentPassword() {
+        return new AuthException(ErrorCode.CURRENT_PASSWORD_INCORRECT);
+    }
+
+    public static AuthException newPasswordMismatch() {
+        return new AuthException(ErrorCode.NEW_PASSWORD_CONFIRM_MISMATCH);
+    }
+
+    public static AuthException emailNotExists() {
+        return new AuthException(ErrorCode.EMAIL_NOT_EXISTS);
+    }
+
     public static AuthException authResendTooEarly(long seconds) {
         String message =
                 MessageFormat.format(ErrorCode.AUTH_RESEND_TOO_EARLY.getMessage(), seconds);
