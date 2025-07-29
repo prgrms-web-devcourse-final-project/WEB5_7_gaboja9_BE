@@ -55,7 +55,7 @@ public class MarketTimeScheduler {
         }
     }
 
-    private boolean isTradingDay() {
+    public boolean isTradingDay() {
         LocalDate today = LocalDate.now();
         DayOfWeek dayOfWeek = today.getDayOfWeek();
 
