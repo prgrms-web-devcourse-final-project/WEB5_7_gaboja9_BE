@@ -312,5 +312,4 @@ public class RanksService {
                 .map(RanksDto::getRank)
                 .orElse(null);
     }
-
 }
