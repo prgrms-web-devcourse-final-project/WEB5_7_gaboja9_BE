@@ -39,7 +39,8 @@ public class SecurityConfig {
                                                 "/auth/refresh",
                                                 "/api/stocks",
                                                 "/ws-stock",
-                                                "/ws-stock/**")
+                                                "/ws-stock/**",
+                                                "/ranks")
                                         .permitAll()
                                         .anyRequest()
                                         .authenticated())

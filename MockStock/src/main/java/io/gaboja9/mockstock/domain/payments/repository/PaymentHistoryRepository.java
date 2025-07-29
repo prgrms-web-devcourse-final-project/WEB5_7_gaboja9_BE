@@ -1,11 +1,13 @@
 package io.gaboja9.mockstock.domain.payments.repository;
 
 import io.gaboja9.mockstock.domain.payments.entity.PaymentHistory;
+import io.gaboja9.mockstock.domain.payments.entity.PaymentStatus;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface PaymentHistoryRepository extends JpaRepository<PaymentHistory, Long> {
@@ -22,4 +24,6 @@ public interface PaymentHistoryRepository extends JpaRepository<PaymentHistory, 
             LIMIT 1
             """)
     Optional<String> findLatestTidByMemberAndStatusReady(@Param("memberId") Long memberId);
+
+    List<PaymentHistory> findByMembersIdAndStatus(Long memberId, PaymentStatus paymentStatus);
 }
