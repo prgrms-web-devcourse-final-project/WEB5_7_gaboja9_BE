@@ -15,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -83,5 +84,20 @@ public class RefreshTokenRepositoryAdapter implements TokenRepository {
                 .createQuery(jpql, Boolean.class)
                 .setParameter("token", token)
                 .getSingleResult();
+    }
+
+    @Override
+    public List<RefreshToken> findAllValidRefreshTokens(Long membersId) {
+        String jpql =
+                """
+        select rf from RefreshToken rf
+        left join RefreshTokenBlackList rtb on rtb.refreshToken = rf
+        where rf.members.id = :membersId and rtb.id is null
+    """;
+
+        return entityManager
+                .createQuery(jpql, RefreshToken.class)
+                .setParameter("membersId", membersId)
+                .getResultList();
     }
 }

@@ -4,6 +4,7 @@ import io.gaboja9.mockstock.domain.auth.dto.MembersDetails;
 import io.gaboja9.mockstock.domain.auth.dto.TokenPair;
 import io.gaboja9.mockstock.domain.auth.dto.request.*;
 import io.gaboja9.mockstock.domain.auth.dto.response.AuthResponseDto;
+import io.gaboja9.mockstock.domain.auth.dto.response.TokenRefreshResponseDto;
 import io.gaboja9.mockstock.domain.auth.entity.RefreshToken;
 import io.gaboja9.mockstock.domain.auth.exception.JwtAuthenticationException;
 import io.gaboja9.mockstock.domain.auth.repository.TokenRepository;
@@ -11,6 +12,7 @@ import io.gaboja9.mockstock.domain.auth.service.EmailVerificationService;
 import io.gaboja9.mockstock.domain.auth.service.FormAuthService;
 import io.gaboja9.mockstock.domain.auth.service.JwtTokenProvider;
 
+import io.gaboja9.mockstock.global.config.JwtConfiguration;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 
@@ -22,6 +24,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 @Slf4j
@@ -34,6 +38,8 @@ public class AuthController {
     private final EmailVerificationService emailVerificationService;
     private final JwtTokenProvider jwtTokenProvider;
     private final TokenRepository tokenRepository;
+    private final JwtConfiguration jwtConfiguration;
+
 
     @PostMapping("/signup")
     public ResponseEntity<AuthResponseDto> signUp(
@@ -146,14 +152,21 @@ public class AuthController {
 
     @PostMapping("/refresh")
     public ResponseEntity<AuthResponseDto> refresh(
-            @RequestHeader("Authorization") String authorization) {
+            @Valid @RequestBody TokenRefreshRequestDto requestDto) {
         log.info("토큰 갱신 요청");
 
         try {
-            String refreshToken = jwtTokenProvider.extractTokenFromHeader(authorization);
+            String refreshToken = requestDto.getRefreshToken();
             String newAccessToken = jwtTokenProvider.refreshAccessToken(refreshToken);
 
-            return ResponseEntity.ok(AuthResponseDto.success("토큰 갱신이 완료되었습니다.", newAccessToken));
+            Long accessTokenExpiresIn = jwtConfiguration.getValidation().getAccess() / 60000;
+
+            TokenRefreshResponseDto responseData = TokenRefreshResponseDto.builder()
+                    .accessToken(newAccessToken)
+                    .accessTokenExpiresIn(accessTokenExpiresIn)
+                    .build();
+
+            return ResponseEntity.ok(AuthResponseDto.success("토큰 갱신이 완료되었습니다.", responseData));
 
         } catch (JwtAuthenticationException e) {
             log.warn("토큰 갱신 실패 - JWT 예외: {}", e.getMessage());
