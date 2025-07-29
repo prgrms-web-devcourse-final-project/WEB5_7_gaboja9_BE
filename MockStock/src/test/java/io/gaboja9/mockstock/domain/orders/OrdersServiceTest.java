@@ -87,7 +87,8 @@ class OrdersServiceTest {
                         .quantity(5)
                         .build();
 
-        StockPriceDto mockPrice = StockPriceDto.builder().stockCode("AAPL").currentPrice(100_000).build();
+        StockPriceDto mockPrice =
+                StockPriceDto.builder().stockCode("AAPL").currentPrice(100_000).build();
 
         when(membersRepository.findByIdWithLock(memberId)).thenReturn(Optional.of(member));
         when(hantuWebSocketHandler.getLatestPrice("AAPL")).thenReturn(mockPrice);
@@ -124,7 +125,8 @@ class OrdersServiceTest {
                         .quantity(2)
                         .build();
 
-        StockPriceDto mockPrice = StockPriceDto.builder().stockCode("AAPL").currentPrice(100_000).build();
+        StockPriceDto mockPrice =
+                StockPriceDto.builder().stockCode("AAPL").currentPrice(100_000).build();
 
         when(membersRepository.findByIdWithLock(memberId)).thenReturn(Optional.of(member));
         when(hantuWebSocketHandler.getLatestPrice("AAPL")).thenReturn(mockPrice);
@@ -155,7 +157,8 @@ class OrdersServiceTest {
                         .quantity(3)
                         .build();
 
-        StockPriceDto mockPrice = StockPriceDto.builder().stockCode("AAPL").currentPrice(100_000).build();
+        StockPriceDto mockPrice =
+                StockPriceDto.builder().stockCode("AAPL").currentPrice(100_000).build();
 
         Portfolios portfolio = new Portfolios("AAPL", "애플", 5, 100000, member);
 
