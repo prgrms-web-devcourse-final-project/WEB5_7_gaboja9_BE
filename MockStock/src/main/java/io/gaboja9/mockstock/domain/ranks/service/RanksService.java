@@ -217,7 +217,7 @@ public class RanksService {
         long totalProfit = totalAsset - totalInvestment;
 
         double returnRate =
-                totalInvestment > 0 ? ((double) totalProfit / totalInvestment) + 100 : 0.0;
+                totalInvestment > 0 ? ((double) totalProfit / totalInvestment) * 100 : 0.0;
 
         return RanksDto.builder()
                 .memberId(member.getId())
