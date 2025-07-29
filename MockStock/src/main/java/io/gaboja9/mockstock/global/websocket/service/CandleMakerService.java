@@ -74,7 +74,7 @@ public class CandleMakerService {
                                 stockPricedto.getTradeVolume());
 
                 currentCandles.put(stockCode, newCandle);
-                log.info("새 분봉 시작: {}", newCandle);
+                //log.info("새 분봉 시작: {}", newCandle);
             } else {
                 // 기존 분봉 업데이트 (불변 객체로 새로 생성)
                 StocksCandleDto updatedCandle =
@@ -105,7 +105,7 @@ public class CandleMakerService {
             WriteApiBlocking writeApi = minuteInfluxDBClient.getWriteApiBlocking();
             writeApi.writeMeasurement(minuteBucket, Influxorg, WritePrecision.S, minuteData);
 
-            log.info("분봉 저장: {}", candle);
+            //log.info("분봉 저장: {}", candle);
 
         } catch (Exception e) {
             log.error("분봉 저장 실패: {} at {}", candle.getStockCode(), candle.getInstant(), e);
