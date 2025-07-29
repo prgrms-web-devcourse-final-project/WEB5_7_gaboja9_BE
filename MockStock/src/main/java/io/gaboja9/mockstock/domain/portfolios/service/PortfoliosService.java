@@ -37,13 +37,19 @@ public class PortfoliosService {
             dtoList.add(portfoliosMapper.toDto(p));
         }
 
-        PortfoliosSummary summary = calculateSummary(dtoList);
-
-        int cashBalance =
+        Members member =
                 membersRepository
                         .findById(memberId)
-                        .orElseThrow(() -> new NotFoundMemberException(memberId))
-                        .getCashBalance();
+                        .orElseThrow(() -> new NotFoundMemberException(memberId));
+
+        int cashBalance = member.getCashBalance();
+        int totalInvestedAmount = member.getTotalInvestedAmount(); // 총 투입 자금
+
+        if (totalInvestedAmount == 0) {
+            totalInvestedAmount = 30_000_000;
+        }
+
+        PortfoliosSummary summary = calculateSummary(dtoList, cashBalance, totalInvestedAmount);
 
         return PortfoliosResponseDto.builder()
                 .cashBalance(cashBalance)
@@ -54,24 +60,29 @@ public class PortfoliosService {
                 .build();
     }
 
-    public PortfoliosSummary calculateSummary(List<PortfolioResponseDto> dtoList) {
-        int totalEvaluationAmount = 0;
-        int totalProfit = 0;
-        int totalInvestment = 0;
+    public PortfoliosSummary calculateSummary(
+            List<PortfolioResponseDto> dtoList, int cashBalance, int totalInvestedAmount) {
+        int totalStockEvaluationAmount = 0;
 
+        // 주식 포트폴리오 계산
         for (PortfolioResponseDto dto : dtoList) {
-            totalEvaluationAmount += dto.getEvaluationAmount();
-            totalProfit += dto.getProfit();
-            totalInvestment += dto.getAvgPrice() * dto.getQuantity();
+            totalStockEvaluationAmount += dto.getEvaluationAmount();
         }
 
-        double totalProfitRate =
-                totalInvestment == 0
-                        ? 0.00
-                        : Math.round((double) totalProfit / totalInvestment * 100 * 100) / 100.0;
+        int totalCurrentAssets = cashBalance + totalStockEvaluationAmount;
+
+        int totalProfit = totalCurrentAssets - totalInvestedAmount;
+
+        double totalProfitRate = 0;
+        if (totalInvestedAmount == 0) {
+            totalProfitRate = 0.00;
+        } else {
+            totalProfitRate =
+                    Math.round((double) totalProfit / totalInvestedAmount * 10000.0) / 100.0;
+        }
 
         return PortfoliosSummary.builder()
-                .totalEvaluationAmount(totalEvaluationAmount)
+                .totalEvaluationAmount(totalStockEvaluationAmount)
                 .totalProfit(totalProfit)
                 .totalProfitRate(totalProfitRate)
                 .build();

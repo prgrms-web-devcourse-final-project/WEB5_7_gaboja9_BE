@@ -15,11 +15,11 @@ public class MemberInfoDto {
     @Schema(description = "프로필 이미지")
     private String profileImage;
 
-    @Schema(description = "총 손익")
-    private double totalProfit;
+    @Schema(description = "수익률")
+    private double totalProfitRate;
 
-    @Schema(description = "총 평가금액")
-    private int totalEvaluationAmount;
+    @Schema(description = "총 자산")
+    private int totalCashBalance;
 
     @Schema(description = "총 거래 횟수")
     private int tradeCnt;

@@ -79,10 +79,10 @@ class MembersServiceTest {
         // then
         assertThat(result.getNickname()).isEqualTo("testUser");
         assertThat(result.getProfileImage()).isEqualTo("test.png");
-        assertThat(result.getTotalProfit()).isEqualTo(10000);
-        assertThat(result.getTotalEvaluationAmount()).isEqualTo(50000);
+        assertThat(result.getTotalProfitRate()).isEqualTo(0.0);
+        assertThat(result.getTotalCashBalance()).isEqualTo(55000);
         assertThat(result.getTradeCnt()).isEqualTo(5);
-        assertThat(result.getPeriod()).isEqualTo(15);
+        assertThat(result.getPeriod()).isEqualTo(16);
         assertThat(result.getBankruptcyCnt()).isEqualTo(0);
     }
 

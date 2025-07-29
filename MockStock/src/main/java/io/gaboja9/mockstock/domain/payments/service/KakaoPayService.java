@@ -142,7 +142,9 @@ public class KakaoPayService {
             if (approveResponse != null) {
 
                 Members member = paymentHistory.getMembers();
-                member.setCashBalance(member.getCashBalance() + paymentHistory.getAmount());
+                int chargeAmount = paymentHistory.getAmount();
+                member.setTotalInvestedAmount(member.getTotalInvestedAmount() + chargeAmount);
+                member.setCashBalance(member.getCashBalance() + chargeAmount);
                 membersRepository.save(member);
 
                 paymentHistory.setStatus(PaymentStatus.APPROVED);
