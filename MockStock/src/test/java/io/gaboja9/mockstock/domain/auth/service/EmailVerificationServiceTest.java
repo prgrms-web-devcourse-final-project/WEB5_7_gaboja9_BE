@@ -80,7 +80,10 @@ class EmailVerificationServiceTest {
         when(membersRepository.findByEmail(EXISTING_EMAIL)).thenReturn(Optional.of(existingMember));
 
         // when & then
-        assertThatThrownBy(() -> emailVerificationService.sendVerificationCodeForSignup(EXISTING_EMAIL))
+        assertThatThrownBy(
+                        () ->
+                                emailVerificationService.sendVerificationCodeForSignup(
+                                        EXISTING_EMAIL))
                 .isInstanceOf(AuthException.class)
                 .hasMessage(ErrorCode.EMAIL_ALREADY_EXISTS.getMessage());
         verify(emailVerificationRepository, never()).save(any());

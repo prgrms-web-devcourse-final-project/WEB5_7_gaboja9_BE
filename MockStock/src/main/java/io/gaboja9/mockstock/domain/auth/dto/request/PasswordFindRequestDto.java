@@ -1,10 +1,11 @@
 package io.gaboja9.mockstock.domain.auth.dto.request;
 
-
 import io.swagger.v3.oas.annotations.media.Schema;
+
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -35,5 +36,4 @@ public class PasswordFindRequestDto {
     @Schema(description = "비밀번호 확인", example = "password123!")
     @NotBlank(message = "비밀번호를 다시 입력해주세요")
     private String passwordConfirm;
-
 }

@@ -84,7 +84,6 @@ public class EmailVerificationService {
         log.info("비밀번호 찾기 인증코드가 {}로 발송되었습니다.", email);
     }
 
-
     private String createAndSaveVerificationCode(String email) {
         // 쿨다운 검사
         checkResendCooldown(email);
