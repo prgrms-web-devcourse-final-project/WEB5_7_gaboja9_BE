@@ -73,9 +73,9 @@ public class KakaoPayService {
         params.put("quantity", "1");
         params.put("total_amount", String.valueOf(amount));
         params.put("tax_free_amount", "0");
-        params.put("approval_url", appBaseUrl + "/payments/approve");
-        params.put("cancel_url", appBaseUrl + "/payments/cancel");
-        params.put("fail_url", appBaseUrl + "/payments/fail");
+        params.put("approval_url", appBaseUrl + "/payments/approve?member_id=" + memberId);
+        params.put("cancel_url", appBaseUrl + "/payments/cancel?member_id=" + memberId);
+        params.put("fail_url", appBaseUrl + "/payments/fail?member_id=" + memberId);
 
         HttpEntity<Map<String, Object>> entity = new HttpEntity<>(params, headers);
 
