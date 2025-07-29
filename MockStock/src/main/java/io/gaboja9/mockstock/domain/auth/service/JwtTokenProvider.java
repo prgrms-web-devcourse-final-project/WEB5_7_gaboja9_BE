@@ -40,7 +40,8 @@ public class JwtTokenProvider {
         String acceessToken = issueAcceessToken(members.getId(), members.getRole());
         String refreshToken = issueRefreshToken(members.getId(), members.getRole());
 
-        List<RefreshToken> existingTokens = tokenRepository.findAllValidRefreshTokens(members.getId());
+        List<RefreshToken> existingTokens =
+                tokenRepository.findAllValidRefreshTokens(members.getId());
         for (RefreshToken existingToken : existingTokens) {
             tokenRepository.addBlackList(existingToken);
             log.info("기존 RefreshToken 무효화: 사용자 ID {}", members.getId());

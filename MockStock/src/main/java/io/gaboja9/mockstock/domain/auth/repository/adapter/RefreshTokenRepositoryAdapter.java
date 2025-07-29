@@ -90,10 +90,10 @@ public class RefreshTokenRepositoryAdapter implements TokenRepository {
     public List<RefreshToken> findAllValidRefreshTokens(Long membersId) {
         String jpql =
                 """
-        select rf from RefreshToken rf
-        left join RefreshTokenBlackList rtb on rtb.refreshToken = rf
-        where rf.members.id = :membersId and rtb.id is null
-    """;
+                    select rf from RefreshToken rf
+                    left join RefreshTokenBlackList rtb on rtb.refreshToken = rf
+                    where rf.members.id = :membersId and rtb.id is null
+                """;
 
         return entityManager
                 .createQuery(jpql, RefreshToken.class)
