@@ -70,6 +70,11 @@ public class JwtTokenProvider {
     }
 
     public boolean validate(String token) {
+
+        if (tokenRepository.isTokenBlacklisted(token)) {
+            throw JwtAuthenticationException.invalid();
+        }
+
         try {
             Jwts.parser().verifyWith(getSecretKey()).build().parseClaimsJws(token);
             return true;
