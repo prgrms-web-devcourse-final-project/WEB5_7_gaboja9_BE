@@ -72,7 +72,7 @@ public interface KakaoPayControllerSpec {
     ResponseEntity<PaymentResponse> paymentApprove(
             @Parameter(description = "카카오페이 결제 고유 토큰", required = true, example = "sample_pg_token")
                     @RequestParam("pg_token")
-                    String pgToken);
+                    String pgToken, @AuthenticationPrincipal MembersDetails membersDetails);
 
     @Operation(summary = "결제 취소", description = "진행 중인 결제를 취소합니다.")
     @ApiResponses(
@@ -83,7 +83,7 @@ public interface KakaoPayControllerSpec {
     ResponseEntity<PaymentResponse> paymentCancel(
             @Parameter(description = "카카오페이 거래 고유 번호", required = true, example = "T1234567890")
                     @RequestParam("tid")
-                    String tid);
+                    String tid, @AuthenticationPrincipal MembersDetails membersDetails);
 
     @Operation(summary = "결제 실패 처리", description = "카카오페이 결제 실패를 처리합니다.")
     @ApiResponses(
@@ -94,5 +94,5 @@ public interface KakaoPayControllerSpec {
     ResponseEntity<PaymentResponse> paymentFail(
             @Parameter(description = "카카오페이 거래 고유 번호", required = true, example = "T1234567890")
                     @RequestParam("tid")
-                    String tid);
+                    String tid, @AuthenticationPrincipal MembersDetails membersDetails);
 }
