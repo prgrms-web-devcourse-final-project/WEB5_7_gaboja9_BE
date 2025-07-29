@@ -61,14 +61,13 @@ class StocksWeeklyChartServiceTest {
         price.setTimestamp(Instant.parse(timestamp));
         price.setStockCode(stockCode);
         price.setClosePrice(closePrice);
-        // ... 다른 필드 설정
         return price;
     }
 
     // ==================== getLatestWeeklyPrices 테스트 ====================
 
     @Test
-    @DisplayName("[getLatest] 저장된 데이터가 있으면 즉시 반환 (캐시 히트)")
+    @DisplayName("[getLatest] 저장된 데이터가 있으면 즉시 반환")
     void getLatestWeeklyPrices_whenStoredDataExists_returnsStoredData() {
         // given
         int limit = 52;
@@ -87,7 +86,7 @@ class StocksWeeklyChartServiceTest {
     }
 
     @Test
-    @DisplayName("[getLatest] 저장된 데이터가 없으면 일봉에서 집계 (캐시 미스)")
+    @DisplayName("저장된 데이터가 없으면 일봉에서 집계")
     void getLatestWeeklyPrices_whenNoStoredData_aggregatesFromDaily() {
         // given
         int limit = 52;
@@ -124,7 +123,7 @@ class StocksWeeklyChartServiceTest {
     // ==================== getMorePastData 테스트 ====================
 
     @Test
-    @DisplayName("[getMorePast] 저장된 과거 데이터가 있으면 즉시 반환 (캐시 히트)")
+    @DisplayName("저장된 과거 데이터가 있으면 즉시 반환")
     void getMorePastData_whenStoredDataExists_returnsStoredData() {
         // given
         Instant beforeTimestamp = Instant.parse("2025-07-14T00:00:00Z");
@@ -144,7 +143,7 @@ class StocksWeeklyChartServiceTest {
     }
 
     @Test
-    @DisplayName("[getMorePast] 저장된 과거 데이터가 없으면 일봉에서 집계 (캐시 미스)")
+    @DisplayName("저장된 과거 데이터가 없으면 일봉에서 집계 ")
     void getMorePastData_whenNoStoredData_aggregatesFromDaily() {
         // given
         Instant beforeTimestamp = Instant.parse("2025-07-14T00:00:00Z");
@@ -174,6 +173,4 @@ class StocksWeeklyChartServiceTest {
         assertThatThrownBy(() -> stocksWeeklyChartService.getMorePastData(stockCode, null, 26))
             .isInstanceOf(StockChartException.class);
     }
-
-    // (getMoreRecentData에 대한 테스트도 위와 유사한 방식으로 2가지 시나리오로 나누어 작성할 수 있습니다.)
 }

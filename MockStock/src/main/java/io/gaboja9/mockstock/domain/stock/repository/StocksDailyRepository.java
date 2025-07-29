@@ -26,7 +26,6 @@ public class StocksDailyRepository {
 
   /*
    * 초기 차트 데이터 로드 (최신 N개)
-   *
    * @param stockCode 주식 코드
    * @param limit 가져올 개수 (기본 50~100개 추천)
    * @return 최신 데이터부터 과거 순으로 정렬된 리스트
@@ -38,8 +37,8 @@ public class StocksDailyRepository {
               |> range(start: -3y)
               |> filter(fn: (r) => r._measurement == "stock_daily" and r.stockCode == "%s")
               |> pivot(rowKey: ["_time"], columnKey: ["_field"], valueColumn: "_value")
-              |> rename(columns: {_time: "timestamp"}) // ✅ 1. _time 컬럼을 timestamp로 이름 변경
-              |> sort(columns: ["timestamp"], desc: true) // ✅ 2. 변경된 이름으로 정렬
+              |> rename(columns: {_time: "timestamp"})
+              |> sort(columns: ["timestamp"], desc: true)
               |> limit(n: %d)
             """,
         dailyBucket, stockCode, limit);
@@ -57,8 +56,8 @@ public class StocksDailyRepository {
               |> range(start: -3y, stop: time(v: "%s"))
               |> filter(fn: (r) => r._measurement == "stock_daily" and r.stockCode == "%s")
               |> pivot(rowKey: ["_time"], columnKey: ["_field"], valueColumn: "_value")
-              |> rename(columns: {_time: "timestamp"}) // ✅ 1. _time 컬럼을 timestamp로 이름 변경
-              |> sort(columns: ["timestamp"], desc: true) // ✅ 2. 변경된 이름으로 정렬
+              |> rename(columns: {_time: "timestamp"})
+              |> sort(columns: ["timestamp"], desc: true)
               |> limit(n: %d)
             """,
         dailyBucket, beforeTimestamp.toString(), stockCode, limit);
@@ -76,8 +75,8 @@ public class StocksDailyRepository {
               |> range(start: time(v: "%s"))
               |> filter(fn: (r) => r._measurement == "stock_daily" and r.stockCode == "%s" and r._time > time(v: "%s"))
               |> pivot(rowKey: ["_time"], columnKey: ["_field"], valueColumn: "_value")
-              |> rename(columns: {_time: "timestamp"}) // ✅ 1. _time 컬럼을 timestamp로 이름 변경
-              |> sort(columns: ["timestamp"], desc: false) // ✅ 2. 변경된 이름으로 정렬
+              |> rename(columns: {_time: "timestamp"})
+              |> sort(columns: ["timestamp"], desc: false)
               |> limit(n: %d)
             """,
         dailyBucket, afterTimestamp.toString(), stockCode, afterTimestamp.toString(), limit);

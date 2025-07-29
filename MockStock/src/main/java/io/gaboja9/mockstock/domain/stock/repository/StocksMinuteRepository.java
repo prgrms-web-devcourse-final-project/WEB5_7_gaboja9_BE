@@ -50,8 +50,8 @@ public class StocksMinuteRepository {
               |> range(start: -7d, stop: time(v: "%s"))
               |> filter(fn: (r) => r._measurement == "stock_minute" and r.stockCode == "%s")
               |> pivot(rowKey: ["_time"], columnKey: ["_field"], valueColumn: "_value")
-              |> rename(columns: {_time: "timestamp"}) // ✅ _time 컬럼을 timestamp로 이름 변경
-              |> sort(columns: ["timestamp"], desc: true) // ✅ 변경된 이름으로 정렬
+              |> rename(columns: {_time: "timestamp"})
+              |> sort(columns: ["timestamp"], desc: true)
               |> limit(n: %d)
             """,
         minuteBucket, beforeTimestamp.toString(), stockCode, limit);
@@ -70,8 +70,8 @@ public class StocksMinuteRepository {
               |> range(start: time(v: "%s"))
               |> filter(fn: (r) => r._measurement == "stock_minute" and r.stockCode == "%s" and r._time > time(v: "%s"))
               |> pivot(rowKey: ["_time"], columnKey: ["_field"], valueColumn: "_value")
-              |> rename(columns: {_time: "timestamp"}) // ✅ _time 컬럼을 timestamp로 이름 변경
-              |> sort(columns: ["timestamp"], desc: false) // ✅ 변경된 이름으로 정렬
+              |> rename(columns: {_time: "timestamp"})
+              |> sort(columns: ["timestamp"], desc: false)
               |> limit(n: %d)
             """,
         minuteBucket, afterTimestamp.toString(), stockCode, afterTimestamp.toString(), limit);
