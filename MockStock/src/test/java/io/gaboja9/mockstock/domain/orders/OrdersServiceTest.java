@@ -19,7 +19,7 @@ import io.gaboja9.mockstock.domain.portfolios.repository.PortfoliosRepository;
 import io.gaboja9.mockstock.domain.portfolios.service.PortfoliosService;
 import io.gaboja9.mockstock.domain.trades.repository.TradesRepository;
 import io.gaboja9.mockstock.global.websocket.HantuWebSocketHandler;
-import io.gaboja9.mockstock.global.websocket.dto.StockPrice;
+import io.gaboja9.mockstock.global.websocket.dto.StockPriceDto;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -87,7 +87,8 @@ class OrdersServiceTest {
                         .quantity(5)
                         .build();
 
-        StockPrice mockPrice = StockPrice.builder().stockCode("AAPL").currentPrice(100_000).build();
+        StockPriceDto mockPrice =
+                StockPriceDto.builder().stockCode("AAPL").currentPrice(100_000).build();
 
         when(membersRepository.findByIdWithLock(memberId)).thenReturn(Optional.of(member));
         when(hantuWebSocketHandler.getLatestPrice("AAPL")).thenReturn(mockPrice);
@@ -124,7 +125,8 @@ class OrdersServiceTest {
                         .quantity(2)
                         .build();
 
-        StockPrice mockPrice = StockPrice.builder().stockCode("AAPL").currentPrice(100_000).build();
+        StockPriceDto mockPrice =
+                StockPriceDto.builder().stockCode("AAPL").currentPrice(100_000).build();
 
         when(membersRepository.findByIdWithLock(memberId)).thenReturn(Optional.of(member));
         when(hantuWebSocketHandler.getLatestPrice("AAPL")).thenReturn(mockPrice);
@@ -155,7 +157,8 @@ class OrdersServiceTest {
                         .quantity(3)
                         .build();
 
-        StockPrice mockPrice = StockPrice.builder().stockCode("AAPL").currentPrice(100_000).build();
+        StockPriceDto mockPrice =
+                StockPriceDto.builder().stockCode("AAPL").currentPrice(100_000).build();
 
         Portfolios portfolio = new Portfolios("AAPL", "애플", 5, 100000, member);
 

@@ -3,7 +3,7 @@ package io.gaboja9.mockstock.domain.portfolios.mapper;
 import io.gaboja9.mockstock.domain.portfolios.dto.response.PortfolioResponseDto;
 import io.gaboja9.mockstock.domain.portfolios.entity.Portfolios;
 import io.gaboja9.mockstock.global.websocket.HantuWebSocketHandler;
-import io.gaboja9.mockstock.global.websocket.dto.StockPrice;
+import io.gaboja9.mockstock.global.websocket.dto.StockPriceDto;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,7 +23,7 @@ public class PortfoliosMapper {
         int quantity = p.getQuantity();
         int avgPrice = p.getAvgPrice();
 
-        Optional<StockPrice> optionalPrice =
+        Optional<StockPriceDto> optionalPrice =
                 Optional.ofNullable(hantuWebSocketHandler.getLatestPrice(p.getStockCode()));
 
         if (optionalPrice.isEmpty()) {

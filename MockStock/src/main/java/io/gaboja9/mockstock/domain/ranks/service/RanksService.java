@@ -14,7 +14,7 @@ import io.gaboja9.mockstock.domain.ranks.dto.RankingResponse;
 import io.gaboja9.mockstock.domain.ranks.dto.RanksDto;
 import io.gaboja9.mockstock.domain.ranks.entity.RanksType;
 import io.gaboja9.mockstock.global.websocket.HantuWebSocketHandler;
-import io.gaboja9.mockstock.global.websocket.dto.StockPrice;
+import io.gaboja9.mockstock.global.websocket.dto.StockPriceDto;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,7 +23,9 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
-import java.time.*;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -287,7 +289,7 @@ public class RanksService {
     }
 
     private Integer getCurrentPriceOrNull(String stockCode) {
-        StockPrice stockPrice = hantuWebSocketHandler.getLatestPrice(stockCode);
+        StockPriceDto stockPrice = hantuWebSocketHandler.getLatestPrice(stockCode);
         if (stockPrice == null) {
             log.warn("현재 가격 정보를 불러올 수 없습니다: {}", stockCode);
             return null;
