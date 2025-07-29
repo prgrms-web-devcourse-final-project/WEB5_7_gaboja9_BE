@@ -38,7 +38,7 @@ public class MembersService {
                         .orElseThrow(() -> new NotFoundMemberException(memberId));
 
         int tradeCnt = tradesRepository.countByMembersId(memberId);
-        // int ranking = ranksService.getRankByMemberId(memberId); // TODO : 랭킹 로직 개발되면 추가
+        int ranking = ranksService.getMemberReturnRateRank(memberId);
         int period =
                 (int) ChronoUnit.DAYS.between(member.getCreatedAt().toLocalDate(), LocalDate.now());
         int bankruptcyCnt = member.getBankruptcyCnt();
@@ -49,7 +49,7 @@ public class MembersService {
                 .totalProfit(portfolios.getTotalProfit())
                 .totalEvaluationAmount(portfolios.getTotalEvaluationAmount())
                 .tradeCnt(tradeCnt)
-                // .ranking(ranking)
+                .ranking(ranking)
                 .period(period)
                 .bankruptcyCnt(bankruptcyCnt)
                 .build();

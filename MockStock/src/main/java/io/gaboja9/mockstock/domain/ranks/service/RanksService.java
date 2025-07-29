@@ -294,4 +294,23 @@ public class RanksService {
         }
         return stockPrice.getCurrentPrice();
     }
+
+    public Integer getMemberReturnRateRank(Long memberId) {
+        String key = RANKING_KEY_PREFIX + RanksType.RETURN_RATE.name().toLowerCase();
+
+        @SuppressWarnings("unchecked")
+        List<RanksDto> cachedRanks = (List<RanksDto>) redisTemplate.opsForValue().get(key);
+
+        if (cachedRanks == null || cachedRanks.isEmpty()) {
+            log.warn("수익률 기준 캐시 랭킹이 없습니다. 실시간 계산을 수행합니다.");
+            cachedRanks = calculateRealTimeRankingList(RanksType.RETURN_RATE);
+        }
+
+        return cachedRanks.stream()
+                .filter(ranking -> ranking.getMemberId().equals(memberId))
+                .findFirst()
+                .map(RanksDto::getRank)
+                .orElse(null);
+    }
+
 }
