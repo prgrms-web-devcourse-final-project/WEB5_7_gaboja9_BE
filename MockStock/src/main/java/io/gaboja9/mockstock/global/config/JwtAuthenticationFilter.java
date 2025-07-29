@@ -2,6 +2,8 @@ package io.gaboja9.mockstock.global.config;
 
 import io.gaboja9.mockstock.domain.auth.dto.MembersDetails;
 import io.gaboja9.mockstock.domain.auth.dto.TokenBody;
+import io.gaboja9.mockstock.domain.auth.exception.JwtAuthenticationException;
+import io.gaboja9.mockstock.domain.auth.exception.JwtResponseHandler;
 import io.gaboja9.mockstock.domain.auth.service.AuthService;
 import io.gaboja9.mockstock.domain.auth.service.JwtTokenProvider;
 
@@ -27,6 +29,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtTokenProvider jwtTokenProvider;
     private final AuthService authService;
+    private final JwtResponseHandler jwtResponseHandler;
 
     @Override
     protected void doFilterInternal(
@@ -41,17 +44,28 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         String token = resolveToken(request);
 
-        if (token != null && jwtTokenProvider.validate(token)) {
+        if (token != null) {
+            try {
+                if (jwtTokenProvider.validate(token)) {
+                    TokenBody tokenBody = jwtTokenProvider.parseJwt(token);
+                    MembersDetails membersDetails =
+                            authService.getMembersDetailsById(tokenBody.getMemberId());
 
-            TokenBody tokenBody = jwtTokenProvider.parseJwt(token);
-            MembersDetails membersDetails =
-                    authService.getMembersDetailsById(tokenBody.getMemberId());
+                    UsernamePasswordAuthenticationToken authentication =
+                            new UsernamePasswordAuthenticationToken(
+                                    membersDetails, token, membersDetails.getAuthorities());
 
-            UsernamePasswordAuthenticationToken authentication =
-                    new UsernamePasswordAuthenticationToken(
-                            membersDetails, token, membersDetails.getAuthorities());
-
-            SecurityContextHolder.getContext().setAuthentication(authentication);
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
+                }
+            } catch (JwtAuthenticationException e) {
+                log.warn("JWT 인증 실패: {} - {}", e.getErrorCode().getCode(), e.getMessage());
+                jwtResponseHandler.handleJwtException(response, e);
+                return;
+            } catch (Exception e) {
+                log.error("토큰 처리 중 예상치 못한 오류 발생", e);
+                jwtResponseHandler.handleUnexpectedException(response);
+                return;
+            }
         }
 
         filterChain.doFilter(request, response);

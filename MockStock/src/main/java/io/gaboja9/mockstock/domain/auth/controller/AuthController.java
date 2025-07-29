@@ -139,6 +139,7 @@ public class AuthController {
             return ResponseEntity.ok(AuthResponseDto.success("토큰 갱신이 완료되었습니다.", newAccessToken));
 
         } catch (JwtAuthenticationException e) {
+            log.warn("토큰 갱신 실패 - JWT 예외: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(AuthResponseDto.fail(e.getMessage()));
         } catch (Exception e) {
