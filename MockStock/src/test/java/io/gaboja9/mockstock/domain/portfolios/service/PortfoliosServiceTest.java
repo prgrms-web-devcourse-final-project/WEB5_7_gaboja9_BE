@@ -87,7 +87,8 @@ class PortfoliosServiceTest {
         given(portfoliosMapper.toDto(p2)).willReturn(dto2);
         given(membersRepository.findById(memberId)).willReturn(Optional.of(member));
 
-        int totalStockEvaluationAmount = dto1.getEvaluationAmount() + dto2.getEvaluationAmount(); // 2700
+        int totalStockEvaluationAmount =
+                dto1.getEvaluationAmount() + dto2.getEvaluationAmount(); // 2700
         int cashBalance = member.getCashBalance(); // 30000000
         int totalInvestedAmount = member.getTotalInvestedAmount(); // 30000000
 
@@ -99,7 +100,8 @@ class PortfoliosServiceTest {
 
         int expectedTotalProfit = totalCurrentAssets - totalInvestedAmount;
 
-        double expectedTotalProfitRate = Math.round((double) expectedTotalProfit / totalInvestedAmount * 10000.0) / 100.0;
+        double expectedTotalProfitRate =
+                Math.round((double) expectedTotalProfit / totalInvestedAmount * 10000.0) / 100.0;
 
         PortfoliosResponseDto result = portfoliosService.getPortfolios(memberId);
 
