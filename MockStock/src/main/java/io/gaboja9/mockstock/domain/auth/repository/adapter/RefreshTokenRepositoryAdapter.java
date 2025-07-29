@@ -1,7 +1,9 @@
 package io.gaboja9.mockstock.domain.auth.repository.adapter;
 
+import io.gaboja9.mockstock.domain.auth.entity.AccessTokenBlackList;
 import io.gaboja9.mockstock.domain.auth.entity.RefreshToken;
 import io.gaboja9.mockstock.domain.auth.entity.RefreshTokenBlackList;
+import io.gaboja9.mockstock.domain.auth.repository.AccessTokenBlackListRepository;
 import io.gaboja9.mockstock.domain.auth.repository.RefreshTokenBlackListRepository;
 import io.gaboja9.mockstock.domain.auth.repository.RefreshTokenRepository;
 import io.gaboja9.mockstock.domain.auth.repository.TokenRepository;
@@ -21,6 +23,7 @@ public class RefreshTokenRepositoryAdapter implements TokenRepository {
 
     private final RefreshTokenRepository refreshTokenRepository;
     private final RefreshTokenBlackListRepository refreshTokenBlackListRepository;
+    private final AccessTokenBlackListRepository accessTokenBlackListRepository;
 
     private final EntityManager entityManager;
 
@@ -52,5 +55,33 @@ public class RefreshTokenRepositoryAdapter implements TokenRepository {
                 .setParameter("membersId", membersId)
                 .getResultStream()
                 .findFirst();
+    }
+
+    @Override
+    public AccessTokenBlackList addAccessTokenBlackList(String accessToken) {
+        return accessTokenBlackListRepository.save(
+                AccessTokenBlackList.builder().accessToken(accessToken).build());
+    }
+
+    @Override
+    public boolean isTokenBlacklisted(String token) {
+
+        // Access Token 블랙리스트 확인
+        if (accessTokenBlackListRepository.existsByAccessToken(token)) {
+            return true;
+        }
+
+        // RefreshToken 블랙리스트 확인
+        String jpql =
+                """
+                    SELECT COUNT(rtb) > 0
+                    FROM RefreshTokenBlackList rtb
+                    WHERE rtb.refreshToken.refreshToken = :token
+                """;
+
+        return entityManager
+                .createQuery(jpql, Boolean.class)
+                .setParameter("token", token)
+                .getSingleResult();
     }
 }

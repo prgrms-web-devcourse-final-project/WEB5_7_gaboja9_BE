@@ -19,7 +19,7 @@ import io.gaboja9.mockstock.domain.trades.entity.TradeType;
 import io.gaboja9.mockstock.domain.trades.entity.Trades;
 import io.gaboja9.mockstock.domain.trades.repository.TradesRepository;
 import io.gaboja9.mockstock.global.websocket.HantuWebSocketHandler;
-import io.gaboja9.mockstock.global.websocket.dto.StockPrice;
+import io.gaboja9.mockstock.global.websocket.dto.StockPriceDto;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -450,7 +450,6 @@ public class OrdersService {
                                 .build();
                     } else {
                         ordersRepository.save(order);
-                        portfoliosService.updateForSell(memberId, stockCode, quantity);
 
                         log.info(
                                 "지정가 매도 주문 대기. memberId={}, stockCode={}, limitPrice={},"
@@ -471,7 +470,7 @@ public class OrdersService {
     }
 
     private Integer getCurrentPriceOrNull(String stockCode) {
-        StockPrice stockPrice = hantuWebSocketHandler.getLatestPrice(stockCode);
+        StockPriceDto stockPrice = hantuWebSocketHandler.getLatestPrice(stockCode);
         if (stockPrice == null) {
             log.warn("현재 가격 정보를 불러올 수 없습니다: {}", stockCode);
             return null;

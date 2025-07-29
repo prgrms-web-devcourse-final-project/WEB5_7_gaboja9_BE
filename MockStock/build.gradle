@@ -25,6 +25,7 @@ repositories {
 
 dependencies {
     implementation 'io.jsonwebtoken:jjwt-api:0.12.6'
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
     runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.6'
     runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.6'
     implementation 'org.springframework.boot:spring-boot-starter-mail'
@@ -53,8 +54,12 @@ dependencies {
     testAnnotationProcessor 'org.projectlombok:lombok'
 
     implementation 'com.fasterxml.jackson.core:jackson-databind'
+    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
 
     implementation 'org.springframework.security:spring-security-messaging'
+
+    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
+
 
 
 }

@@ -12,6 +12,18 @@ spring:
     hibernate:
       ddl-auto: update
 
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      timeout: 2000ms
+      lettuce:
+        pool:
+          max-active: 8
+          max-idle: 8
+          min-idle: 0
+          max-wait: -1ms
+
   security:
     oauth2:
       client:
@@ -140,8 +152,8 @@ custom:
       base: https://mock-stock.pages.dev/
 
     validation:
-      access: 600000
-      refresh: 86400000
+      access: 3600000 # 1시간
+      refresh: 86400000 # 24시간
 
     secrets:
       origin-key: ${JWT_ORIGIN_KEY}

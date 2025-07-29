@@ -11,6 +11,7 @@ import io.gaboja9.mockstock.domain.auth.service.EmailVerificationService;
 import io.gaboja9.mockstock.domain.auth.service.FormAuthService;
 import io.gaboja9.mockstock.domain.auth.service.JwtTokenProvider;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 
 import lombok.RequiredArgsConstructor;
@@ -58,44 +59,86 @@ public class AuthController {
 
     @PostMapping("/email")
     public ResponseEntity<AuthResponseDto> email(
-            @Valid @RequestBody EmailVerificationRequestDto emailVerificationRequestDto) {
-        log.info("이메일 인증코드 발송 요청: {}", emailVerificationRequestDto.getEmail());
+            @Valid @RequestBody EmailVerificationRequestDto dto) {
+        log.info("이메일 인증코드 발송 요청: {}", dto.getEmail());
 
-        emailVerificationService.sendVerificationCode(emailVerificationRequestDto.getEmail());
+        emailVerificationService.sendVerificationCodeForSignup(dto.getEmail());
 
         return ResponseEntity.ok(AuthResponseDto.success("인증코드가 발송되었습니다."));
     }
 
-    @PostMapping("/passwordReset")
-    public ResponseEntity<AuthResponseDto> resetPassword(
-            @Valid @RequestBody PasswordResetRequestDto dto) {
-        log.info("비밀번호 재설정 요청: {}", dto.getEmail());
+    @PostMapping("/email/passwordFind")
+    public ResponseEntity<AuthResponseDto> emailForPasswordFind(
+            @Valid @RequestBody EmailVerificationRequestDto dto) {
+        log.info("이메일 인증코드 발송 요청: {}", dto.getEmail());
 
-        boolean verified = emailVerificationService.verifyCode(dto.getEmail(), dto.getCode());
+        emailVerificationService.sendVerificationCodeForPasswordFind(dto.getEmail());
 
-        if (!verified) {
-            return ResponseEntity.badRequest()
-                    .body(AuthResponseDto.fail("인증코드가 올바르지 않거나 만료되었습니다."));
-        }
-
-        formAuthService.resetPassword(dto.getEmail(), dto.getNewPassword());
-
-        return ResponseEntity.ok(AuthResponseDto.success("비밀번호가 재설정되었습니다."));
+        return ResponseEntity.ok(AuthResponseDto.success("비밀번호 찾기 인증코드가 발송되었습니다."));
     }
 
-    @PostMapping("/logout")
-    public ResponseEntity<AuthResponseDto> logout(Authentication authentication) {
+    @PostMapping("/passwordReset")
+    public ResponseEntity<AuthResponseDto> resetPassword(
+            @Valid @RequestBody PasswordResetRequestDto dto, Authentication authentication) {
 
-        log.info("로그아웃 요청");
+        log.info("비밀번호 재설정 요청");
 
         MembersDetails membersDetails = (MembersDetails) authentication.getPrincipal();
         Long memberId = membersDetails.getId();
 
-        Optional<RefreshToken> refreshTokenOptional = jwtTokenProvider.findRefreshToken(memberId);
+        try {
+            formAuthService.resetPassword(memberId, dto);
+            return ResponseEntity.ok(AuthResponseDto.success("비밀번호가 재설정되었습니다."));
+        } catch (Exception e) {
+            log.error("비밀번호 재설정 처리 중 오류 발생", e);
+            return ResponseEntity.badRequest().body(AuthResponseDto.fail(e.getMessage()));
+        }
+    }
 
+    @PostMapping("/passwordFind")
+    public ResponseEntity<AuthResponseDto> findPassword(
+            @Valid @RequestBody PasswordFindRequestDto dto) {
+
+        log.info("비밀번호 찾기 요청");
+
+        try {
+            formAuthService.findPassword(dto);
+            return ResponseEntity.ok(AuthResponseDto.success("비밀번호가 재설정되었습니다."));
+        } catch (Exception e) {
+            log.error("비밀번호 찾기 중 오류 발생", e);
+            return ResponseEntity.badRequest().body(AuthResponseDto.fail(e.getMessage()));
+        }
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<AuthResponseDto> logout(
+            Authentication authentication, HttpServletRequest request) {
+
+        log.info("로그아웃 요청");
+
+        if (authentication == null) {
+            return ResponseEntity.badRequest().body(AuthResponseDto.fail("인증되지 않은 사용자입니다."));
+        }
+
+        MembersDetails membersDetails = (MembersDetails) authentication.getPrincipal();
+        Long memberId = membersDetails.getId();
+
+        String authorization = request.getHeader("Authorization");
+        if (authorization != null) {
+            try {
+                String accessToken = jwtTokenProvider.extractTokenFromHeader(authorization);
+                tokenRepository.addAccessTokenBlackList(accessToken);
+                log.info("Access Token이 블랙리스트에 추가되었습니다.");
+            } catch (Exception e) {
+                log.warn("Access Token 추출 실패", e);
+            }
+        }
+
+        Optional<RefreshToken> refreshTokenOptional = jwtTokenProvider.findRefreshToken(memberId);
         if (refreshTokenOptional.isPresent()) {
             RefreshToken refreshToken = refreshTokenOptional.get();
             tokenRepository.addBlackList(refreshToken);
+            log.info("Refresh Token이 블랙리스트에 추가되었습니다.");
         }
 
         return ResponseEntity.ok(AuthResponseDto.success("로그아웃이 완료되었습니다."));
@@ -113,6 +156,7 @@ public class AuthController {
             return ResponseEntity.ok(AuthResponseDto.success("토큰 갱신이 완료되었습니다.", newAccessToken));
 
         } catch (JwtAuthenticationException e) {
+            log.warn("토큰 갱신 실패 - JWT 예외: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(AuthResponseDto.fail(e.getMessage()));
         } catch (Exception e) {

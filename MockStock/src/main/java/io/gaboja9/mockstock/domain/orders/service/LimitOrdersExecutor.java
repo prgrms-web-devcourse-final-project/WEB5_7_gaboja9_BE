@@ -6,12 +6,15 @@ import io.gaboja9.mockstock.domain.orders.entity.OrderStatus;
 import io.gaboja9.mockstock.domain.orders.entity.Orders;
 import io.gaboja9.mockstock.domain.orders.exception.NotFoundOrderException;
 import io.gaboja9.mockstock.domain.orders.repository.OrdersRepository;
+import io.gaboja9.mockstock.domain.portfolios.entity.Portfolios;
+import io.gaboja9.mockstock.domain.portfolios.exception.NotFoundPortfolioException;
+import io.gaboja9.mockstock.domain.portfolios.repository.PortfoliosRepository;
 import io.gaboja9.mockstock.domain.portfolios.service.PortfoliosService;
 import io.gaboja9.mockstock.domain.trades.entity.TradeType;
 import io.gaboja9.mockstock.domain.trades.entity.Trades;
 import io.gaboja9.mockstock.domain.trades.repository.TradesRepository;
 import io.gaboja9.mockstock.global.websocket.HantuWebSocketHandler;
-import io.gaboja9.mockstock.global.websocket.dto.StockPrice;
+import io.gaboja9.mockstock.global.websocket.dto.StockPriceDto;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,11 +32,13 @@ import java.util.concurrent.TimeUnit;
 @RequiredArgsConstructor
 @Slf4j
 public class LimitOrdersExecutor {
+
     private final OrdersRepository ordersRepository;
     private final HantuWebSocketHandler hantuWebSocketHandler;
     private final TradesRepository tradesRepository;
     private final PortfoliosService portfoliosService;
     private final NotificationsService notificationsService;
+    private final PortfoliosRepository portfoliosRepository;
 
     // Virtual Thread 환경에서는 단순한 Semaphore 기반 동시성 제어가 더 효율적
     private final ConcurrentHashMap<String, Semaphore> memberSemaphores = new ConcurrentHashMap<>();
@@ -54,7 +59,7 @@ public class LimitOrdersExecutor {
                 return;
             }
 
-            StockPrice price = hantuWebSocketHandler.getLatestPrice(order.getStockCode());
+            StockPriceDto price = hantuWebSocketHandler.getLatestPrice(order.getStockCode());
             if (price == null) {
                 log.warn(
                         "실시간 가격 정보 없음. orderId={}, stockCode={}",
@@ -92,9 +97,11 @@ public class LimitOrdersExecutor {
             if (semaphore.tryAcquire(30, TimeUnit.SECONDS)) {
                 try {
                     // 가격 재확인
-                    StockPrice refreshed =
+                    StockPriceDto refreshed =
                             hantuWebSocketHandler.getLatestPrice(order.getStockCode());
-                    if (refreshed == null) return;
+                    if (refreshed == null) {
+                        return;
+                    }
 
                     int currentPrice = refreshed.getCurrentPrice();
                     if (!shouldExecuteOrder(order, currentPrice)) {
@@ -118,6 +125,21 @@ public class LimitOrdersExecutor {
     }
 
     private void executeOrder(Orders order, int executionPrice) {
+        if (order.getTradeType() == TradeType.SELL) {
+            Portfolios portfolio =
+                    portfoliosRepository
+                            .findByMembersIdAndStockCodeWithLock(
+                                    order.getMembers().getId(), order.getStockCode())
+                            .orElseThrow(NotFoundPortfolioException::new);
+
+            if (portfolio.getQuantity() < order.getQuantity()) {
+                order.cancel();
+                ordersRepository.save(order);
+                log.warn("포트폴리오 수량 부족으로 주문 취소. orderId={}", order.getId());
+                return;
+            }
+        }
+
         order.execute();
         ordersRepository.save(order);
         Members member = order.getMembers();
@@ -147,6 +169,8 @@ public class LimitOrdersExecutor {
         } else if (order.getTradeType() == TradeType.SELL) {
             int actualAmount = executionPrice * order.getQuantity();
             member.setCashBalance(member.getCashBalance() + actualAmount);
+            portfoliosService.updateForSell(
+                    member.getId(), order.getStockCode(), order.getQuantity());
         }
 
         try {

@@ -34,6 +34,8 @@ public class Members extends BaseEntity {
 
     @Setter private int cashBalance = 30_000_000;
 
+    @Setter private int totalInvestedAmount = 0;
+
     @Setter private int bankruptcyCnt;
 
     @Setter private String memo;

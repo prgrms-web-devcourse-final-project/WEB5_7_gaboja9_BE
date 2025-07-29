@@ -3,8 +3,9 @@ package io.gaboja9.mockstock.global.websocket;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import io.gaboja9.mockstock.global.websocket.dto.StockPrice;
+import io.gaboja9.mockstock.global.websocket.dto.StockPriceDto;
 import io.gaboja9.mockstock.global.websocket.mapper.StockPriceMapper;
+import io.gaboja9.mockstock.global.websocket.service.CandleMakerService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -48,12 +49,13 @@ public class HantuWebSocketHandler extends TextWebSocketHandler {
     private final RestTemplate restTemplate;
     private final HantuWebSocketSessionManager eventService;
     private final SimpMessagingTemplate messagingTemplate;
+    private final CandleMakerService candleMakerService;
 
     private WebSocketSession session;
     private String approvalKey;
     private final ExecutorService executorService = Executors.newFixedThreadPool(5);
     private final Map<String, String> subscribedStocks = new ConcurrentHashMap<>();
-    private final Map<String, StockPrice> latestPrices = new ConcurrentHashMap<>();
+    private final Map<String, StockPriceDto> latestPrices = new ConcurrentHashMap<>();
 
     // 웹소켓 세션이 열렸을 때 호출됨
 
@@ -234,14 +236,16 @@ public class HantuWebSocketHandler extends TextWebSocketHandler {
                 String[] parts = message.split("\\|");
                 if (parts.length >= 4) {
                     String[] fields = parts[3].split("\\^");
-                    StockPrice priceData = StockPriceMapper.parseStockPriceData(fields);
+                    StockPriceDto priceData = StockPriceMapper.parseStockPriceData(fields);
 
-                    // log.info(priceData.toString());
+                    // og.info(priceData.toString());
                     //  STOMP 브로드캐스트 추가
 
                     messagingTemplate.convertAndSend(
                             "/topic/stock/" + priceData.getStockCode(), priceData);
                     latestPrices.put(priceData.getStockCode(), priceData);
+
+                    candleMakerService.processTick(priceData);
                 }
             } catch (Exception e) {
                 //                log.error("Error processing real-time data: {}", message, e);
@@ -299,7 +303,7 @@ public class HantuWebSocketHandler extends TextWebSocketHandler {
     //    });
     //  }
 
-    public StockPrice getLatestPrice(String stockCode) {
+    public StockPriceDto getLatestPrice(String stockCode) {
         return latestPrices.get(stockCode);
     }
 }

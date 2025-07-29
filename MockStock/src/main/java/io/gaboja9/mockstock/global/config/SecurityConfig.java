@@ -31,10 +31,16 @@ public class SecurityConfig {
                                                 "/swagger-ui/**",
                                                 "/v3/api-docs/**",
                                                 "/actuator/**",
-                                                "/auth/**",
+                                                "/auth/signup",
+                                                "/auth/login",
+                                                "/auth/email",
+                                                "/auth/email/passwordFind",
+                                                "/auth/passwordFind",
+                                                "/auth/refresh",
                                                 "/api/stocks",
                                                 "/ws-stock",
-                                                "/ws-stock/**")
+                                                "/ws-stock/**",
+                                                "/ranks")
                                         .permitAll()
                                         .anyRequest()
                                         .authenticated())

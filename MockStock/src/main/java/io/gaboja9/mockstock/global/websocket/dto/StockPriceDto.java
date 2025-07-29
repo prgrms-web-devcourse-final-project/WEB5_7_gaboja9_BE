@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Schema(description = "실시간 주식 체결 데이터 DTO")
-public class StockPrice {
+public class StockPriceDto {
 
     @Schema(description = "종목 코드", example = "005930")
     private String stockCode; // 종목코드
