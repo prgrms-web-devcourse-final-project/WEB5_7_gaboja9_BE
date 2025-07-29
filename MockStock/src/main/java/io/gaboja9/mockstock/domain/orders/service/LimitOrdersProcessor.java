@@ -12,7 +12,7 @@ import io.gaboja9.mockstock.domain.trades.entity.TradeType;
 import io.gaboja9.mockstock.domain.trades.entity.Trades;
 import io.gaboja9.mockstock.domain.trades.repository.TradesRepository;
 import io.gaboja9.mockstock.global.websocket.HantuWebSocketHandler;
-import io.gaboja9.mockstock.global.websocket.dto.StockPrice;
+import io.gaboja9.mockstock.global.websocket.dto.StockPriceDto;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -96,7 +96,7 @@ public class LimitOrdersProcessor {
                 return;
             }
 
-            StockPrice price = hantuWebSocketHandler.getLatestPrice(order.getStockCode());
+            StockPriceDto price = hantuWebSocketHandler.getLatestPrice(order.getStockCode());
             if (price == null) {
                 log.warn(
                         "실시간 가격 정보 없음. orderId={}, stockCode={}",
@@ -134,7 +134,7 @@ public class LimitOrdersProcessor {
             if (semaphore.tryAcquire(30, TimeUnit.SECONDS)) {
                 try {
                     // 가격 재확인
-                    StockPrice refreshed =
+                    StockPriceDto refreshed =
                             hantuWebSocketHandler.getLatestPrice(order.getStockCode());
                     if (refreshed == null) return;
 

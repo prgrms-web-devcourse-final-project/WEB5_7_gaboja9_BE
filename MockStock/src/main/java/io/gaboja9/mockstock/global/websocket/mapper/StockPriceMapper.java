@@ -1,12 +1,12 @@
 package io.gaboja9.mockstock.global.websocket.mapper;
 
-import io.gaboja9.mockstock.global.websocket.dto.StockPrice;
+import io.gaboja9.mockstock.global.websocket.dto.StockPriceDto;
 
 public class StockPriceMapper {
 
     // 문자열 배열 데이터를 StockPriceData로 파싱
-    public static StockPrice parseStockPriceData(String[] fields) {
-        return StockPrice.builder()
+    public static StockPriceDto parseStockPriceData(String[] fields) {
+        return StockPriceDto.builder()
                 .stockCode(fields[0])
                 .tradeTime(fields[1])
                 .currentPrice(parseInt(fields[2]))
