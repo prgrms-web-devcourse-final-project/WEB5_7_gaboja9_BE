@@ -40,7 +40,8 @@ public class SecurityConfig {
                                                 "/api/stocks",
                                                 "/ws-stock",
                                                 "/ws-stock/**",
-                                                "/ranks")
+                                                "/ranks",
+                                                "/payments/**")
                                         .permitAll()
                                         .anyRequest()
                                         .authenticated())
