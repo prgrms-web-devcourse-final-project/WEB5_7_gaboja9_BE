@@ -30,7 +30,7 @@ public class NotificationController {
         return ResponseEntity.ok(settings);
     }
 
-    @PutMapping("/settings")
+    @PatchMapping("/settings")
     public ResponseEntity<NotificationSettingsResponseDto> updateNotificationSettings(
             @Valid @RequestBody NotificationSettingsUpdateRequestDto requestDto,
             @AuthenticationPrincipal MembersDetails membersDetails) {
