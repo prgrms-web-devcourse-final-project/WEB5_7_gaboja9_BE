@@ -6,6 +6,7 @@ import static org.mockito.Mockito.*;
 
 import io.gaboja9.mockstock.domain.auth.dto.TokenPair;
 import io.gaboja9.mockstock.domain.auth.dto.request.LoginRequestDto;
+import io.gaboja9.mockstock.domain.auth.dto.request.PasswordFindRequestDto;
 import io.gaboja9.mockstock.domain.auth.dto.request.PasswordResetRequestDto;
 import io.gaboja9.mockstock.domain.auth.dto.request.SignUpRequestDto;
 import io.gaboja9.mockstock.domain.auth.exception.AuthException;
@@ -532,5 +533,140 @@ class FormAuthServiceTest {
         verify(passwordEncoder).matches("weak", "encodedCurrentPassword");
         verify(passwordEncoder, never()).encode(anyString());
         verify(membersRepository, never()).save(any());
+    }
+
+    @Test
+    void findPassword_정상_비밀번호찾기_성공() {
+        // given
+        PasswordFindRequestDto passwordFindDto =
+                PasswordFindRequestDto.builder()
+                        .email(TEST_EMAIL)
+                        .verificationCode("123456")
+                        .newPassword("newPassword123!")
+                        .passwordConfirm("newPassword123!")
+                        .build();
+
+        Members existingMember =
+                Members.builder()
+                        .email(TEST_EMAIL)
+                        .password(ENCODED_PASSWORD)
+                        .provider("LOCAL")
+                        .build();
+
+        when(membersRepository.findByEmail(TEST_EMAIL)).thenReturn(Optional.of(existingMember));
+        when(emailVerificationService.verifyCode(TEST_EMAIL, "123456")).thenReturn(true);
+        when(passwordEncoder.encode("newPassword123!")).thenReturn("newEncodedPassword");
+
+        // when
+        formAuthService.findPassword(passwordFindDto);
+
+        // then
+        verify(membersRepository).findByEmail(TEST_EMAIL);
+        verify(emailVerificationService).verifyCode(TEST_EMAIL, "123456");
+        verify(passwordEncoder).encode("newPassword123!");
+        verify(membersRepository).save(existingMember);
+
+        assertThat(existingMember.getPassword()).isEqualTo("newEncodedPassword");
+    }
+
+    @Test
+    void findPassword_존재하지않는_이메일_예외발생() {
+        // given
+        PasswordFindRequestDto passwordFindDto =
+                PasswordFindRequestDto.builder()
+                        .email(TEST_EMAIL)
+                        .verificationCode("123456")
+                        .newPassword("newPassword123!")
+                        .passwordConfirm("newPassword123!")
+                        .build();
+
+        when(membersRepository.findByEmail(TEST_EMAIL)).thenReturn(Optional.empty());
+
+        // when & then
+        assertThatThrownBy(() -> formAuthService.findPassword(passwordFindDto))
+                .isInstanceOf(AuthException.class)
+                .hasMessageContaining("존재하지 않는 이메일입니다.");
+
+        verify(membersRepository).findByEmail(TEST_EMAIL);
+        verify(emailVerificationService, never()).verifyCode(any(), any());
+        verify(passwordEncoder, never()).encode(any());
+    }
+
+    @Test
+    void findPassword_잘못된_인증코드_예외발생() {
+        // given
+        PasswordFindRequestDto passwordFindDto =
+                PasswordFindRequestDto.builder()
+                        .email(TEST_EMAIL)
+                        .verificationCode("wrongCode")
+                        .newPassword("newPassword123!")
+                        .passwordConfirm("newPassword123!")
+                        .build();
+
+        Members existingMember = Members.builder().email(TEST_EMAIL).provider("LOCAL").build();
+
+        when(membersRepository.findByEmail(TEST_EMAIL)).thenReturn(Optional.of(existingMember));
+        when(emailVerificationService.verifyCode(TEST_EMAIL, "wrongCode")).thenReturn(false);
+
+        // when & then
+        assertThatThrownBy(() -> formAuthService.findPassword(passwordFindDto))
+                .isInstanceOf(AuthException.class)
+                .hasMessageContaining("인증코드가 올바르지 않습니다");
+
+        verify(membersRepository).findByEmail(TEST_EMAIL);
+        verify(emailVerificationService).verifyCode(TEST_EMAIL, "wrongCode");
+        verify(passwordEncoder, never()).encode(any());
+    }
+
+    @Test
+    void findPassword_소셜로그인_사용자_예외발생() {
+        // given
+        PasswordFindRequestDto passwordFindDto =
+                PasswordFindRequestDto.builder()
+                        .email(TEST_EMAIL)
+                        .verificationCode("123456")
+                        .newPassword("newPassword123!")
+                        .passwordConfirm("newPassword123!")
+                        .build();
+
+        Members socialMember = Members.builder().email(TEST_EMAIL).provider("GOOGLE").build();
+
+        when(membersRepository.findByEmail(TEST_EMAIL)).thenReturn(Optional.of(socialMember));
+        when(emailVerificationService.verifyCode(TEST_EMAIL, "123456")).thenReturn(true);
+
+        // when & then
+        assertThatThrownBy(() -> formAuthService.findPassword(passwordFindDto))
+                .isInstanceOf(AuthException.class)
+                .hasMessageContaining("GOOGLE 계정이 존재합니다");
+
+        verify(membersRepository).findByEmail(TEST_EMAIL);
+        verify(emailVerificationService).verifyCode(TEST_EMAIL, "123456");
+        verify(passwordEncoder, never()).encode(any());
+    }
+
+    @Test
+    void findPassword_비밀번호_확인_불일치_예외발생() {
+        // given
+        PasswordFindRequestDto passwordFindDto =
+                PasswordFindRequestDto.builder()
+                        .email(TEST_EMAIL)
+                        .verificationCode("123456")
+                        .newPassword("newPassword123!")
+                        .passwordConfirm("differentPassword!")
+                        .build();
+
+        Members existingMember = Members.builder().email(TEST_EMAIL).provider("LOCAL").build();
+
+        when(membersRepository.findByEmail(TEST_EMAIL)).thenReturn(Optional.of(existingMember));
+        when(emailVerificationService.verifyCode(TEST_EMAIL, "123456")).thenReturn(true);
+
+        // when & then
+        assertThatThrownBy(() -> formAuthService.findPassword(passwordFindDto))
+                .isInstanceOf(AuthException.class)
+                .hasMessageContaining("새 비밀번호와 비밀번호 확인이 일치하지 않습니다");
+
+        verify(membersRepository).findByEmail(TEST_EMAIL);
+        verify(emailVerificationService).verifyCode(TEST_EMAIL, "123456");
+        verify(passwordEncoder, never()).encode(any());
     }
 }
