@@ -2,6 +2,7 @@ package io.gaboja9.mockstock.domain.auth.service;
 
 import io.gaboja9.mockstock.domain.auth.dto.TokenPair;
 import io.gaboja9.mockstock.domain.auth.dto.request.LoginRequestDto;
+import io.gaboja9.mockstock.domain.auth.dto.request.PasswordFindRequestDto;
 import io.gaboja9.mockstock.domain.auth.dto.request.PasswordResetRequestDto;
 import io.gaboja9.mockstock.domain.auth.dto.request.SignUpRequestDto;
 import io.gaboja9.mockstock.domain.auth.exception.AuthException;
@@ -99,12 +100,43 @@ public class FormAuthService {
         return membersRepository.findByEmail(email).isPresent();
     }
 
+    // 비밀번호 찾기
+    public void findPassword(PasswordFindRequestDto dto) {
+        Optional<Members> member = membersRepository.findByEmail(dto.getEmail());
+
+        if (member.isEmpty()) {
+            throw AuthException.emailNotExists();
+        }
+
+        if (!emailVerificationService.verifyCode(dto.getEmail(), dto.getVerificationCode())) {
+            throw AuthException.invalidVerificationCode();
+        }
+
+        if (!member.get().getProvider().equals("LOCAL")) {
+            throw AuthException.socialLoginRequired(member.get().getProvider());
+        }
+
+        if (!dto.getNewPassword().equals(dto.getPasswordConfirm())) {
+            throw AuthException.newPasswordMismatch();
+        }
+
+        if (!isValidPassword(dto.getNewPassword())) {
+            throw AuthException.weakPassword();
+        }
+
+        String encodedPassword = passwordEncoder.encode(dto.getNewPassword());
+        member.get().setPassword(encodedPassword);
+        membersRepository.save(member.get());
+
+        log.info("비밀번호 찾기 완료: {}", dto.getEmail());
+    }
+
     // 비밀번호 재설정
     public void resetPassword(Long memberId, PasswordResetRequestDto dto) {
         Members member =
                 membersRepository
                         .findById(memberId)
-                        .orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUNT_MEMBER));
+                        .orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND_MEMBER));
 
         validatePasswordReset(member, dto);
 

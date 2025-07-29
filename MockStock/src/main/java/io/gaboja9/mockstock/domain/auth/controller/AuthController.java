@@ -58,12 +58,22 @@ public class AuthController {
 
     @PostMapping("/email")
     public ResponseEntity<AuthResponseDto> email(
-            @Valid @RequestBody EmailVerificationRequestDto emailVerificationRequestDto) {
-        log.info("이메일 인증코드 발송 요청: {}", emailVerificationRequestDto.getEmail());
+            @Valid @RequestBody EmailVerificationRequestDto dto) {
+        log.info("이메일 인증코드 발송 요청: {}", dto.getEmail());
 
-        emailVerificationService.sendVerificationCode(emailVerificationRequestDto.getEmail());
+        emailVerificationService.sendVerificationCodeForSignup(dto.getEmail());
 
         return ResponseEntity.ok(AuthResponseDto.success("인증코드가 발송되었습니다."));
+    }
+
+    @PostMapping("/email/passwordFind")
+    public ResponseEntity<AuthResponseDto> emailForPasswordFind(
+            @Valid @RequestBody EmailVerificationRequestDto dto) {
+        log.info("이메일 인증코드 발송 요청: {}", dto.getEmail());
+
+        emailVerificationService.sendVerificationCodeForPasswordFind(dto.getEmail());
+
+        return ResponseEntity.ok(AuthResponseDto.success("비밀번호 찾기 인증코드가 발송되었습니다."));
     }
 
     @PostMapping("/passwordReset")
@@ -80,6 +90,21 @@ public class AuthController {
             return ResponseEntity.ok(AuthResponseDto.success("비밀번호가 재설정되었습니다."));
         } catch (Exception e) {
             log.error("비밀번호 재설정 처리 중 오류 발생", e);
+            return ResponseEntity.badRequest().body(AuthResponseDto.fail(e.getMessage()));
+        }
+    }
+
+    @PostMapping("/passwordFind")
+    public ResponseEntity<AuthResponseDto> findPassword(
+            @Valid @RequestBody PasswordFindRequestDto dto) {
+
+        log.info("비밀번호 찾기 요청");
+
+        try {
+            formAuthService.findPassword(dto);
+            return ResponseEntity.ok(AuthResponseDto.success("비밀번호가 재설정되었습니다."));
+        } catch (Exception e) {
+            log.error("비밀번호 찾기 중 오류 발생", e);
             return ResponseEntity.badRequest().body(AuthResponseDto.fail(e.getMessage()));
         }
     }

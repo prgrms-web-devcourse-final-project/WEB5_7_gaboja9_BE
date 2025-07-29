@@ -34,6 +34,8 @@ public class SecurityConfig {
                                                 "/auth/signup",
                                                 "/auth/login",
                                                 "/auth/email",
+                                                "/auth/email/passwordFind",
+                                                "/auth/passwordFind",
                                                 "/auth/refresh",
                                                 "/api/stocks",
                                                 "/ws-stock",

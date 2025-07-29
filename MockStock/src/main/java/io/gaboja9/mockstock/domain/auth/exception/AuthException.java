@@ -51,6 +51,10 @@ public class AuthException extends BaseException {
         return new AuthException(ErrorCode.NEW_PASSWORD_CONFIRM_MISMATCH);
     }
 
+    public static AuthException emailNotExists() {
+        return new AuthException(ErrorCode.EMAIL_NOT_EXISTS);
+    }
+
     public static AuthException authResendTooEarly(long seconds) {
         String message =
                 MessageFormat.format(ErrorCode.AUTH_RESEND_TOO_EARLY.getMessage(), seconds);

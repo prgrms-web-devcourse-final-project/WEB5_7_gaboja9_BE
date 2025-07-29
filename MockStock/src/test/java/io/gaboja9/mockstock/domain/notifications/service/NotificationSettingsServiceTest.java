@@ -77,7 +77,7 @@ class NotificationSettingsServiceTest {
         // when & then
         assertThatThrownBy(() -> notificationSettingsService.getNotificationSettings(memberId))
                 .isInstanceOf(BaseException.class)
-                .hasFieldOrPropertyWithValue("errorCode", ErrorCode.NOT_FOUNT_MEMBER);
+                .hasFieldOrPropertyWithValue("errorCode", ErrorCode.NOT_FOUND_MEMBER);
     }
 
     @Test

@@ -14,7 +14,7 @@ public enum ErrorCode {
     INVALID_INPUT_VALUE(HttpStatus.BAD_REQUEST, "GLOBAL-002", "잘못된 입력값입니다."),
 
     // 사용자 관련 에러
-    NOT_FOUNT_MEMBER(HttpStatus.NOT_FOUND, "MEMBER-001", "사용자를 찾을 수 없습니다."),
+    NOT_FOUND_MEMBER(HttpStatus.NOT_FOUND, "MEMBER-001", "사용자를 찾을 수 없습니다."),
     UNAUTHORIZED_MEMBER(HttpStatus.UNAUTHORIZED, "MEMBER-002", "인증되지 않은 사용자입니다."),
 
     // 결제 관련 에러
@@ -47,6 +47,7 @@ public enum ErrorCode {
     CURRENT_PASSWORD_INCORRECT(HttpStatus.BAD_REQUEST, "AUTH-011", "현재 비밀번호가 올바르지 않습니다."),
     NEW_PASSWORD_CONFIRM_MISMATCH(
             HttpStatus.BAD_REQUEST, "AUTH-012", "새 비밀번호와 비밀번호 확인이 일치하지 않습니다."),
+    EMAIL_NOT_EXISTS(HttpStatus.BAD_REQUEST, "AUTH-013", "존재하지 않는 이메일입니다."),
 
     // 주식 관련 에러
     NOT_FOUND_STOCK(HttpStatus.NOT_FOUND, "STOCK-001", "존재하지 않는 주식입니다."),

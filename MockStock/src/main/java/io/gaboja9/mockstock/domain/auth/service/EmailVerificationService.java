@@ -41,11 +41,11 @@ public class EmailVerificationService {
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
 
             helper.setTo(email);
-            helper.setSubject("MockStock 회원가입 인증코드");
+            helper.setSubject("MockStock 인증코드");
             helper.setText(
                     String.format(
                             "안녕하세요!\n\n"
-                                    + "MockStock 회원가입 인증코드는 다음과 같습니다:\n\n"
+                                    + "MockStock 인증코드는 다음과 같습니다:\n\n"
                                     + "인증코드: %s\n\n"
                                     + "5분 내에 인증을 완료해주세요.\n\n"
                                     + "감사합니다.",
@@ -59,14 +59,33 @@ public class EmailVerificationService {
         }
     }
 
-    // 인증코드 발송 (재발송도 고려..)
-    public void sendVerificationCode(String email) {
+    // 회원가입시 인증코드 발송 (재발송도 고려..)
+    public void sendVerificationCodeForSignup(String email) {
 
         // 이메일 중복 검사
         if (membersRepository.findByEmail(email).isPresent()) {
             throw AuthException.emailAlreadyExists();
         }
 
+        String verificationCode = createAndSaveVerificationCode(email);
+        sendEmail(email, verificationCode);
+        log.info("회원가입 인증코드가 {}로 발송되었습니다.", email);
+    }
+
+    // 비밀번호 찾기시 인증코드 발송
+    public void sendVerificationCodeForPasswordFind(String email) {
+
+        if (membersRepository.findByEmail(email).isEmpty()) {
+            throw AuthException.emailNotExists();
+        }
+
+        String verificationCode = createAndSaveVerificationCode(email);
+        sendEmail(email, verificationCode);
+        log.info("비밀번호 찾기 인증코드가 {}로 발송되었습니다.", email);
+    }
+
+
+    private String createAndSaveVerificationCode(String email) {
         // 쿨다운 검사
         checkResendCooldown(email);
 
@@ -83,10 +102,7 @@ public class EmailVerificationService {
                         .build();
 
         emailVerificationRepository.save(emailVerification);
-
-        // 이메일 발송
-        sendEmail(email, VerificationCode);
-        log.info("인증코드가 {}로 발송되었습니다. 코드: {}", email, VerificationCode);
+        return VerificationCode;
     }
 
     // 인증코드 검증

@@ -28,7 +28,7 @@ public class NotificationSettingsService {
     private Members getMemberById(Long memberId) {
         return membersRepository
                 .findById(memberId)
-                .orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUNT_MEMBER));
+                .orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND_MEMBER));
     }
 
     public NotificationSettingsResponseDto getNotificationSettings(Long memberId) {

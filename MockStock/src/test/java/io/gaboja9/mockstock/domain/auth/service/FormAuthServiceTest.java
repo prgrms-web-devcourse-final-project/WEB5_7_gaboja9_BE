@@ -345,7 +345,7 @@ class FormAuthServiceTest {
         // when & then
         assertThatThrownBy(() -> formAuthService.resetPassword(999L, dto))
                 .isInstanceOf(BaseException.class)
-                .hasFieldOrPropertyWithValue("errorCode", ErrorCode.NOT_FOUNT_MEMBER);
+                .hasFieldOrPropertyWithValue("errorCode", ErrorCode.NOT_FOUND_MEMBER);
 
         verify(membersRepository).findById(999L);
         verify(passwordEncoder, never()).matches(anyString(), anyString());
