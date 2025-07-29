@@ -49,7 +49,7 @@ class PortfoliosServiceTest {
                         "testUser",
                         "google",
                         "test.png",
-                        5000,
+                        30000000,
                         0,
                         LocalDateTime.now().minusDays(15));
 
@@ -87,19 +87,26 @@ class PortfoliosServiceTest {
         given(portfoliosMapper.toDto(p2)).willReturn(dto2);
         given(membersRepository.findById(memberId)).willReturn(Optional.of(member));
 
-        int totalEvaluationAmount = dto1.getEvaluationAmount() + dto2.getEvaluationAmount(); // 2700
-        int totalProfit = dto1.getProfit() + dto2.getProfit(); // 200
-        int totalInvestment =
-                dto1.getAvgPrice() * dto1.getQuantity()
-                        + dto2.getAvgPrice() * dto2.getQuantity(); // 2750
-        double totalProfitRate = (double) totalProfit / totalInvestment * 100;
+        int totalStockEvaluationAmount = dto1.getEvaluationAmount() + dto2.getEvaluationAmount(); // 2700
+        int cashBalance = member.getCashBalance(); // 30000000
+        int totalInvestedAmount = member.getTotalInvestedAmount(); // 30000000
+
+        if (totalInvestedAmount == 0) {
+            totalInvestedAmount = 30_000_000;
+        }
+
+        int totalCurrentAssets = cashBalance + totalStockEvaluationAmount;
+
+        int expectedTotalProfit = totalCurrentAssets - totalInvestedAmount;
+
+        double expectedTotalProfitRate = Math.round((double) expectedTotalProfit / totalInvestedAmount * 10000.0) / 100.0;
 
         PortfoliosResponseDto result = portfoliosService.getPortfolios(memberId);
 
-        assertThat(result.getCashBalance()).isEqualTo(member.getCashBalance());
-        assertThat(result.getTotalEvaluationAmount()).isEqualTo(totalEvaluationAmount);
-        assertThat(result.getTotalProfit()).isEqualTo(totalProfit);
-        assertThat(result.getTotalProfitRate()).isEqualTo(totalProfitRate);
+        assertThat(result.getCashBalance()).isEqualTo(cashBalance);
+        assertThat(result.getTotalEvaluationAmount()).isEqualTo(totalStockEvaluationAmount);
+        assertThat(result.getTotalProfit()).isEqualTo(expectedTotalProfit);
+        assertThat(result.getTotalProfitRate()).isEqualTo(expectedTotalProfitRate);
         assertThat(result.getPortfolios()).containsExactly(dto1, dto2);
     }
 

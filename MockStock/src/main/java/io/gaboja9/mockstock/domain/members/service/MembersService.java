@@ -46,11 +46,11 @@ public class MembersService {
         return MemberInfoDto.builder()
                 .nickname(member.getNickname())
                 .profileImage(member.getProfileImage())
-                .totalProfit(portfolios.getTotalProfit())
-                .totalEvaluationAmount(portfolios.getTotalEvaluationAmount())
+                .totalProfitRate(portfolios.getTotalProfitRate())
+                .totalCashBalance(portfolios.getTotalEvaluationAmount() + member.getCashBalance())
                 .tradeCnt(tradeCnt)
                 .ranking(ranking)
-                .period(period)
+                .period(period + 1)
                 .bankruptcyCnt(bankruptcyCnt)
                 .build();
     }
