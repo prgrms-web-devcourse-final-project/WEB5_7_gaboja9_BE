@@ -18,7 +18,6 @@ import io.gaboja9.mockstock.domain.stock.measurement.DailyStockPrice;
 import io.gaboja9.mockstock.domain.stock.repository.StocksRepository;
 import io.gaboja9.mockstock.domain.stock.repository.StocksWeeklyRepository;
 
-import java.util.Collections;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -29,7 +28,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.Instant;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -38,14 +37,11 @@ import java.util.Optional;
 @DisplayName("StocksWeeklyChartService 테스트")
 class StocksWeeklyChartServiceTest {
 
-    @Mock
-    private StocksWeeklyRepository stocksWeeklyRepository;
+    @Mock private StocksWeeklyRepository stocksWeeklyRepository;
 
-    @Mock
-    private StocksRepository stocksRepository;
+    @Mock private StocksRepository stocksRepository;
 
-    @InjectMocks
-    private StocksWeeklyChartService stocksWeeklyChartService;
+    @InjectMocks private StocksWeeklyChartService stocksWeeklyChartService;
 
     private Stocks sampleStock;
     private String stockCode = "005930";
@@ -71,13 +67,16 @@ class StocksWeeklyChartServiceTest {
     void getLatestWeeklyPrices_whenStoredDataExists_returnsStoredData() {
         // given
         int limit = 52;
-        List<DailyStockPrice> storedData = List.of(createSampleStockPrice("2025-07-21T00:00:00Z", 62100L));
+        List<DailyStockPrice> storedData =
+                List.of(createSampleStockPrice("2025-07-21T00:00:00Z", 62100L));
 
         when(stocksRepository.findByStockCode(stockCode)).thenReturn(Optional.of(sampleStock));
-        when(stocksWeeklyRepository.findStoredWeeklyPrices(stockCode, limit)).thenReturn(storedData);
+        when(stocksWeeklyRepository.findStoredWeeklyPrices(stockCode, limit))
+                .thenReturn(storedData);
 
         // when
-        List<DailyStockPrice> actualData = stocksWeeklyChartService.getLatestWeeklyPrices(stockCode, limit);
+        List<DailyStockPrice> actualData =
+                stocksWeeklyChartService.getLatestWeeklyPrices(stockCode, limit);
 
         // then
         assertThat(actualData).isEqualTo(storedData);
@@ -90,15 +89,18 @@ class StocksWeeklyChartServiceTest {
     void getLatestWeeklyPrices_whenNoStoredData_aggregatesFromDaily() {
         // given
         int limit = 52;
-        List<DailyStockPrice> aggregatedData = List.of(createSampleStockPrice("2025-07-21T00:00:00Z", 62500L));
+        List<DailyStockPrice> aggregatedData =
+                List.of(createSampleStockPrice("2025-07-21T00:00:00Z", 62500L));
 
         when(stocksRepository.findByStockCode(stockCode)).thenReturn(Optional.of(sampleStock));
-        when(stocksWeeklyRepository.findStoredWeeklyPrices(stockCode, limit)).thenReturn(
-            Collections.emptyList());
-        when(stocksWeeklyRepository.aggregateFromDaily(stockCode, limit)).thenReturn(aggregatedData);
+        when(stocksWeeklyRepository.findStoredWeeklyPrices(stockCode, limit))
+                .thenReturn(Collections.emptyList());
+        when(stocksWeeklyRepository.aggregateFromDaily(stockCode, limit))
+                .thenReturn(aggregatedData);
 
         // when
-        List<DailyStockPrice> actualData = stocksWeeklyChartService.getLatestWeeklyPrices(stockCode, limit);
+        List<DailyStockPrice> actualData =
+                stocksWeeklyChartService.getLatestWeeklyPrices(stockCode, limit);
 
         // then
         assertThat(actualData).isEqualTo(aggregatedData);
@@ -114,8 +116,9 @@ class StocksWeeklyChartServiceTest {
         when(stocksRepository.findByStockCode(invalidStockCode)).thenReturn(Optional.empty());
 
         // when & then
-        assertThatThrownBy(() -> stocksWeeklyChartService.getLatestWeeklyPrices(invalidStockCode, 52))
-            .isInstanceOf(NotFoundStockException.class);
+        assertThatThrownBy(
+                        () -> stocksWeeklyChartService.getLatestWeeklyPrices(invalidStockCode, 52))
+                .isInstanceOf(NotFoundStockException.class);
         verify(stocksWeeklyRepository, never()).findStoredWeeklyPrices(anyString(), anyInt());
         verify(stocksWeeklyRepository, never()).aggregateFromDaily(anyString(), anyInt());
     }
@@ -128,18 +131,23 @@ class StocksWeeklyChartServiceTest {
         // given
         Instant beforeTimestamp = Instant.parse("2025-07-14T00:00:00Z");
         int limit = 26;
-        List<DailyStockPrice> storedData = List.of(createSampleStockPrice("2025-07-07T00:00:00Z", 63300L));
+        List<DailyStockPrice> storedData =
+                List.of(createSampleStockPrice("2025-07-07T00:00:00Z", 63300L));
 
         when(stocksRepository.findByStockCode(stockCode)).thenReturn(Optional.of(sampleStock));
-        when(stocksWeeklyRepository.findStoredWeeklyPricesBefore(stockCode, beforeTimestamp, limit)).thenReturn(storedData);
+        when(stocksWeeklyRepository.findStoredWeeklyPricesBefore(stockCode, beforeTimestamp, limit))
+                .thenReturn(storedData);
 
         // when
-        List<DailyStockPrice> actualData = stocksWeeklyChartService.getMorePastData(stockCode, beforeTimestamp, limit);
+        List<DailyStockPrice> actualData =
+                stocksWeeklyChartService.getMorePastData(stockCode, beforeTimestamp, limit);
 
         // then
         assertThat(actualData).isEqualTo(storedData);
-        verify(stocksWeeklyRepository, times(1)).findStoredWeeklyPricesBefore(stockCode, beforeTimestamp, limit);
-        verify(stocksWeeklyRepository, never()).aggregateFromDailyBefore(anyString(), any(Instant.class), anyInt());
+        verify(stocksWeeklyRepository, times(1))
+                .findStoredWeeklyPricesBefore(stockCode, beforeTimestamp, limit);
+        verify(stocksWeeklyRepository, never())
+                .aggregateFromDailyBefore(anyString(), any(Instant.class), anyInt());
     }
 
     @Test
@@ -148,19 +156,25 @@ class StocksWeeklyChartServiceTest {
         // given
         Instant beforeTimestamp = Instant.parse("2025-07-14T00:00:00Z");
         int limit = 26;
-        List<DailyStockPrice> aggregatedData = List.of(createSampleStockPrice("2025-07-07T00:00:00Z", 63300L));
+        List<DailyStockPrice> aggregatedData =
+                List.of(createSampleStockPrice("2025-07-07T00:00:00Z", 63300L));
 
         when(stocksRepository.findByStockCode(stockCode)).thenReturn(Optional.of(sampleStock));
-        when(stocksWeeklyRepository.findStoredWeeklyPricesBefore(stockCode, beforeTimestamp, limit)).thenReturn(Collections.emptyList());
-        when(stocksWeeklyRepository.aggregateFromDailyBefore(stockCode, beforeTimestamp, limit)).thenReturn(aggregatedData);
+        when(stocksWeeklyRepository.findStoredWeeklyPricesBefore(stockCode, beforeTimestamp, limit))
+                .thenReturn(Collections.emptyList());
+        when(stocksWeeklyRepository.aggregateFromDailyBefore(stockCode, beforeTimestamp, limit))
+                .thenReturn(aggregatedData);
 
         // when
-        List<DailyStockPrice> actualData = stocksWeeklyChartService.getMorePastData(stockCode, beforeTimestamp, limit);
+        List<DailyStockPrice> actualData =
+                stocksWeeklyChartService.getMorePastData(stockCode, beforeTimestamp, limit);
 
         // then
         assertThat(actualData).isEqualTo(aggregatedData);
-        verify(stocksWeeklyRepository, times(1)).findStoredWeeklyPricesBefore(stockCode, beforeTimestamp, limit);
-        verify(stocksWeeklyRepository, times(1)).aggregateFromDailyBefore(stockCode, beforeTimestamp, limit);
+        verify(stocksWeeklyRepository, times(1))
+                .findStoredWeeklyPricesBefore(stockCode, beforeTimestamp, limit);
+        verify(stocksWeeklyRepository, times(1))
+                .aggregateFromDailyBefore(stockCode, beforeTimestamp, limit);
     }
 
     @Test
@@ -171,6 +185,6 @@ class StocksWeeklyChartServiceTest {
 
         // when & then
         assertThatThrownBy(() -> stocksWeeklyChartService.getMorePastData(stockCode, null, 26))
-            .isInstanceOf(StockChartException.class);
+                .isInstanceOf(StockChartException.class);
     }
 }
