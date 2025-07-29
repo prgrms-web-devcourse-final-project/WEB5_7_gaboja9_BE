@@ -22,7 +22,6 @@ public class KakaoPayController implements KakaoPayControllerSpec {
     private final KakaoPayService kakaoPayService;
 
     @PostMapping("/ready")
-    @Override
     public ResponseEntity<PaymentResponse> paymentReady(
             @Valid @RequestBody PaymentRequest request,
             @AuthenticationPrincipal MembersDetails membersDetails) {
@@ -38,14 +37,12 @@ public class KakaoPayController implements KakaoPayControllerSpec {
     }
 
     @GetMapping("/approve")
-    @Override
     public ResponseEntity<PaymentResponse> paymentApprove(
-            @RequestParam("pg_token") String pgToken) {
+            @RequestParam("pg_token") String pgToken,
+            @AuthenticationPrincipal MembersDetails membersDetails) {
         try {
-            // TODO: JWT 도입시 헤더에서 추출
-            Long memberId = 1L;
-
-            KakaoPayApproveResponse response = kakaoPayService.paymentApprove(pgToken, memberId);
+            KakaoPayApproveResponse response =
+                    kakaoPayService.paymentApprove(pgToken, membersDetails.getId());
 
             return ResponseEntity.ok(PaymentResponse.success("결제 승인 완료", response));
 
@@ -56,12 +53,11 @@ public class KakaoPayController implements KakaoPayControllerSpec {
     }
 
     @GetMapping("/cancel")
-    @Override
-    public ResponseEntity<PaymentResponse> paymentCancel(@RequestParam("tid") String tid) {
+    public ResponseEntity<PaymentResponse> paymentCancel(
+            @RequestParam("tid") String tid,
+            @AuthenticationPrincipal MembersDetails membersDetails) {
         try {
-            // TODO: JWT 도입시 헤더에서 추출
-            Long memberId = 1L;
-            kakaoPayService.paymentCancel(tid, memberId);
+            kakaoPayService.paymentCancel(tid, membersDetails.getId());
 
             return ResponseEntity.ok(PaymentResponse.success("결제 취소 완료", null));
 
@@ -72,11 +68,11 @@ public class KakaoPayController implements KakaoPayControllerSpec {
     }
 
     @GetMapping("/fail")
-    @Override
-    public ResponseEntity<PaymentResponse> paymentFail(@RequestParam("tid") String tid) {
+    public ResponseEntity<PaymentResponse> paymentFail(
+            @RequestParam("tid") String tid,
+            @AuthenticationPrincipal MembersDetails membersDetails) {
         try {
-            Long userId = 1L;
-            kakaoPayService.paymentFail(tid, userId);
+            kakaoPayService.paymentFail(tid, membersDetails.getId());
 
             return ResponseEntity.ok(PaymentResponse.success("결제 실패 처리 완료", null));
 
