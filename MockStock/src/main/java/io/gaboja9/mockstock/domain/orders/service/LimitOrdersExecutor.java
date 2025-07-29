@@ -6,6 +6,9 @@ import io.gaboja9.mockstock.domain.orders.entity.OrderStatus;
 import io.gaboja9.mockstock.domain.orders.entity.Orders;
 import io.gaboja9.mockstock.domain.orders.exception.NotFoundOrderException;
 import io.gaboja9.mockstock.domain.orders.repository.OrdersRepository;
+import io.gaboja9.mockstock.domain.portfolios.entity.Portfolios;
+import io.gaboja9.mockstock.domain.portfolios.exception.NotFoundPortfolioException;
+import io.gaboja9.mockstock.domain.portfolios.repository.PortfoliosRepository;
 import io.gaboja9.mockstock.domain.portfolios.service.PortfoliosService;
 import io.gaboja9.mockstock.domain.trades.entity.TradeType;
 import io.gaboja9.mockstock.domain.trades.entity.Trades;
@@ -35,6 +38,7 @@ public class LimitOrdersExecutor {
     private final TradesRepository tradesRepository;
     private final PortfoliosService portfoliosService;
     private final NotificationsService notificationsService;
+    private final PortfoliosRepository portfoliosRepository;
 
     // Virtual Thread 환경에서는 단순한 Semaphore 기반 동시성 제어가 더 효율적
     private final ConcurrentHashMap<String, Semaphore> memberSemaphores = new ConcurrentHashMap<>();
@@ -121,6 +125,21 @@ public class LimitOrdersExecutor {
     }
 
     private void executeOrder(Orders order, int executionPrice) {
+        if (order.getTradeType() == TradeType.SELL) {
+            Portfolios portfolio =
+                    portfoliosRepository
+                            .findByMembersIdAndStockCodeWithLock(
+                                    order.getMembers().getId(), order.getStockCode())
+                            .orElseThrow(NotFoundPortfolioException::new);
+
+            if (portfolio.getQuantity() < order.getQuantity()) {
+                order.cancel();
+                ordersRepository.save(order);
+                log.warn("포트폴리오 수량 부족으로 주문 취소. orderId={}", order.getId());
+                return;
+            }
+        }
+
         order.execute();
         ordersRepository.save(order);
         Members member = order.getMembers();
@@ -150,6 +169,8 @@ public class LimitOrdersExecutor {
         } else if (order.getTradeType() == TradeType.SELL) {
             int actualAmount = executionPrice * order.getQuantity();
             member.setCashBalance(member.getCashBalance() + actualAmount);
+            portfoliosService.updateForSell(
+                    member.getId(), order.getStockCode(), order.getQuantity());
         }
 
         try {
