@@ -123,9 +123,11 @@ public class LimitOrdersExecutor {
 
     private void executeOrder(Orders order, int executionPrice) {
         if (order.getTradeType() == TradeType.SELL) {
-            Portfolios portfolio = portfoliosRepository
-                    .findByMembersIdAndStockCodeWithLock(order.getMembers().getId(), order.getStockCode())
-                    .orElseThrow(NotFoundPortfolioException::new);
+            Portfolios portfolio =
+                    portfoliosRepository
+                            .findByMembersIdAndStockCodeWithLock(
+                                    order.getMembers().getId(), order.getStockCode())
+                            .orElseThrow(NotFoundPortfolioException::new);
 
             if (portfolio.getQuantity() < order.getQuantity()) {
                 order.cancel();
@@ -164,7 +166,8 @@ public class LimitOrdersExecutor {
         } else if (order.getTradeType() == TradeType.SELL) {
             int actualAmount = executionPrice * order.getQuantity();
             member.setCashBalance(member.getCashBalance() + actualAmount);
-            portfoliosService.updateForSell(member.getId(),order.getStockCode(), order.getQuantity());
+            portfoliosService.updateForSell(
+                    member.getId(), order.getStockCode(), order.getQuantity());
         }
 
         try {

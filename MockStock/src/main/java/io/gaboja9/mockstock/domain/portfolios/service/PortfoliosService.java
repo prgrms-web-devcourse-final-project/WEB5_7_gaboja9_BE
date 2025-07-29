@@ -37,9 +37,10 @@ public class PortfoliosService {
             dtoList.add(portfoliosMapper.toDto(p));
         }
 
-        Members member = membersRepository
-                .findById(memberId)
-                .orElseThrow(() -> new NotFoundMemberException(memberId));
+        Members member =
+                membersRepository
+                        .findById(memberId)
+                        .orElseThrow(() -> new NotFoundMemberException(memberId));
 
         int cashBalance = member.getCashBalance();
         int totalInvestedAmount = member.getTotalInvestedAmount(); // 총 투입 자금
@@ -59,7 +60,8 @@ public class PortfoliosService {
                 .build();
     }
 
-    public PortfoliosSummary calculateSummary(List<PortfolioResponseDto> dtoList, int cashBalance, int totalInvestedAmount) {
+    public PortfoliosSummary calculateSummary(
+            List<PortfolioResponseDto> dtoList, int cashBalance, int totalInvestedAmount) {
         int totalStockEvaluationAmount = 0;
 
         // 주식 포트폴리오 계산
@@ -75,7 +77,8 @@ public class PortfoliosService {
         if (totalInvestedAmount == 0) {
             totalProfitRate = 0.00;
         } else {
-            totalProfitRate = Math.round((double) totalProfit / totalInvestedAmount * 10000.0) / 100.0;
+            totalProfitRate =
+                    Math.round((double) totalProfit / totalInvestedAmount * 10000.0) / 100.0;
         }
 
         return PortfoliosSummary.builder()
