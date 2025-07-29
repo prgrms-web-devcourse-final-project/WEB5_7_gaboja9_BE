@@ -11,6 +11,7 @@ import io.gaboja9.mockstock.domain.auth.service.EmailVerificationService;
 import io.gaboja9.mockstock.domain.auth.service.FormAuthService;
 import io.gaboja9.mockstock.domain.auth.service.JwtTokenProvider;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 
 import lombok.RequiredArgsConstructor;
@@ -84,18 +85,36 @@ public class AuthController {
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<AuthResponseDto> logout(Authentication authentication) {
+    public ResponseEntity<AuthResponseDto> logout(
+            Authentication authentication,
+            HttpServletRequest request) {
 
         log.info("로그아웃 요청");
+
+        if (authentication == null) {
+            return ResponseEntity.badRequest()
+                    .body(AuthResponseDto.fail("인증되지 않은 사용자입니다."));
+        }
 
         MembersDetails membersDetails = (MembersDetails) authentication.getPrincipal();
         Long memberId = membersDetails.getId();
 
-        Optional<RefreshToken> refreshTokenOptional = jwtTokenProvider.findRefreshToken(memberId);
+        String authorization = request.getHeader("Authorization");
+        if (authorization != null) {
+            try {
+                String accessToken = jwtTokenProvider.extractTokenFromHeader(authorization);
+                tokenRepository.addAccessTokenBlackList(accessToken);
+                log.info("Access Token이 블랙리스트에 추가되었습니다.");
+            } catch (Exception e) {
+                log.warn("Access Token 추출 실패", e);
+            }
+        }
 
+        Optional<RefreshToken> refreshTokenOptional = jwtTokenProvider.findRefreshToken(memberId);
         if (refreshTokenOptional.isPresent()) {
             RefreshToken refreshToken = refreshTokenOptional.get();
             tokenRepository.addBlackList(refreshToken);
+            log.info("Refresh Token이 블랙리스트에 추가되었습니다.");
         }
 
         return ResponseEntity.ok(AuthResponseDto.success("로그아웃이 완료되었습니다."));
