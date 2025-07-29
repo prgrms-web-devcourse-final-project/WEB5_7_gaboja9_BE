@@ -450,7 +450,6 @@ public class OrdersService {
                                 .build();
                     } else {
                         ordersRepository.save(order);
-                        portfoliosService.updateForSell(memberId, stockCode, quantity);
 
                         log.info(
                                 "지정가 매도 주문 대기. memberId={}, stockCode={}, limitPrice={},"
