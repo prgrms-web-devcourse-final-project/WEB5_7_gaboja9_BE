@@ -24,7 +24,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.sound.sampled.Port;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Semaphore;
@@ -129,9 +128,8 @@ public class LimitOrdersExecutor {
     private void executeOrder(Orders order, int executionPrice) {
         if (order.getTradeType() == TradeType.SELL) {
             Optional<Portfolios> optionalPortfolio =
-                    portfoliosRepository
-                            .findByMembersIdAndStockCodeWithLock(
-                                    order.getMembers().getId(), order.getStockCode());
+                    portfoliosRepository.findByMembersIdAndStockCodeWithLock(
+                            order.getMembers().getId(), order.getStockCode());
 
             if (optionalPortfolio.isEmpty()) {
                 order.cancel();
