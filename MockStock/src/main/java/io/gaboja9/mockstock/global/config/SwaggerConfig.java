@@ -5,8 +5,8 @@ import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
 import io.swagger.v3.oas.annotations.info.Info;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.security.SecurityScheme;
-
 import io.swagger.v3.oas.annotations.servers.Server;
+
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
@@ -70,8 +70,8 @@ import org.springframework.context.annotation.Configuration;
                                 - 모든 에러는 `/user/queue/errors`로 수신
                                 """),
         servers = {
-                @Server(url = "https://mockstocks.duckdns.org", description = "배포용"),
-                @Server(url = "http://localhost:8080", description = "개발용")
+            @Server(url = "https://mockstocks.duckdns.org", description = "배포용"),
+            @Server(url = "http://localhost:8080", description = "개발용")
         },
         security = @SecurityRequirement(name = "bearerAuth"))
 @SecurityScheme(
