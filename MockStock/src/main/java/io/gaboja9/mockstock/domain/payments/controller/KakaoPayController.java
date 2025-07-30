@@ -38,11 +38,9 @@ public class KakaoPayController implements KakaoPayControllerSpec {
 
     @GetMapping("/approve")
     public ResponseEntity<PaymentResponse> paymentApprove(
-            @RequestParam("pg_token") String pgToken,
-            @RequestParam("member_id") Long memberId) {
+            @RequestParam("pg_token") String pgToken, @RequestParam("member_id") Long memberId) {
         try {
-            KakaoPayApproveResponse response =
-                    kakaoPayService.paymentApprove(pgToken, memberId);
+            KakaoPayApproveResponse response = kakaoPayService.paymentApprove(pgToken, memberId);
 
             return ResponseEntity.ok(PaymentResponse.success("결제 승인 완료", response));
 
@@ -54,8 +52,7 @@ public class KakaoPayController implements KakaoPayControllerSpec {
 
     @GetMapping("/cancel")
     public ResponseEntity<PaymentResponse> paymentCancel(
-            @RequestParam("tid") String tid,
-            @RequestParam("member_id") Long memberId) {
+            @RequestParam("tid") String tid, @RequestParam("member_id") Long memberId) {
         try {
             kakaoPayService.paymentCancel(tid, memberId);
 
@@ -69,8 +66,7 @@ public class KakaoPayController implements KakaoPayControllerSpec {
 
     @GetMapping("/fail")
     public ResponseEntity<PaymentResponse> paymentFail(
-            @RequestParam("tid") String tid,
-            @RequestParam("member_id") Long memberId) {
+            @RequestParam("tid") String tid, @RequestParam("member_id") Long memberId) {
         try {
             kakaoPayService.paymentFail(tid, memberId);
 
