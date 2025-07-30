@@ -23,7 +23,6 @@ import java.util.concurrent.ConcurrentHashMap;
 public class CandleMakerService {
 
     private final InfluxDBClient minuteInfluxDBClient;
-    private final MarketTimeScheduler marketTimeScheduler;
 
     @Value("${spring.influx.bucket.minute}")
     private String minuteBucket;
@@ -35,7 +34,6 @@ public class CandleMakerService {
             @Qualifier("minuteInfluxDBClient") InfluxDBClient minuteInfluxDBClient,
             MarketTimeScheduler marketTimeScheduler) {
         this.minuteInfluxDBClient = minuteInfluxDBClient;
-        this.marketTimeScheduler = marketTimeScheduler;
     }
 
     // 각 종목별 현재 분봉 데이터
@@ -96,10 +94,10 @@ public class CandleMakerService {
             MinuteStockPrice minuteData = new MinuteStockPrice();
             minuteData.setTimestamp(candle.getInstant());
             minuteData.setStockCode(candle.getStockCode());
-            minuteData.setOpenPrice(candle.getOpen().longValue());
-            minuteData.setMaxPrice(candle.getHigh().longValue());
-            minuteData.setMinPrice(candle.getLow().longValue());
-            minuteData.setClosePrice(candle.getClose().longValue());
+            minuteData.setOpenPrice(candle.getOpen());
+            minuteData.setMaxPrice(candle.getHigh());
+            minuteData.setMinPrice(candle.getLow());
+            minuteData.setClosePrice(candle.getClose());
             minuteData.setAccumTrans(candle.getVolume());
 
             WriteApiBlocking writeApi = minuteInfluxDBClient.getWriteApiBlocking();

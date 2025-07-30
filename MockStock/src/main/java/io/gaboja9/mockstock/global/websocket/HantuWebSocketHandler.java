@@ -63,24 +63,12 @@ public class HantuWebSocketHandler extends TextWebSocketHandler {
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
         this.session = session;
         eventService.setSession(session);
-        //        log.info(
-        //                "WebSocket connection established at {}: {}", LocalDateTime.now(),
-        // session.getId());
 
         // 접속 승인키 얻기
         approvalKey = getApprovalKey();
 
         // 초기 종목 구독
         subscribeInitialStocks();
-
-        // 재연결시
-        //        if (subscribedStocks.isEmpty()) {
-        //            log.info("Initial connection. Subscribing to default stocks.");
-        //            subscribeInitialStocks();
-        //        } else {
-        //            log.info("Reconnection detected. Restoring previous subscriptions.");
-        //            resubscribeStocks();
-        //        }
     }
 
     /** 애플리케이션 시작 시 구독할 초기 종목들을 설정합니다. */
@@ -88,8 +76,25 @@ public class HantuWebSocketHandler extends TextWebSocketHandler {
         //        log.info("Subscribing to initial stocks...");
         // 삼성전자, 카카오, 네이버를 순서대로 구독 요청
         subscribeStockPrice("005930", "H1"); // 삼성전자
+        subscribeStockPrice("247540", "H1"); // 에코프로비엠
+        subscribeStockPrice("005380", "H1"); // 현대차
+        subscribeStockPrice("035420", "H1"); // NAVER
         subscribeStockPrice("035720", "H1"); // 카카오
-        subscribeStockPrice("035420", "H1"); // 네이버
+        subscribeStockPrice("259960", "H1"); // 크래프톤
+        subscribeStockPrice("068270", "H1"); // 셀트리온
+        subscribeStockPrice("128940", "H1"); // 한미약품
+        subscribeStockPrice("096770", "H1"); // SK이노베이션
+        subscribeStockPrice("051910", "H1"); // LG화학
+        subscribeStockPrice("005490", "H1"); // POSCO홀딩스
+        subscribeStockPrice("017670", "H1"); // SK텔레콤
+        subscribeStockPrice("105560", "H1"); // KB금융
+        subscribeStockPrice("323410", "H1"); // 카카오뱅크
+        subscribeStockPrice("139480", "H1"); // 이마트
+        subscribeStockPrice("000120", "H1"); // CJ대한통운
+        subscribeStockPrice("003490", "H1"); // 대한항공
+        subscribeStockPrice("009540", "H1"); // 한국조선해양
+        subscribeStockPrice("375500", "H1"); // DL이앤씨
+        subscribeStockPrice("006400", "H1"); // 삼성SDI
     }
 
     // 메세지 호출시 호출
@@ -104,11 +109,6 @@ public class HantuWebSocketHandler extends TextWebSocketHandler {
     // 연결 종료시 호출
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) {
-        //        log.info(
-        //                "WebSocket connection closed at {}: {}, status: {}",
-        //                LocalDateTime.now(),
-        //                session.getId(),
-        //                status);
         this.session = null;
         eventService.setConnectionActive(false);
         eventService.setSession(null);
@@ -117,7 +117,6 @@ public class HantuWebSocketHandler extends TextWebSocketHandler {
     // 에러 발생시 호출
     @Override
     public void handleTransportError(WebSocketSession session, Throwable exception) {
-        //        log.error("WebSocket transport error in session {}", session.getId(), exception);
         eventService.setConnectionActive(false);
     }
 
@@ -282,26 +281,6 @@ public class HantuWebSocketHandler extends TextWebSocketHandler {
             //            log.warn("Could not parse JSON message: {}", message, e);
         }
     }
-
-    //  /**
-    //   * 재연결 후 기존 구독 복원
-    //   */
-    //  private void resubscribeStocks() {
-    //    if (subscribedStocks.isEmpty()) {
-    //      return;
-    //    }
-    //
-    //    log.info("Resubscribing to {} stocks after reconnection", subscribedStocks.size());
-    //    new HashMap<>(subscribedStocks).forEach((stockCode, marketCode) -> {
-    //      try {
-    //        Thread.sleep(100);
-    //        subscribeStockPrice(stockCode, marketCode);
-    //      } catch (InterruptedException e) {
-    //        Thread.currentThread().interrupt();
-    //        log.error("Resubscription interrupted", e);
-    //      }
-    //    });
-    //  }
 
     public StockPriceDto getLatestPrice(String stockCode) {
         return latestPrices.get(stockCode);
