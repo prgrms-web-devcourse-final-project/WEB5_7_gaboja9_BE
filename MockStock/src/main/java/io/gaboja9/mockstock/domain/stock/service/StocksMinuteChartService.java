@@ -93,7 +93,6 @@ public class StocksMinuteChartService {
         }
     }
 
-    // 입력값 유효성 검증 (일봉과 동일)
     private void validateStockCode(String stockCode) {
         // 기본 null/empty 체크
         if (stockCode == null || stockCode.trim().isEmpty()) {
