@@ -24,6 +24,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.sound.sampled.Port;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
@@ -126,11 +128,19 @@ public class LimitOrdersExecutor {
 
     private void executeOrder(Orders order, int executionPrice) {
         if (order.getTradeType() == TradeType.SELL) {
-            Portfolios portfolio =
+            Optional<Portfolios> optionalPortfolio =
                     portfoliosRepository
                             .findByMembersIdAndStockCodeWithLock(
-                                    order.getMembers().getId(), order.getStockCode())
-                            .orElseThrow(NotFoundPortfolioException::new);
+                                    order.getMembers().getId(), order.getStockCode());
+
+            if (optionalPortfolio.isEmpty()) {
+                order.cancel();
+                ordersRepository.save(order);
+                log.warn("보유중인 주식이 없어서 주문 취소. orderId={}", order.getId());
+                throw new NotFoundPortfolioException();
+            }
+
+            Portfolios portfolio = optionalPortfolio.get();
 
             if (portfolio.getQuantity() < order.getQuantity()) {
                 order.cancel();
