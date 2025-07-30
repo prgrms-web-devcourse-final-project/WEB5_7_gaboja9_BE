@@ -64,7 +64,10 @@ public class SecurityConfig {
         CorsConfiguration configuration = new CorsConfiguration();
 
         configuration.setAllowedOrigins(
-                List.of("https://mock-stock.pages.dev", "http://localhost:3000", "https://mockstocks.duckdns.org"));
+                List.of(
+                        "https://mock-stock.pages.dev",
+                        "http://localhost:3000",
+                        "https://mockstocks.duckdns.org"));
 
         configuration.setAllowedMethods(
                 List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
