@@ -7,6 +7,16 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+    services:
+      redis:
+        image: redis:7
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
     env:
       PROJECT_DIR: MockStock
       APP_BASE_URL: ${{ secrets.APP_BASE_URL }}
