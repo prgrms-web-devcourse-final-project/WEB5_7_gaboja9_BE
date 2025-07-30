@@ -5,7 +5,9 @@ import io.gaboja9.mockstock.domain.stock.mapper.StocksChartMapper;
 import io.gaboja9.mockstock.domain.stock.measurement.DailyStockPrice;
 import io.gaboja9.mockstock.domain.stock.measurement.MinuteStockPrice;
 import io.gaboja9.mockstock.domain.stock.service.StocksDailyChartService;
+import io.gaboja9.mockstock.domain.stock.service.StocksFiveMinuteChartService;
 import io.gaboja9.mockstock.domain.stock.service.StocksMinuteChartService;
+import io.gaboja9.mockstock.domain.stock.service.StocksMonthlyChartService;
 import io.gaboja9.mockstock.domain.stock.service.StocksWeeklyChartService;
 
 import lombok.RequiredArgsConstructor;
@@ -29,6 +31,9 @@ public class StocksChartController implements StocksChartControllerSpec {
     private final StocksDailyChartService stocksDailyChartService;
     private final StocksMinuteChartService stocksMinuteChartService;
     private final StocksWeeklyChartService stocksWeeklyChartService;
+    private final StocksFiveMinuteChartService stocksFiveMinuteChartService;
+    private final StocksMonthlyChartService stocksMonthlyChartService;
+
     private final StocksChartMapper stocksChartMapper; //  1. 매퍼 주입
 
     // ==================== 일봉 차트 API ====================
@@ -168,5 +173,62 @@ public class StocksChartController implements StocksChartControllerSpec {
         List<DailyStockPrice> data =
                 stocksWeeklyChartService.getMoreRecentData(stockCode, afterTimestamp, limit);
         return stocksChartMapper.toChartResponse(stockCode, data, "weekly", !data.isEmpty());
+    }
+
+    // ============ 5분봉 조회 ========
+
+    @GetMapping("/5minute/{stockCode}/initial")
+    public StocksChartResponse<MinuteStockPrice> getInitialFiveMinuteChartData(
+            @PathVariable String stockCode, @RequestParam(defaultValue = "200") int limit) {
+
+        log.info("Loading initial 5minute chart data for stock: {}, limit: {}", stockCode, limit);
+        List<MinuteStockPrice> data =
+                stocksFiveMinuteChartService.getLatestMinutePrices(stockCode, limit);
+        return stocksChartMapper.toChartResponse(stockCode, data, "5minute");
+    }
+
+    @GetMapping("/5minute/{stockCode}/load-past")
+    public StocksChartResponse<MinuteStockPrice> loadPastFiveMinuteChartData(
+            @PathVariable String stockCode,
+            @RequestParam("before") Instant beforeTimestamp,
+            @RequestParam(defaultValue = "100") int limit) {
+
+        log.info(
+                "Loading past 5minute chart data for stock: {} before {}, limit: {}",
+                stockCode,
+                beforeTimestamp,
+                limit);
+        List<MinuteStockPrice> data =
+                stocksFiveMinuteChartService.getMorePastData(stockCode, beforeTimestamp, limit);
+        return stocksChartMapper.toChartResponse(stockCode, data, "5minute");
+    }
+
+    @GetMapping("/5minute/{stockCode}/load-recent")
+    public StocksChartResponse<MinuteStockPrice> loadRecentFiveMinuteChartData(
+            @PathVariable String stockCode,
+            @RequestParam("after") Instant afterTimestamp,
+            @RequestParam(defaultValue = "50") int limit) {
+
+        log.info(
+                "Loading recent 5minute chart data for stock: {} after {}, limit: {}",
+                stockCode,
+                afterTimestamp,
+                limit);
+        List<MinuteStockPrice> data =
+                stocksFiveMinuteChartService.getMoreRecentData(stockCode, afterTimestamp, limit);
+        // 실시간 업데이트는 새로운 데이터가 있는지 여부를 포함하여 응답
+        return stocksChartMapper.toChartResponse(stockCode, data, "5minute", !data.isEmpty());
+    }
+
+    //  ========================월봉 ====================
+
+    @GetMapping("/monthly/{stockCode}/initial")
+    public StocksChartResponse<DailyStockPrice> getInitialMonthlyChartData(
+            @PathVariable String stockCode, @RequestParam(defaultValue = "36") int limit) {
+
+        log.info("Loading initial monthly chart data for stock: {}, limit: {}", stockCode, limit);
+        List<DailyStockPrice> data =
+                stocksMonthlyChartService.getLatestMonthlyPrices(stockCode, limit);
+        return stocksChartMapper.toChartResponse(stockCode, data, "monthly");
     }
 }

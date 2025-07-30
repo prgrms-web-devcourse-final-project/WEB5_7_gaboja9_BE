@@ -6,9 +6,11 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import java.time.Instant;
 
+@Slf4j
 @Getter
 @Builder
 @NoArgsConstructor
@@ -23,16 +25,16 @@ public class StocksCandleDto {
     private Long timestamp;
 
     @Schema(description = "시가", example = "75000")
-    private Integer open;
+    private Long open;
 
     @Schema(description = "고가", example = "75200")
-    private Integer high;
+    private Long high;
 
     @Schema(description = "저가", example = "74800")
-    private Integer low;
+    private Long low;
 
     @Schema(description = "종가", example = "75100")
-    private Integer close;
+    private Long close;
 
     @Schema(description = "거래량", example = "1523")
     private Long volume;
@@ -42,7 +44,7 @@ public class StocksCandleDto {
     private Integer tickCount = 1;
 
     /** 새로운 체결가로 분봉 업데이트 */
-    public StocksCandleDto updateWith(int price, long newVolume) {
+    public StocksCandleDto updateWith(long price, long newVolume) { // int → long 변경
         return StocksCandleDto.builder()
                 .stockCode(this.stockCode)
                 .timestamp(this.timestamp)
@@ -57,17 +59,21 @@ public class StocksCandleDto {
 
     /** 새로운 분봉 생성 (정적 팩토리 메서드) */
     public static StocksCandleDto createNew(
-            String stockCode, long timestamp, int price, long volume) {
-        return StocksCandleDto.builder()
-                .stockCode(stockCode)
-                .timestamp(timestamp)
-                .open(price)
-                .high(price)
-                .low(price)
-                .close(price)
-                .volume(volume)
-                .tickCount(1)
-                .build();
+            String stockCode, long timestamp, long price, long volume) { // int → long 변경
+        StocksCandleDto candle =
+                StocksCandleDto.builder()
+                        .stockCode(stockCode)
+                        .timestamp(timestamp)
+                        .open(price)
+                        .high(price)
+                        .low(price)
+                        .close(price)
+                        .volume(volume)
+                        .tickCount(1)
+                        .build();
+
+        //        log.info("createNew 완료 - {}", candle.toString());
+        return candle;
     }
 
     /** 타임스탬프를 Instant로 변환 */
@@ -85,19 +91,5 @@ public class StocksCandleDto {
     public String toString() {
         return String.format(
                 "[%s] %s | %s T:%d", stockCode, getInstant(), getOHLCVString(), tickCount);
-    }
-
-    /** 불변 객체 복사 (방어적 복사) */
-    public StocksCandleDto copy() {
-        return StocksCandleDto.builder()
-                .stockCode(this.stockCode)
-                .timestamp(this.timestamp)
-                .open(this.open)
-                .high(this.high)
-                .low(this.low)
-                .close(this.close)
-                .volume(this.volume)
-                .tickCount(this.tickCount)
-                .build();
     }
 }
