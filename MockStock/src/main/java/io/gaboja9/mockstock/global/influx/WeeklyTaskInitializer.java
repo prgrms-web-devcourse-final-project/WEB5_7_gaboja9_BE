@@ -86,7 +86,6 @@ public class WeeklyTaskInitializer {
         return tasks.stream().filter(task -> name.equals(task.getName())).findFirst();
     }
 
-    // TODO 주기 일주일로 바꿔 놓기 (3년치 하려면 -3y) -1w
     private String generateFluxScript() {
         return String.format(
                 """
@@ -100,7 +99,7 @@ public class WeeklyTaskInitializer {
 
                 // 1. 공통 데이터 조회 (데일리 버킷에서)
                 base = from(bucket: "%s")
-                  |> range(start: -3y)
+                  |> range(start: -8d)
                   |> filter(fn: (r) => r._measurement == "stock_daily")
                   |> filter(fn: (r) => {
                       weekday = date.weekDay(t: r._time)

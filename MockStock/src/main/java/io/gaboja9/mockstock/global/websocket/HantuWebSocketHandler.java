@@ -238,7 +238,7 @@ public class HantuWebSocketHandler extends TextWebSocketHandler {
                     String[] fields = parts[3].split("\\^");
                     StockPriceDto priceData = StockPriceMapper.parseStockPriceData(fields);
 
-                    // og.info(priceData.toString());
+                    // log.info(priceData.toString());
                     //  STOMP 브로드캐스트 추가
 
                     messagingTemplate.convertAndSend(
