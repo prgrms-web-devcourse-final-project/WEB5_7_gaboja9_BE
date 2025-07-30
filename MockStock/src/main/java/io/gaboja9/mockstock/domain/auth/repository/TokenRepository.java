@@ -5,6 +5,7 @@ import io.gaboja9.mockstock.domain.auth.entity.RefreshToken;
 import io.gaboja9.mockstock.domain.auth.entity.RefreshTokenBlackList;
 import io.gaboja9.mockstock.domain.members.entity.Members;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface TokenRepository {
@@ -17,4 +18,6 @@ public interface TokenRepository {
     Optional<RefreshToken> findValidRefreshToken(Long memberId);
 
     boolean isTokenBlacklisted(String token);
+
+    List<RefreshToken> findAllValidRefreshTokens(Long memberId);
 }

@@ -21,6 +21,7 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 
 import javax.crypto.SecretKey;
@@ -36,13 +37,24 @@ public class JwtTokenProvider {
     private final TokenRepository tokenRepository;
 
     public TokenPair generateTokenPair(Members members) {
-
         String acceessToken = issueAcceessToken(members.getId(), members.getRole());
         String refreshToken = issueRefreshToken(members.getId(), members.getRole());
 
+        List<RefreshToken> existingTokens =
+                tokenRepository.findAllValidRefreshTokens(members.getId());
+        for (RefreshToken existingToken : existingTokens) {
+            tokenRepository.addBlackList(existingToken);
+            log.info("기존 RefreshToken 무효화: 사용자 ID {}", members.getId());
+        }
+
         tokenRepository.save(members, refreshToken);
 
-        return TokenPair.builder().accessToken(acceessToken).refreshToken(refreshToken).build();
+        return TokenPair.builder()
+                .accessToken(acceessToken)
+                .refreshToken(refreshToken)
+                .accessTokenExpiresIn(jwtConfiguration.getValidation().getAccess() / 60000)
+                .refreshTokenExpiresIn(jwtConfiguration.getValidation().getRefresh() / 60000)
+                .build();
     }
 
     public Optional<RefreshToken> findRefreshToken(Long membersId) {
