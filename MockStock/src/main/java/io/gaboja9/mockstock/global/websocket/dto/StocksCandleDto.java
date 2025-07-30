@@ -6,9 +6,9 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import java.time.Instant;
-import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Getter
@@ -46,32 +46,33 @@ public class StocksCandleDto {
     /** 새로운 체결가로 분봉 업데이트 */
     public StocksCandleDto updateWith(long price, long newVolume) { // int → long 변경
         return StocksCandleDto.builder()
-            .stockCode(this.stockCode)
-            .timestamp(this.timestamp)
-            .open(this.open)
-            .high(Math.max(this.high, price))
-            .low(Math.min(this.low, price))
-            .close(price)
-            .volume(this.volume + newVolume)
-            .tickCount(this.tickCount + 1)
-            .build();
+                .stockCode(this.stockCode)
+                .timestamp(this.timestamp)
+                .open(this.open)
+                .high(Math.max(this.high, price))
+                .low(Math.min(this.low, price))
+                .close(price)
+                .volume(this.volume + newVolume)
+                .tickCount(this.tickCount + 1)
+                .build();
     }
 
     /** 새로운 분봉 생성 (정적 팩토리 메서드) */
     public static StocksCandleDto createNew(
-        String stockCode, long timestamp, long price, long volume) { // int → long 변경
-        StocksCandleDto candle = StocksCandleDto.builder()
-            .stockCode(stockCode)
-            .timestamp(timestamp)
-            .open(price)
-            .high(price)
-            .low(price)
-            .close(price)
-            .volume(volume)
-            .tickCount(1)
-            .build();
+            String stockCode, long timestamp, long price, long volume) { // int → long 변경
+        StocksCandleDto candle =
+                StocksCandleDto.builder()
+                        .stockCode(stockCode)
+                        .timestamp(timestamp)
+                        .open(price)
+                        .high(price)
+                        .low(price)
+                        .close(price)
+                        .volume(volume)
+                        .tickCount(1)
+                        .build();
 
-//        log.info("createNew 완료 - {}", candle.toString());
+        //        log.info("createNew 완료 - {}", candle.toString());
         return candle;
     }
 
@@ -89,7 +90,6 @@ public class StocksCandleDto {
     @Override
     public String toString() {
         return String.format(
-            "[%s] %s | %s T:%d", stockCode, getInstant(), getOHLCVString(), tickCount);
+                "[%s] %s | %s T:%d", stockCode, getInstant(), getOHLCVString(), tickCount);
     }
-
 }

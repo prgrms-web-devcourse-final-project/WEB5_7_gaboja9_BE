@@ -69,8 +69,6 @@ public class HantuWebSocketHandler extends TextWebSocketHandler {
 
         // 초기 종목 구독
         subscribeInitialStocks();
-
-
     }
 
     /** 애플리케이션 시작 시 구독할 초기 종목들을 설정합니다. */
@@ -283,7 +281,6 @@ public class HantuWebSocketHandler extends TextWebSocketHandler {
             //            log.warn("Could not parse JSON message: {}", message, e);
         }
     }
-
 
     public StockPriceDto getLatestPrice(String stockCode) {
         return latestPrices.get(stockCode);
