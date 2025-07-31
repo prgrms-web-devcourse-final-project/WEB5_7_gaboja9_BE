@@ -92,11 +92,8 @@ public class KakaoPayController implements KakaoPayControllerSpec {
                         .body(PaymentResponse.fail("페이지 크기는 1~100 사이여야 합니다"));
             }
 
-            PaymentHistoryRequest request = PaymentHistoryRequest.builder()
-                    .page(page)
-                    .size(size)
-                    .status(status)
-                    .build();
+            PaymentHistoryRequest request =
+                    PaymentHistoryRequest.builder().page(page).size(size).status(status).build();
 
             PaymentHistoryResponse response =
                     kakaoPayService.getPaymentHistory(membersDetails.getId(), request);
@@ -111,8 +108,7 @@ public class KakaoPayController implements KakaoPayControllerSpec {
 
     @GetMapping("/history/{paymentId}")
     public ResponseEntity<PaymentResponse> getPaymentDetail(
-            @PathVariable Long paymentId,
-            @AuthenticationPrincipal MembersDetails membersDetails) {
+            @PathVariable Long paymentId, @AuthenticationPrincipal MembersDetails membersDetails) {
         try {
             PaymentHistoryDto response =
                     kakaoPayService.getPaymentDetail(membersDetails.getId(), paymentId);

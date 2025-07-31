@@ -173,7 +173,6 @@ public class KakaoPayService {
         paymentHistoryRepository.save(paymentHistory);
     }
 
-
     public void paymentFail(String tid, Long membersId) {
         PaymentHistory paymentHistory =
                 paymentHistoryRepository
@@ -195,9 +194,7 @@ public class KakaoPayService {
         return paymentHistoryRepository.findLatestTidByMemberAndStatusReady(memberId).orElse(null);
     }
 
-    /**
-     * 충전 내역 조회 (페이지네이션)
-     */
+    /** 충전 내역 조회 (페이지네이션) */
     public PaymentHistoryResponse getPaymentHistory(Long memberId, PaymentHistoryRequest request) {
         Pageable pageable = PageRequest.of(request.getPage(), request.getSize());
 
@@ -205,18 +202,20 @@ public class KakaoPayService {
 
         if (request.getStatus() != null) {
             // 상태별 필터링
-            paymentPage = paymentHistoryRepository.findByMembersIdAndStatusOrderByCreatedAtDesc(
-                    memberId, request.getStatus(), pageable);
+            paymentPage =
+                    paymentHistoryRepository.findByMembersIdAndStatusOrderByCreatedAtDesc(
+                            memberId, request.getStatus(), pageable);
         } else {
             // 전체 조회
-            paymentPage = paymentHistoryRepository.findByMembersIdOrderByCreatedAtDesc(
-                    memberId, pageable);
+            paymentPage =
+                    paymentHistoryRepository.findByMembersIdOrderByCreatedAtDesc(
+                            memberId, pageable);
         }
 
-        List<PaymentHistoryDto> paymentDtos = paymentPage.getContent()
-                .stream()
-                .map(PaymentHistoryDto::from)
-                .collect(Collectors.toList());
+        List<PaymentHistoryDto> paymentDtos =
+                paymentPage.getContent().stream()
+                        .map(PaymentHistoryDto::from)
+                        .collect(Collectors.toList());
 
         // 페이지네이션 정보
         PaymentHistoryResponse.PaginationInfo paginationInfo =
@@ -239,19 +238,18 @@ public class KakaoPayService {
                 .build();
     }
 
-    /**
-     * 결제 요약 정보 조회
-     */
+    /** 결제 요약 정보 조회 */
     public PaymentHistoryResponse.PaymentSummary getPaymentSummary(Long memberId) {
         // 총 충전 금액/횟수
         Long totalAmount = paymentHistoryRepository.sumTotalAmountByMemberId(memberId);
         Integer totalCount = paymentHistoryRepository.countTotalByMemberId(memberId);
 
         // 승인된 충전 금액/횟수
-        Long approvedAmount = paymentHistoryRepository.sumAmountByMemberIdAndStatus(
-                memberId, PaymentStatus.APPROVED);
-        Integer approvedCount = paymentHistoryRepository.countByMemberIdAndStatus(
-                memberId, PaymentStatus.APPROVED);
+        Long approvedAmount =
+                paymentHistoryRepository.sumAmountByMemberIdAndStatus(
+                        memberId, PaymentStatus.APPROVED);
+        Integer approvedCount =
+                paymentHistoryRepository.countByMemberIdAndStatus(memberId, PaymentStatus.APPROVED);
 
         return PaymentHistoryResponse.PaymentSummary.builder()
                 .totalChargedAmount(totalAmount != null ? totalAmount : 0L)
@@ -261,12 +259,15 @@ public class KakaoPayService {
                 .build();
     }
 
-    /**
-     * 특정 충전 내역 상세 조회
-     */
+    /** 특정 충전 내역 상세 조회 */
     public PaymentHistoryDto getPaymentDetail(Long memberId, Long paymentId) {
-        PaymentHistory paymentHistory = paymentHistoryRepository.findById(paymentId)
-                .orElseThrow(() -> new PaymentHistoryException(ErrorCode.PAYMENT_HISTORY_NOT_FOUND));
+        PaymentHistory paymentHistory =
+                paymentHistoryRepository
+                        .findById(paymentId)
+                        .orElseThrow(
+                                () ->
+                                        new PaymentHistoryException(
+                                                ErrorCode.PAYMENT_HISTORY_NOT_FOUND));
 
         // 본인의 결제 내역인지 확인
         if (!paymentHistory.getMembers().getId().equals(memberId)) {

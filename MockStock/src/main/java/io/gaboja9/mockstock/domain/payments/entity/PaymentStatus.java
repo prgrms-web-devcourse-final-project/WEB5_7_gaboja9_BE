@@ -4,7 +4,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 
 @Schema(description = "결제 상태")
 public enum PaymentStatus {
-
     @Schema(description = "결제 준비 완료 - 사용자가 결제 페이지로 이동한 상태")
     READY,
 

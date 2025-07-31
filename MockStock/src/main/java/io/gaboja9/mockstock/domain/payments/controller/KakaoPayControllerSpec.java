@@ -101,144 +101,130 @@ public interface KakaoPayControllerSpec {
                     String tid,
             @AuthenticationPrincipal Long memberId);
 
-
     @Operation(
             summary = "충전 내역 조회",
-            description = "사용자의 포인트 충전 내역을 페이지네이션으로 조회합니다. 상태별 필터링도 가능합니다."
-    )
-    @ApiResponses(value = {
-            @ApiResponse(
-                    responseCode = "200",
-                    description = "충전 내역 조회 성공",
-                    content = @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = PaymentResponse.class),
-                            examples = @ExampleObject(
-                                    value = """
-                    {
-                      "success": true,
-                      "message": "충전 내역 조회 성공",
-                      "data": {
-                        "payments": [
-                          {
-                            "id": 1,
-                            "partnerOrderId": "ORDER_1234567890_123",
-                            "amount": 100000,
-                            "status": "APPROVED",
-                            "createdAt": "2025-07-31T10:30:00",
-                            "updatedAt": "2025-07-31T10:35:00"
-                          }
-                        ],
-                        "pagination": {
-                          "currentPage": 0,
-                          "pageSize": 10,
-                          "totalPages": 1,
-                          "totalElements": 5,
-                          "hasNext": false,
-                          "hasPrevious": false
-                        },
-                        "summary": {
-                          "totalChargedAmount": 500000,
-                          "totalChargeCount": 5,
-                          "approvedAmount": 400000,
-                          "approvedCount": 4
-                        }
-                      }
-                    }
-                    """
-                            )
-                    )
-            ),
-            @ApiResponse(responseCode = "400", description = "잘못된 요청"),
-            @ApiResponse(responseCode = "401", description = "인증 실패")
-    })
+            description = "사용자의 포인트 충전 내역을 페이지네이션으로 조회합니다. 상태별 필터링도 가능합니다.")
+    @ApiResponses(
+            value = {
+                @ApiResponse(
+                        responseCode = "200",
+                        description = "충전 내역 조회 성공",
+                        content =
+                                @Content(
+                                        mediaType = "application/json",
+                                        schema = @Schema(implementation = PaymentResponse.class),
+                                        examples =
+                                                @ExampleObject(
+                                                        value =
+                                                                """
+                                                                {
+                                                                  "success": true,
+                                                                  "message": "충전 내역 조회 성공",
+                                                                  "data": {
+                                                                    "payments": [
+                                                                      {
+                                                                        "id": 1,
+                                                                        "partnerOrderId": "ORDER_1234567890_123",
+                                                                        "amount": 100000,
+                                                                        "status": "APPROVED",
+                                                                        "createdAt": "2025-07-31T10:30:00",
+                                                                        "updatedAt": "2025-07-31T10:35:00"
+                                                                      }
+                                                                    ],
+                                                                    "pagination": {
+                                                                      "currentPage": 0,
+                                                                      "pageSize": 10,
+                                                                      "totalPages": 1,
+                                                                      "totalElements": 5,
+                                                                      "hasNext": false,
+                                                                      "hasPrevious": false
+                                                                    },
+                                                                    "summary": {
+                                                                      "totalChargedAmount": 500000,
+                                                                      "totalChargeCount": 5,
+                                                                      "approvedAmount": 400000,
+                                                                      "approvedCount": 4
+                                                                    }
+                                                                  }
+                                                                }
+                                                                """))),
+                @ApiResponse(responseCode = "400", description = "잘못된 요청"),
+                @ApiResponse(responseCode = "401", description = "인증 실패")
+            })
     ResponseEntity<PaymentResponse> getPaymentHistory(
             @Parameter(description = "페이지 번호 (0부터 시작)", example = "0")
-            @RequestParam(defaultValue = "0") int page,
-
+                    @RequestParam(defaultValue = "0")
+                    int page,
             @Parameter(description = "페이지 크기 (최대 100)", example = "10")
-            @RequestParam(defaultValue = "10") int size,
-
+                    @RequestParam(defaultValue = "10")
+                    int size,
             @Parameter(
-                    description = "결제 상태 필터 (선택사항)",
-                    schema = @Schema(implementation = PaymentStatus.class),
-                    example = "APPROVED"
-            )
-            @RequestParam(required = false) PaymentStatus status,
+                            description = "결제 상태 필터 (선택사항)",
+                            schema = @Schema(implementation = PaymentStatus.class),
+                            example = "APPROVED")
+                    @RequestParam(required = false)
+                    PaymentStatus status,
+            @Parameter(hidden = true) @AuthenticationPrincipal MembersDetails membersDetails);
 
-            @Parameter(hidden = true)
-            @AuthenticationPrincipal MembersDetails membersDetails
-    );
-
-    @Operation(
-            summary = "충전 내역 상세 조회",
-            description = "특정 충전 내역의 상세 정보를 조회합니다."
-    )
-    @ApiResponses(value = {
-            @ApiResponse(
-                    responseCode = "200",
-                    description = "충전 내역 상세 조회 성공",
-                    content = @Content(
-                            mediaType = "application/json",
-                            examples = @ExampleObject(
-                                    value = """
-                    {
-                      "success": true,
-                      "message": "충전 내역 상세 조회 성공",
-                      "data": {
-                        "id": 1,
-                        "partnerOrderId": "ORDER_1234567890_123",
-                        "amount": 100000,
-                        "status": "APPROVED",
-                        "createdAt": "2025-07-31T10:30:00",
-                        "updatedAt": "2025-07-31T10:35:00"
-                      }
-                    }
-                    """
-                            )
-                    )
-            ),
-            @ApiResponse(responseCode = "404", description = "충전 내역을 찾을 수 없음"),
-            @ApiResponse(responseCode = "403", description = "접근 권한 없음")
-    })
+    @Operation(summary = "충전 내역 상세 조회", description = "특정 충전 내역의 상세 정보를 조회합니다.")
+    @ApiResponses(
+            value = {
+                @ApiResponse(
+                        responseCode = "200",
+                        description = "충전 내역 상세 조회 성공",
+                        content =
+                                @Content(
+                                        mediaType = "application/json",
+                                        examples =
+                                                @ExampleObject(
+                                                        value =
+                                                                """
+                                                                {
+                                                                  "success": true,
+                                                                  "message": "충전 내역 상세 조회 성공",
+                                                                  "data": {
+                                                                    "id": 1,
+                                                                    "partnerOrderId": "ORDER_1234567890_123",
+                                                                    "amount": 100000,
+                                                                    "status": "APPROVED",
+                                                                    "createdAt": "2025-07-31T10:30:00",
+                                                                    "updatedAt": "2025-07-31T10:35:00"
+                                                                  }
+                                                                }
+                                                                """))),
+                @ApiResponse(responseCode = "404", description = "충전 내역을 찾을 수 없음"),
+                @ApiResponse(responseCode = "403", description = "접근 권한 없음")
+            })
     ResponseEntity<PaymentResponse> getPaymentDetail(
-            @Parameter(description = "충전 내역 ID", required = true)
-            @PathVariable Long paymentId,
+            @Parameter(description = "충전 내역 ID", required = true) @PathVariable Long paymentId,
+            @Parameter(hidden = true) @AuthenticationPrincipal MembersDetails membersDetails);
 
-            @Parameter(hidden = true)
-            @AuthenticationPrincipal MembersDetails membersDetails
-    );
-
-    @Operation(
-            summary = "충전 요약 정보 조회",
-            description = "사용자의 전체 충전 요약 정보를 조회합니다."
-    )
-    @ApiResponses(value = {
-            @ApiResponse(
-                    responseCode = "200",
-                    description = "충전 요약 조회 성공",
-                    content = @Content(
-                            mediaType = "application/json",
-                            examples = @ExampleObject(
-                                    value = """
-                    {
-                      "success": true,
-                      "message": "충전 요약 조회 성공",
-                      "data": {
-                        "totalChargedAmount": 500000,
-                        "totalChargeCount": 5,
-                        "approvedAmount": 400000,
-                        "approvedCount": 4
-                      }
-                    }
-                    """
-                            )
-                    )
-            ),
-            @ApiResponse(responseCode = "401", description = "인증 실패")
-    })
+    @Operation(summary = "충전 요약 정보 조회", description = "사용자의 전체 충전 요약 정보를 조회합니다.")
+    @ApiResponses(
+            value = {
+                @ApiResponse(
+                        responseCode = "200",
+                        description = "충전 요약 조회 성공",
+                        content =
+                                @Content(
+                                        mediaType = "application/json",
+                                        examples =
+                                                @ExampleObject(
+                                                        value =
+                                                                """
+                                                                {
+                                                                  "success": true,
+                                                                  "message": "충전 요약 조회 성공",
+                                                                  "data": {
+                                                                    "totalChargedAmount": 500000,
+                                                                    "totalChargeCount": 5,
+                                                                    "approvedAmount": 400000,
+                                                                    "approvedCount": 4
+                                                                  }
+                                                                }
+                                                                """))),
+                @ApiResponse(responseCode = "401", description = "인증 실패")
+            })
     ResponseEntity<PaymentResponse> getPaymentSummary(
-            @Parameter(hidden = true)
-            @AuthenticationPrincipal MembersDetails membersDetails
-    );
+            @Parameter(hidden = true) @AuthenticationPrincipal MembersDetails membersDetails);
 }

@@ -34,19 +34,21 @@ public interface PaymentHistoryRepository extends JpaRepository<PaymentHistory, 
     Page<PaymentHistory> findByMembersIdAndStatusOrderByCreatedAtDesc(
             Long memberId, PaymentStatus status, Pageable pageable);
 
-    @Query("SELECT COALESCE(SUM(ph.amount), 0) FROM PaymentHistory ph " +
-            "WHERE ph.members.id = :memberId AND ph.status = :status")
+    @Query(
+            "SELECT COALESCE(SUM(ph.amount), 0) FROM PaymentHistory ph "
+                    + "WHERE ph.members.id = :memberId AND ph.status = :status")
     Long sumAmountByMemberIdAndStatus(Long memberId, PaymentStatus status);
 
-    @Query("SELECT COUNT(ph) FROM PaymentHistory ph " +
-            "WHERE ph.members.id = :memberId AND ph.status = :status")
+    @Query(
+            "SELECT COUNT(ph) FROM PaymentHistory ph "
+                    + "WHERE ph.members.id = :memberId AND ph.status = :status")
     Integer countByMemberIdAndStatus(Long memberId, PaymentStatus status);
 
-    @Query("SELECT COALESCE(SUM(ph.amount), 0) FROM PaymentHistory ph " +
-            "WHERE ph.members.id = :memberId")
+    @Query(
+            "SELECT COALESCE(SUM(ph.amount), 0) FROM PaymentHistory ph "
+                    + "WHERE ph.members.id = :memberId")
     Long sumTotalAmountByMemberId(Long memberId);
 
-    @Query("SELECT COUNT(ph) FROM PaymentHistory ph " +
-            "WHERE ph.members.id = :memberId")
+    @Query("SELECT COUNT(ph) FROM PaymentHistory ph " + "WHERE ph.members.id = :memberId")
     Integer countTotalByMemberId(Long memberId);
 }
