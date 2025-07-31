@@ -5,10 +5,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.influxdb.client.InfluxDBClient;
 import com.influxdb.client.WriteApi;
 import com.influxdb.client.domain.WritePrecision;
+import com.influxdb.client.write.Point;
 
-import io.gaboja9.mockstock.domain.stock.measurement.DailyStockPrice;
-
-import java.time.Instant;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -22,14 +20,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import java.time.Instant;
 import java.time.LocalDate;
-import java.time.ZoneOffset;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import com.influxdb.client.write.Point;
-import java.time.ZoneId;
 
 @Service
 @Slf4j
@@ -119,7 +116,6 @@ public class DailyStockService {
                         .queryParam("FID_PERIOD_DIV_CODE", periodCode)
                         .queryParam("FID_ORG_ADJ_PRC", "0");
 
-
         HttpEntity<?> entity = new HttpEntity<>(headers);
 
         try {
@@ -152,15 +148,23 @@ public class DailyStockService {
                 // ✅ KST 자정 → UTC 변환 (한국장 날짜 보존)
                 Instant ts = LocalDate.parse(ds, DATE_FMT).atStartOfDay(KST).toInstant();
 
-                Point p = Point
-                    .measurement(measurement)          // 런타임에 measurement 지정
-                    .time(ts, WritePrecision.NS)       // ⬅️ Point에서는 time(...)으로 타임스탬프 설정
-                    .addTag("stockCode", stockCode)
-                    .addField("openPrice",  Long.parseLong(n.path("stck_oprc").asText("0")))
-                    .addField("closePrice", Long.parseLong(n.path("stck_clpr").asText("0")))
-                    .addField("maxPrice",   Long.parseLong(n.path("stck_hgpr").asText("0")))
-                    .addField("minPrice",   Long.parseLong(n.path("stck_lwpr").asText("0")))
-                    .addField("accumTrans", Long.parseLong(n.path("acml_vol").asText("0")));
+                Point p =
+                        Point.measurement(measurement) // 런타임에 measurement 지정
+                                .time(ts, WritePrecision.NS) // ⬅️ Point에서는 time(...)으로 타임스탬프 설정
+                                .addTag("stockCode", stockCode)
+                                .addField(
+                                        "openPrice",
+                                        Long.parseLong(n.path("stck_oprc").asText("0")))
+                                .addField(
+                                        "closePrice",
+                                        Long.parseLong(n.path("stck_clpr").asText("0")))
+                                .addField(
+                                        "maxPrice", Long.parseLong(n.path("stck_hgpr").asText("0")))
+                                .addField(
+                                        "minPrice", Long.parseLong(n.path("stck_lwpr").asText("0")))
+                                .addField(
+                                        "accumTrans",
+                                        Long.parseLong(n.path("acml_vol").asText("0")));
 
                 points.add(p);
             }
@@ -170,8 +174,11 @@ public class DailyStockService {
 
             try (WriteApi wa = dailyClient.getWriteApi()) {
                 wa.writePoints(points);
-                log.info("Influx 저장 완료 - 종목: {}, measurement: {}, 건수: {}",
-                    stockCode, measurement, points.size());
+                log.info(
+                        "Influx 저장 완료 - 종목: {}, measurement: {}, 건수: {}",
+                        stockCode,
+                        measurement,
+                        points.size());
             }
         } catch (Exception e) {
             log.error("데이터 파싱/저장 오류 - 종목: {}, period: {}", stockCode, periodCode, e);
