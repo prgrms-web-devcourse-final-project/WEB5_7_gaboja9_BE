@@ -108,7 +108,7 @@ public class RanksService {
         assignRanks(sortedRanks);
 
         String key = RANKING_KEY_PREFIX + ranksType.name().toLowerCase();
-        redisTemplate.opsForValue().set(key, sortedRanks, Duration.ofHours(1));
+        redisTemplate.opsForValue().set(key, sortedRanks, Duration.ofDays(7));
     }
 
     public RankingResponse getRankingWithPagination(Long memberId, RankingRequest request) {
