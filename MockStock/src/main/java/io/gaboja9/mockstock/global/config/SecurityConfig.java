@@ -69,9 +69,9 @@ public class SecurityConfig {
                         "http://localhost:3000",
                         "https://mockstocks.duckdns.org",
                         "https://mockstocks.duckdns.org:3000",
-                        "https://mockstocks.duckdns.org/ws",
-                        "ws://localhost:8080/ws",
-                        "wss://mockstocks.duckdns.org/ws"));
+                        "https://mockstocks.duckdns.org/ws-stock",
+                        "ws://localhost:8080/ws-stock",
+                        "wss://mockstocks.duckdns.org/ws-stock"));
 
         configuration.setAllowedMethods(
                 List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
