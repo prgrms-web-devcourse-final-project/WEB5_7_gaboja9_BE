@@ -1,10 +1,8 @@
 package io.gaboja9.mockstock.domain.payments.controller;
 
 import io.gaboja9.mockstock.domain.auth.dto.MembersDetails;
-import io.gaboja9.mockstock.domain.payments.dto.KakaoPayApproveResponse;
-import io.gaboja9.mockstock.domain.payments.dto.KakaoPayReadyResponse;
-import io.gaboja9.mockstock.domain.payments.dto.PaymentRequest;
-import io.gaboja9.mockstock.domain.payments.dto.PaymentResponse;
+import io.gaboja9.mockstock.domain.payments.dto.*;
+import io.gaboja9.mockstock.domain.payments.entity.PaymentStatus;
 import io.gaboja9.mockstock.domain.payments.service.KakaoPayService;
 
 import jakarta.validation.Valid;
@@ -75,6 +73,70 @@ public class KakaoPayController implements KakaoPayControllerSpec {
         } catch (Exception e) {
             return ResponseEntity.badRequest()
                     .body(PaymentResponse.fail("결제 실패 처리 실패: " + e.getMessage()));
+        }
+    }
+
+    @GetMapping("/history")
+    public ResponseEntity<PaymentResponse> getPaymentHistory(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) PaymentStatus status,
+            @AuthenticationPrincipal MembersDetails membersDetails) {
+        try {
+            if (page < 0) {
+                return ResponseEntity.badRequest()
+                        .body(PaymentResponse.fail("페이지 번호는 0 이상이어야 합니다"));
+            }
+            if (size < 1 || size > 100) {
+                return ResponseEntity.badRequest()
+                        .body(PaymentResponse.fail("페이지 크기는 1~100 사이여야 합니다"));
+            }
+
+            PaymentHistoryRequest request = PaymentHistoryRequest.builder()
+                    .page(page)
+                    .size(size)
+                    .status(status)
+                    .build();
+
+            PaymentHistoryResponse response =
+                    kakaoPayService.getPaymentHistory(membersDetails.getId(), request);
+
+            return ResponseEntity.ok(PaymentResponse.success("충전 내역 조회 성공", response));
+
+        } catch (Exception e) {
+            return ResponseEntity.badRequest()
+                    .body(PaymentResponse.fail("충전 내역 조회 실패: " + e.getMessage()));
+        }
+    }
+
+    @GetMapping("/history/{paymentId}")
+    public ResponseEntity<PaymentResponse> getPaymentDetail(
+            @PathVariable Long paymentId,
+            @AuthenticationPrincipal MembersDetails membersDetails) {
+        try {
+            PaymentHistoryDto response =
+                    kakaoPayService.getPaymentDetail(membersDetails.getId(), paymentId);
+
+            return ResponseEntity.ok(PaymentResponse.success("충전 내역 상세 조회 성공", response));
+
+        } catch (Exception e) {
+            return ResponseEntity.badRequest()
+                    .body(PaymentResponse.fail("충전 내역 상세 조회 실패: " + e.getMessage()));
+        }
+    }
+
+    @GetMapping("/summary")
+    public ResponseEntity<PaymentResponse> getPaymentSummary(
+            @AuthenticationPrincipal MembersDetails membersDetails) {
+        try {
+            PaymentHistoryResponse.PaymentSummary summary =
+                    kakaoPayService.getPaymentSummary(membersDetails.getId());
+
+            return ResponseEntity.ok(PaymentResponse.success("충전 요약 조회 성공", summary));
+
+        } catch (Exception e) {
+            return ResponseEntity.badRequest()
+                    .body(PaymentResponse.fail("충전 요약 조회 실패: " + e.getMessage()));
         }
     }
 }

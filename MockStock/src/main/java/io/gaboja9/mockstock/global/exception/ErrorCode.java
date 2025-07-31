@@ -25,6 +25,8 @@ public enum ErrorCode {
     KAKAOPAY_API_ERROR(HttpStatus.BAD_GATEWAY, "PAYMENT-005", "카카오페이 API 호출 중 오류가 발생했습니다."),
     INVALID_PAYMENT_AMOUNT(HttpStatus.BAD_REQUEST, "PAYMENT-006", "잘못된 결제 금액입니다."),
     PAYMENT_ALREADY_PROCESSED(HttpStatus.CONFLICT, "PAYMENT-007", "이미 처리된 결제입니다."),
+    PAYMENT_ACCESS_DENIED(HttpStatus.ACCEPTED, "PAYMENT-008", "결제 내역 접근 권한이 없습니다."),
+    PAYMENT_HISTORY_NOT_FOUNT(HttpStatus.NOT_FOUND, "PAYMENT-009", "결제 내역을 찾을 수 없습니다."),
 
     // 인증 관련 에러
     JWT_TOKEN_EXPIRED(HttpStatus.UNAUTHORIZED, "JWT-001", "토큰이 만료되었습니다."),
