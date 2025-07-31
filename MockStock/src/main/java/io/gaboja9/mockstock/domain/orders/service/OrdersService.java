@@ -61,9 +61,9 @@ public class OrdersService {
         try {
             if (semaphore.tryAcquire(30, TimeUnit.SECONDS)) {
                 try {
-                    if (!openKoreanMarket()) {
+                    /*if (!openKoreanMarket()) {
                         throw new NotOpenKoreanMarketException();
-                    }
+                    }*/
                     return task.get();
                 } finally {
                     semaphore.release();
