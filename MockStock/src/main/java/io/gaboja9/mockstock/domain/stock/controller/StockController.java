@@ -40,7 +40,7 @@ public class StockController implements StockControllerSpec {
             @RequestParam String endDate, // 20240731 형태로 받기
             @RequestParam(defaultValue = "D") String periodCode) {
 
-        log.info("장기간 일봉 데이터 수집 요청: {}, 기간: {} ~ {}", stockCode, startDate, endDate);
+        log.info("장기간  데이터 수집 요청: {}, 기간: {} ~ {}", stockCode, startDate, endDate);
 
         try {
             // yyyyMMdd 형태를 LocalDate로 변환 (날짜 계산용)
@@ -60,7 +60,7 @@ public class StockController implements StockControllerSpec {
                 }
 
                 batchCount++;
-                log.info("일봉 배치 {}: {} ~ {}", batchCount, current, batchEnd);
+                log.info(" 배치 {}: {} ~ {}", batchCount, current, batchEnd);
 
                 try {
                     // String 형태로 변환해서 기존 서비스 호출
@@ -73,7 +73,7 @@ public class StockController implements StockControllerSpec {
 
                 } catch (Exception batchException) {
                     failCount++;
-                    log.error("일봉 배치 {} 실패: {}", batchCount, batchException.getMessage());
+                    log.error(" 배치 {} 실패: {}", batchCount, batchException.getMessage());
                 }
 
                 current = batchEnd.plusDays(1);
@@ -85,15 +85,15 @@ public class StockController implements StockControllerSpec {
 
             String resultMessage =
                     String.format(
-                            "장기간 일봉 데이터 수집 완료 - 총 배치: %d개, 성공: %d개, 실패: %d개",
+                            "장기간 데이터 수집 완료 - 총 배치: %d개, 성공: %d개, 실패: %d개",
                             batchCount, successCount, failCount);
 
             return ResponseEntity.ok(resultMessage);
 
         } catch (Exception e) {
-            log.error("장기간 일봉 데이터 수집 중 오류 발생", e);
+            log.error("장기간 데이터 수집 중 오류 발생", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("장기간 일봉 데이터 수집 실패: " + e.getMessage());
+                    .body("장기간 데이터 수집 실패: " + e.getMessage());
         }
     }
 
@@ -188,7 +188,7 @@ public class StockController implements StockControllerSpec {
         dailyStockService.fetchAndSaveDailyData(
                 marketCode, stockCode, startDate, endDate, periodCode);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body("데일리 주식 저장 완료");
+        return ResponseEntity.status(HttpStatus.CREATED).body(" 주식 저장 완료");
     }
 
     @GetMapping("/minute-data")
