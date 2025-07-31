@@ -160,9 +160,11 @@ public class RanksService {
                         .build();
 
         // 마지막 업데이트 시간 조회
-        LocalDateTime lastUpdated =
-                (LocalDateTime) redisTemplate.opsForValue().get(LAST_UPDATE_KEY);
-        if (lastUpdated == null) {
+        String lastUpdatedStr = (String) redisTemplate.opsForValue().get(LAST_UPDATE_KEY);
+        LocalDateTime lastUpdated = null;
+        if (lastUpdatedStr != null) {
+            lastUpdated = LocalDateTime.parse(lastUpdatedStr);
+        } else {
             lastUpdated = LocalDateTime.now();
         }
 
