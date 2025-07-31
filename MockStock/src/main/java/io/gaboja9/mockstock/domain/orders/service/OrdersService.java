@@ -471,12 +471,13 @@ public class OrdersService {
     }
 
     private Integer getCurrentPriceOrNull(String stockCode) {
-        //StockPriceDto stockPrice = hantuWebSocketHandler.getLatestPrice(stockCode);
+        // StockPriceDto stockPrice = hantuWebSocketHandler.getLatestPrice(stockCode);
         int randomFluctuation = ThreadLocalRandom.current().nextInt(-20, 21) * 50;
-        StockPriceDto stockPrice = StockPriceDto.builder()
-                .stockCode("005930")
-                .currentPrice(70000 + randomFluctuation)
-                .build();
+        StockPriceDto stockPrice =
+                StockPriceDto.builder()
+                        .stockCode("005930")
+                        .currentPrice(70000 + randomFluctuation)
+                        .build();
         if (stockPrice == null) {
             log.warn("현재 가격 정보를 불러올 수 없습니다: {}", stockCode);
             return null;
