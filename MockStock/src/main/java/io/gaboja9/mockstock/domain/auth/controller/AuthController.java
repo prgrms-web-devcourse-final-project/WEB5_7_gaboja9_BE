@@ -30,7 +30,7 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor
-public class AuthController {
+public class AuthController implements AuthControllerSpec {
 
     private final FormAuthService formAuthService;
     private final EmailVerificationService emailVerificationService;
