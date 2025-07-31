@@ -50,7 +50,10 @@ public class StocksService {
     }
 
     public List<StockResponse> getAllStocks() {
-
         return stocksMapper.toDtoList(stocksRepository.findAll());
+    }
+
+    public boolean existsByCode(String stockCode) {
+        return stocksRepository.findByStockCode(stockCode).isPresent();
     }
 }

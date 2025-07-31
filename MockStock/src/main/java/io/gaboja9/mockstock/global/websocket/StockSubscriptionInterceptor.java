@@ -1,7 +1,7 @@
 package io.gaboja9.mockstock.global.websocket;
 
+import io.gaboja9.mockstock.domain.stock.service.StocksService;
 import io.gaboja9.mockstock.global.exception.ErrorResponse;
-import io.gaboja9.mockstock.global.websocket.service.AvailableStockService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,7 +20,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class StockSubscriptionInterceptor implements ChannelInterceptor {
 
-    private final AvailableStockService availableStockService;
+    private final StocksService stocksService;
     private final ObjectProvider<SimpMessagingTemplate> messagingTemplateProvider;
 
     @Override
@@ -34,7 +34,7 @@ public class StockSubscriptionInterceptor implements ChannelInterceptor {
             if (destination != null && destination.startsWith("/topic/stock/")) {
                 String stockCode = destination.substring("/topic/stock/".length());
 
-                if (!availableStockService.isStockAvailable(stockCode)) {
+                if (!stocksService.existsByCode(stockCode)) {
                     log.warn("잘못된 종목코드 구독 시도: {} (session: {})", stockCode, sessionId);
 
                     String user =
