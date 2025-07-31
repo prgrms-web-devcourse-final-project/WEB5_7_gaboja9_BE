@@ -5,8 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.influxdb.client.InfluxDBClient;
 import com.influxdb.client.WriteApi;
 import com.influxdb.client.domain.WritePrecision;
-
-import io.gaboja9.mockstock.domain.stock.measurement.DailyStockPrice;
+import com.influxdb.client.write.Point;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -21,8 +20,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import java.time.Instant;
 import java.time.LocalDate;
-import java.time.ZoneOffset;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -46,6 +46,9 @@ public class DailyStockService {
     private String appSecret;
 
     private final HantuAuthService hantuAuthService;
+
+    private static final DateTimeFormatter DATE_FMT = DateTimeFormatter.ofPattern("yyyyMMdd");
+    private static final ZoneId KST = ZoneId.of("Asia/Seoul");
 
     public DailyStockService(
             RestTemplate restTemplate,
@@ -80,7 +83,7 @@ public class DailyStockService {
                         marketCode, stockCode, startDate, endDate, periodCode, accessToken);
 
         if (responseBody != null) {
-            saveDailyStockDataToInflux(responseBody, stockCode);
+            saveStockDataToInflux(responseBody, stockCode, periodCode);
         }
 
         log.info("단일 종목 데이터 수집 완료 - {}", stockCode);
@@ -126,40 +129,66 @@ public class DailyStockService {
         }
     }
 
-    private void saveDailyStockDataToInflux(String responseBody, String stockCode) {
+    private void saveStockDataToInflux(String responseBody, String stockCode, String periodCode) {
         try {
-            JsonNode rootNode = objectMapper.readTree(responseBody);
-            JsonNode output2 = rootNode.path("output2");
-
-            if (output2.isMissingNode() || !output2.isArray()) {
-                log.warn("{} 종목에 대한 데이터 없음. 응답: {}", stockCode, responseBody);
+            JsonNode root = objectMapper.readTree(responseBody);
+            JsonNode arr = root.path("output2");
+            if (!arr.isArray() || arr.isEmpty()) {
+                log.warn("데이터 없음 - 종목: {}, 응답: {}", stockCode, responseBody);
                 return;
             }
 
-            List<DailyStockPrice> pricePoints = new ArrayList<>();
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
+            String measurement = measurementFrom(periodCode);
+            List<Point> points = new ArrayList<>(arr.size());
 
-            for (JsonNode node : output2) {
-                DailyStockPrice point = new DailyStockPrice();
-                LocalDate date = LocalDate.parse(node.path("stck_bsop_date").asText(), formatter);
-                point.setTimestamp(date.atTime(0, 0).toInstant(ZoneOffset.UTC));
-                point.setStockCode(stockCode);
-                point.setOpenPrice(Long.parseLong(node.path("stck_oprc").asText()));
-                point.setClosePrice(Long.parseLong(node.path("stck_clpr").asText()));
-                point.setMaxPrice(Long.parseLong(node.path("stck_hgpr").asText()));
-                point.setMinPrice(Long.parseLong(node.path("stck_lwpr").asText()));
-                point.setAccumTrans(Long.parseLong(node.path("acml_vol").asText()));
-                pricePoints.add(point);
+            for (JsonNode n : arr) {
+                String ds = n.path("stck_bsop_date").asText(null);
+                if (ds == null) continue;
+
+                // ✅ KST 자정 → UTC 변환 (한국장 날짜 보존)
+                Instant ts = LocalDate.parse(ds, DATE_FMT).atStartOfDay(KST).toInstant();
+
+                Point p =
+                        Point.measurement(measurement) // 런타임에 measurement 지정
+                                .time(ts, WritePrecision.NS) // ⬅️ Point에서는 time(...)으로 타임스탬프 설정
+                                .addTag("stockCode", stockCode)
+                                .addField(
+                                        "openPrice",
+                                        Long.parseLong(n.path("stck_oprc").asText("0")))
+                                .addField(
+                                        "closePrice",
+                                        Long.parseLong(n.path("stck_clpr").asText("0")))
+                                .addField(
+                                        "maxPrice", Long.parseLong(n.path("stck_hgpr").asText("0")))
+                                .addField(
+                                        "minPrice", Long.parseLong(n.path("stck_lwpr").asText("0")))
+                                .addField(
+                                        "accumTrans",
+                                        Long.parseLong(n.path("acml_vol").asText("0")));
+
+                points.add(p);
             }
 
-            if (!pricePoints.isEmpty()) {
-                try (WriteApi writeApi = dailyClient.getWriteApi()) {
-                    writeApi.writeMeasurements(WritePrecision.NS, pricePoints);
-                    log.info("{} 종목의 일별 데이터 {}건 저장 완료", stockCode, pricePoints.size());
-                }
+            // 최신→과거로 오는 경우 대비: 오래된 것부터 쓰기
+            Collections.reverse(points);
+
+            try (WriteApi wa = dailyClient.getWriteApi()) {
+                wa.writePoints(points);
+                log.info(
+                        "Influx 저장 완료 - 종목: {}, measurement: {}, 건수: {}",
+                        stockCode,
+                        measurement,
+                        points.size());
             }
         } catch (Exception e) {
-            log.error("{} 종목 데이터 파싱 또는 InfluxDB 저장 중 에러 발생", stockCode, e);
+            log.error("데이터 파싱/저장 오류 - 종목: {}, period: {}", stockCode, periodCode, e);
         }
+    }
+
+    private String measurementFrom(String periodCode) {
+        if ("D".equalsIgnoreCase(periodCode)) return "stock_daily";
+        if ("M".equalsIgnoreCase(periodCode)) return "stock_monthly";
+        if ("W".equalsIgnoreCase(periodCode)) return "stock_weekly";
+        return "stock_yearly";
     }
 }
