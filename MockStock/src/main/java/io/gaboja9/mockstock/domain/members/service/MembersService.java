@@ -66,6 +66,7 @@ public class MembersService {
         portfoliosService.remove(memberId);
         ordersService.remove(memberId);
         findMember.setCashBalance(30_000_000);
+        findMember.setTotalInvestedAmount(0);
         findMember.setBankruptcyCnt(findMember.getBankruptcyCnt() + 1);
     }
 
