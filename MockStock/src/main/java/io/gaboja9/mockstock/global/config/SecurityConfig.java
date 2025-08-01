@@ -76,8 +76,7 @@ public class SecurityConfig {
                         "http://127.0.0.1:5173",
                         "https://127.0.0.1:5173",
                         "http://127.0.0.1:5500",
-                        "https://127.0.0.1:5500"
-                ));
+                        "https://127.0.0.1:5500"));
 
         configuration.setAllowedMethods(
                 List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
