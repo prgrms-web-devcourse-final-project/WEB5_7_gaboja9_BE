@@ -57,7 +57,8 @@ public class StocksBulkService {
     //  각 종목을 비동기 작업으로 제출
     List<CompletableFuture<Void>> futures = allStocks.stream()
         .map(stock -> CompletableFuture.runAsync(() ->
-                processSingleStock(stock, marketCode, longTermStartStr, todayStr, minuteStartStr, processedCount, allStocks.size()),
+                processSingleStock(stock, marketCode, longTermStartStr, todayStr, minuteStartStr,
+                    processedCount, allStocks.size()),
             executorService))
         .collect(Collectors.toList());
 
@@ -71,7 +72,6 @@ public class StocksBulkService {
 
   /**
    * 개별 종목의 모든 데이터를 순차적으로 처리하는 메서드
-   * 이 메서드 자체가 병렬로 실행됩니다.
    */
   private void processSingleStock(StockResponse stock, String marketCode, String longTermStartStr,
       String todayStr, String minuteStartStr,
@@ -99,7 +99,8 @@ public class StocksBulkService {
       sleep(DELAY_BETWEEN_PERIODS_MS);
 
       // 4. 분봉 데이터 수집
-      stocksMinuteService.fetchAndSaveLongTermMinuteData(marketCode, stockCode, minuteStartStr, todayStr, "Y");
+      stocksMinuteService.fetchAndSaveLongTermMinuteData(marketCode, stockCode, minuteStartStr,
+          todayStr, "Y");
       log.debug("{} 분봉 수집 완료", stockCode);
 
       log.info("[{}/{}] {} 종목 처리 완료", currentCount, totalSize, stockCode);
@@ -109,23 +110,25 @@ public class StocksBulkService {
     }
   }
 
-  //
-  // --- 아래는 이전 버전의 안정적인 데이터 수집 헬퍼 메서드들 (변경 없음) ---
-  //
-  private void fetchMonthlyData(String marketCode, String stockCode, String startDate, String endDate) {
+  private void fetchMonthlyData(String marketCode, String stockCode, String startDate,
+      String endDate) {
     stocksDataService.fetchAndSaveData(marketCode, stockCode, startDate, endDate, "M");
   }
 
-  private void fetchWeeklyData(String marketCode, String stockCode, String startDate, String endDate) {
+  private void fetchWeeklyData(String marketCode, String stockCode, String startDate,
+      String endDate) {
     LocalDate start = LocalDate.parse(startDate, DATE_FMT);
     LocalDate mid = start.plusWeeks(76);
 
-    stocksDataService.fetchAndSaveData(marketCode, stockCode, start.format(DATE_FMT), mid.format(DATE_FMT), "W");
+    stocksDataService.fetchAndSaveData(marketCode, stockCode, start.format(DATE_FMT),
+        mid.format(DATE_FMT), "W");
     sleep(DELAY_BETWEEN_PERIODS_MS);
-    stocksDataService.fetchAndSaveData(marketCode, stockCode, mid.plusDays(1).format(DATE_FMT), endDate, "W");
+    stocksDataService.fetchAndSaveData(marketCode, stockCode, mid.plusDays(1).format(DATE_FMT),
+        endDate, "W");
   }
 
-  private void fetchDailyData(String marketCode, String stockCode, String startDate, String endDate) {
+  private void fetchDailyData(String marketCode, String stockCode, String startDate,
+      String endDate) {
     LocalDate start = LocalDate.parse(startDate, DATE_FMT);
     LocalDate end = LocalDate.parse(endDate, DATE_FMT);
     LocalDate current = start;
@@ -135,7 +138,8 @@ public class StocksBulkService {
       if (batchEnd.isAfter(end)) {
         batchEnd = end;
       }
-      stocksDataService.fetchAndSaveData(marketCode, stockCode, current.format(DATE_FMT), batchEnd.format(DATE_FMT), "D");
+      stocksDataService.fetchAndSaveData(marketCode, stockCode, current.format(DATE_FMT),
+          batchEnd.format(DATE_FMT), "D");
       current = batchEnd.plusDays(1);
       if (current.isBefore(end) || current.isEqual(end)) {
         sleep(DELAY_BETWEEN_PERIODS_MS);

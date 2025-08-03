@@ -44,8 +44,9 @@ public class StocksDataMapper {
 
       for (JsonNode node : arr) {
         String dateStr = node.path("stck_bsop_date").asText(null);
-        if (dateStr == null)
+        if (dateStr == null) {
           continue;
+        }
 
         Point point = createInfluxPoint(node, stockCode, dateStr, measurement);
         points.add(point);
@@ -74,8 +75,9 @@ public class StocksDataMapper {
 
       for (JsonNode node : arr) {
         String dateStr = node.path("stck_bsop_date").asText(null);
-        if (dateStr == null)
+        if (dateStr == null) {
           continue;
+        }
 
         DailyStockPrice price = createStockPrice(node, stockCode, dateStr);
         prices.add(price);
@@ -137,12 +139,15 @@ public class StocksDataMapper {
   }
 
   private String measurementFrom(String periodCode) {
-    if ("D".equalsIgnoreCase(periodCode))
+    if ("D".equalsIgnoreCase(periodCode)) {
       return "stock_daily";
-    if ("M".equalsIgnoreCase(periodCode))
+    }
+    if ("M".equalsIgnoreCase(periodCode)) {
       return "stock_monthly";
-    if ("W".equalsIgnoreCase(periodCode))
+    }
+    if ("W".equalsIgnoreCase(periodCode)) {
       return "stock_weekly";
+    }
     return "stock_yearly";
   }
 }

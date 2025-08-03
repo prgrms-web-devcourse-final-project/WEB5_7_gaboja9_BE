@@ -3,7 +3,6 @@ package io.gaboja9.mockstock.domain.stock.service;
 
 import com.influxdb.client.write.Point;
 import io.gaboja9.mockstock.domain.stock.mapper.StocksDataMapper;
-import io.gaboja9.mockstock.domain.stock.measurement.DailyStockPrice;
 import io.gaboja9.mockstock.domain.stock.repository.StocksDailyRepository;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -147,7 +146,8 @@ public class StocksDataService {
       }
 
       batchCount++;
-      log.info("배치 {}: {} ~ {} (종목: {}, 주기: {})", batchCount, current, batchEnd, stockCode, periodCode);
+      log.info("배치 {}: {} ~ {} (종목: {}, 주기: {})", batchCount, current, batchEnd, stockCode,
+          periodCode);
 
       try {
         String batchStartStr = current.format(DATE_FMT);
