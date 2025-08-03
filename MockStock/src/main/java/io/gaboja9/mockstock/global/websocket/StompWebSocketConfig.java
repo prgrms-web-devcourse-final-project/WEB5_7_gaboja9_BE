@@ -35,20 +35,7 @@ public class StompWebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        registry.addEndpoint("/ws-stock")
-                .setAllowedOrigins(
-                        "https://mock-stock.pages.dev",
-                        "http://localhost:3000",
-                        "https://mockstocks.duckdns.org",
-                        "https://mockstocks.duckdns.org:3000",
-                        "http://localhost:5500",
-                        "http://127.0.0.1:5500",
-                        "https://127.0.0.1:5500",
-                        "http://localhost:5173",
-                        "https://localhost:5173",
-                        "https://127.0.0.1:5173",
-                        "http://127.0.0.1:5173")
-                .withSockJS();
+        registry.addEndpoint("/ws-stock").setAllowedOriginPatterns("*").withSockJS();
 
         registry.setErrorHandler(webSocketExceptionHandler);
     }
