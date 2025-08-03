@@ -1,6 +1,7 @@
 package io.gaboja9.mockstock.domain.members.controller;
 
 import io.gaboja9.mockstock.domain.auth.dto.MembersDetails;
+import io.gaboja9.mockstock.domain.mails.dto.request.MailsRequestDto;
 import io.gaboja9.mockstock.domain.mails.dto.response.MailsResponseDto;
 import io.gaboja9.mockstock.domain.members.dto.request.MemosCreateRequestDto;
 import io.gaboja9.mockstock.domain.members.dto.response.MemberInfoDto;
@@ -166,4 +167,16 @@ public interface MembersControllerSpec {
                             content = @Content(schema = @Schema(hidden = true))))
     @PostMapping("/bankruptcy")
     ResponseEntity<Void> declareBankruptcy(@AuthenticationPrincipal MembersDetails membersDetails);
+
+    @Operation(
+            summary = "메일을 읽음 상태로 변경합니다.",
+            description = "메일을 읽음 상태로 변경합니다.",
+            responses =
+            @ApiResponse(
+                    responseCode = "204",
+                    description = "성공적으로 읽음 처리가 되었습니다.",
+                    content = @Content(schema = @Schema(hidden = true))))
+    @PatchMapping("/mails")
+    public ResponseEntity<Page<MailsResponseDto>> changedMails(@AuthenticationPrincipal MembersDetails membersDetails, MailsRequestDto dto);
+
 }

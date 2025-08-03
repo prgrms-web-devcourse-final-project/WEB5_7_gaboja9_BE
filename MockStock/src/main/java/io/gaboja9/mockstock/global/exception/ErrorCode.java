@@ -88,7 +88,10 @@ public enum ErrorCode {
 
     // 알림 관련 에러
     NOTIFICATION_SETTING_UPDATE_FAILED(
-            HttpStatus.INTERNAL_SERVER_ERROR, "NOTIFICATION-001", "알림 설정 업데이트에 실패했습니다.");
+            HttpStatus.INTERNAL_SERVER_ERROR, "NOTIFICATION-001", "알림 설정 업데이트에 실패했습니다."),
+
+    //메일 관련 에러
+    NOT_FOUND_MAIL(HttpStatus.NOT_FOUND, "MAIL-001", "메일을 찾을 수 없습니다");
 
     private final HttpStatus status;
     private final String code;
