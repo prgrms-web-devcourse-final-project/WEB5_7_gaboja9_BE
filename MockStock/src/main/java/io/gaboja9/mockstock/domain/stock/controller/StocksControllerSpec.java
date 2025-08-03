@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import java.util.List;
 
 @Tag(name = "주식 관리", description = "주식 관련 API")
-public interface StockControllerSpec {
+public interface StocksControllerSpec {
 
     @Operation(
             summary = "전체 주식 목록 조회",
@@ -87,10 +87,10 @@ public interface StockControllerSpec {
     ResponseEntity<List<StockResponse>> getAllStocks();
 
     @Operation(
-            summary = "장기간 일봉 데이터 대량 수집",
+            summary = "장기간 일/주/월봉 데이터 대량 수집",
             description =
                     """
-                    지정된 기간의 일봉 데이터를 100일 단위로 분할하여 대량 수집합니다.
+                    지정된 기간의 일/주/월봉 데이터를 100일 단위로 분할하여 대량 수집합니다.
 
                     **주요 특징:**
                     - 100일 단위 자동 분할 처리
@@ -139,7 +139,7 @@ public interface StockControllerSpec {
             @Parameter(description = "종료 날짜 (yyyyMMdd 형식)", example = "20241231", required = true)
                     @RequestParam
                     String endDate,
-            @Parameter(description = "기간 구분 코드 (D: 일봉)", example = "D")
+            @Parameter(description = "기간 구분 코드 (D: 일봉, W: 주봉, M: 월봉)", example = "D")
                     @RequestParam(defaultValue = "D")
                     String periodCode);
 
@@ -202,4 +202,56 @@ public interface StockControllerSpec {
             @Parameter(description = "과거 데이터 포함 여부 (Y: 포함, N: 미포함)", example = "Y")
                     @RequestParam(defaultValue = "Y")
                     String includePastData);
+
+    @Operation(
+            summary = "전체 주식 데이터 일괄 수집",
+            description =
+                    """
+                    등록된 모든 주식의 과거 데이터를 일괄적으로 수집합니다.
+
+                    **수집 데이터:**
+                    - 일봉 데이터: 2년 11개월 (약 1,065일)
+                    - 주봉 데이터: 2년 11개월 (약 152주)
+                    - 월봉 데이터: 2년 11개월 (35개월)
+                    - 분봉 데이터: 최근 7일
+
+                    **처리 방식:**
+                    - 종목별 순차 처리 (동시 처리 없음)
+                    - 종목간 1.5초 딜레이, 기간간 0.8초 딜레이
+                    - 개별 종목/기간 실패가 전체 작업 중단시키지 않음
+                    - 백그라운드에서 실행되어 즉시 응답 반환
+
+                    **예상 소요시간:**
+                    - 20개 종목 기준: 약 1.5-2시간
+                    - 종목당 평균 4-5분 (일/주/월/분봉 포함)
+
+                    **모니터링:**
+                    - 실시간 진행상황: 서버 로그 확인
+                    - 개별 종목별 성공/실패 상태 로깅
+                    - 최종 완료시 전체 통계 출력
+                    """,
+            tags = {"주식 데이터 수집"})
+    @ApiResponses({
+        @ApiResponse(
+                responseCode = "201",
+                description = "데이터 수집 작업 시작됨",
+                content =
+                        @Content(
+                                mediaType = "text/plain",
+                                examples =
+                                        @ExampleObject(
+                                                name = "작업 시작 성공",
+                                                value = "데이터 수집 작업 시작됨"))),
+        @ApiResponse(
+                responseCode = "500",
+                description = "데이터 수집 시작 실패",
+                content =
+                        @Content(
+                                mediaType = "text/plain",
+                                examples = @ExampleObject(name = "시작 실패", value = "데이터 수집 시작 실패")))
+    })
+    ResponseEntity<String> fetchAllStocksAllData(
+            @Parameter(description = "시장 구분 코드 (J: KRX)", example = "J")
+                    @RequestParam(defaultValue = "J")
+                    String marketCode);
 }

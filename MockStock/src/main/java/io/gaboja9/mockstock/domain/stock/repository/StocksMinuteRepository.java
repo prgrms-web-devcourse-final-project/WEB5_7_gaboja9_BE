@@ -2,6 +2,8 @@ package io.gaboja9.mockstock.domain.stock.repository;
 
 import com.influxdb.client.InfluxDBClient;
 import com.influxdb.client.QueryApi;
+import com.influxdb.client.WriteApi;
+import com.influxdb.client.domain.WritePrecision;
 
 import io.gaboja9.mockstock.domain.stock.measurement.MinuteStockPrice;
 
@@ -97,5 +99,17 @@ public class StocksMinuteRepository {
                 stockCode);
         QueryApi queryApi = minuteInfluxDBClient.getQueryApi();
         return queryApi.query(flux, MinuteStockPrice.class);
+    }
+
+    public void save(List<MinuteStockPrice> prices) {
+        if (prices.isEmpty()) {
+            log.debug("저장할 분봉 데이터 없음");
+            return;
+        }
+
+        try (WriteApi writeApi = minuteInfluxDBClient.getWriteApi()) {
+            writeApi.writeMeasurements(WritePrecision.NS, prices);
+            log.debug("분봉 InfluxDB 저장 완료 - 건수: {}", prices.size());
+        }
     }
 }
