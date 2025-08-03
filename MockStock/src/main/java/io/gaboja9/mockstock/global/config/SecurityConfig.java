@@ -65,14 +65,14 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
 
-//        configuration.setAllowedOrigins(
-//                List.of(
-//                        "https://mock-stock.pages.dev",
-//                        "http://localhost:3000",
-//                        "https://mockstocks.duckdns.org",
-//                        "https://mockstocks.duckdns.org:3000",
-//                        "http://127.0.0.1:5500",
-//                        "http://127.0.0.1:5173"));
+        //        configuration.setAllowedOrigins(
+        //                List.of(
+        //                        "https://mock-stock.pages.dev",
+        //                        "http://localhost:3000",
+        //                        "https://mockstocks.duckdns.org",
+        //                        "https://mockstocks.duckdns.org:3000",
+        //                        "http://127.0.0.1:5500",
+        //                        "http://127.0.0.1:5173"));
 
         configuration.setAllowedOriginPatterns(List.of("*"));
 

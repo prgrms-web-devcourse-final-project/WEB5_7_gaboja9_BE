@@ -173,7 +173,6 @@ public class KakaoPayService {
         paymentHistoryRepository.save(paymentHistory);
     }
 
-
     public void paymentFail(String tid, Long membersId) {
         PaymentHistory paymentHistory =
                 paymentHistoryRepository
