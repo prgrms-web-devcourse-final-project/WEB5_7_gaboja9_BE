@@ -32,4 +32,7 @@ public class MemberInfoDto {
 
     @Schema(description = "파산 횟수")
     private int bankruptcyCnt;
+
+    @Schema(description = "멤버 id")
+    private Long memberId;
 }

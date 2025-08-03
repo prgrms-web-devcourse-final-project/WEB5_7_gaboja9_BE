@@ -52,6 +52,7 @@ public class MembersService {
                 .ranking(ranking)
                 .period(period + 1)
                 .bankruptcyCnt(bankruptcyCnt)
+                .memberId(memberId)
                 .build();
     }
 
