@@ -3,6 +3,9 @@ package io.gaboja9.mockstock.domain.stock.repository;
 import com.influxdb.client.InfluxDBClient;
 import com.influxdb.client.QueryApi;
 
+import com.influxdb.client.WriteApi;
+import com.influxdb.client.domain.WritePrecision;
+import com.influxdb.client.write.Point;
 import io.gaboja9.mockstock.domain.stock.measurement.DailyStockPrice;
 
 import lombok.extern.slf4j.Slf4j;
@@ -100,5 +103,18 @@ public class StocksDailyRepository {
                 "Loading {} daily prices after {} for stock: {}", limit, afterTimestamp, stockCode);
         QueryApi queryApi = dailyInfluxDBClient.getQueryApi();
         return queryApi.query(flux, DailyStockPrice.class);
+    }
+
+    public void savePoints(List<Point> points) {
+        if (points.isEmpty()) {
+            log.debug("저장할 데이터 없음");
+            return;
+        }
+
+        try (WriteApi writeApi = dailyInfluxDBClient.getWriteApi()) {
+            writeApi.writePoints(points);  // ✅ writePoints 사용
+            log.debug("InfluxDB 저장 완료 - 건수: {}", points.size());
+        }
+        // 예외는 그대로 던짐 - 서비스에서 처리
     }
 }
