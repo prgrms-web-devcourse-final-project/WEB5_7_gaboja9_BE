@@ -42,7 +42,8 @@ public class SecurityConfig {
                                                 "/ws-stock/**",
                                                 "/ranks",
                                                 "/payments/**",
-                                                "/stocks/**")
+                                                "/stocks/**",
+                                                "mockPrice/**")
                                         .permitAll()
                                         .anyRequest()
                                         .authenticated())
