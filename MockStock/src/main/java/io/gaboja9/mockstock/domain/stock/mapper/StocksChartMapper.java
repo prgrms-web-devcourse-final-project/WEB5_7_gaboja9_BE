@@ -6,9 +6,8 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
-@Component // Spring 컨테이너에 Bean으로 등록
+@Component
 public class StocksChartMapper {
-
     // Daily 차트 응답 DTO로 변환
     public <T> StocksChartResponse<T> toChartResponse(
             String stockCode, List<T> data, String timeframe) {
