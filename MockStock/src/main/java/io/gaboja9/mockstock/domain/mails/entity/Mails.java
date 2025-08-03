@@ -8,6 +8,7 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 
@@ -26,7 +27,7 @@ public class Mails extends BaseEntity {
 
     private String content;
 
-    private boolean unread = true;
+    @Setter private boolean unread = true;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "members_id")

@@ -1,6 +1,7 @@
 package io.gaboja9.mockstock.domain.members.controller;
 
 import io.gaboja9.mockstock.domain.auth.dto.MembersDetails;
+import io.gaboja9.mockstock.domain.mails.dto.request.MailsRequestDto;
 import io.gaboja9.mockstock.domain.mails.dto.response.MailsResponseDto;
 import io.gaboja9.mockstock.domain.mails.service.MailsService;
 import io.gaboja9.mockstock.domain.members.dto.request.MemosCreateRequestDto;
@@ -147,6 +148,14 @@ public class MembersController implements MembersControllerSpec {
         Long currentId = membersDetails.getId();
 
         membersService.processBankruptcy(currentId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping("/mails")
+    public ResponseEntity<Page<MailsResponseDto>> changedMails(
+            @AuthenticationPrincipal MembersDetails membersDetails, MailsRequestDto dto) {
+        Long currentId = membersDetails.getId();
+        mailsService.changeUnreadStatus(currentId, dto.getMailId());
         return ResponseEntity.noContent().build();
     }
 }

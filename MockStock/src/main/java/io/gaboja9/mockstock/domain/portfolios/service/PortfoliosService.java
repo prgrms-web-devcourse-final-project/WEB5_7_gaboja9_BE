@@ -43,11 +43,7 @@ public class PortfoliosService {
                         .orElseThrow(() -> new NotFoundMemberException(memberId));
 
         int cashBalance = member.getCashBalance();
-        int totalInvestedAmount = member.getTotalInvestedAmount(); // 총 투입 자금
-
-        if (totalInvestedAmount == 0) {
-            totalInvestedAmount = 30_000_000;
-        }
+        int totalInvestedAmount = member.getTotalInvestedAmount() + 30_000_000; // 총 투입 자금
 
         PortfoliosSummary summary = calculateSummary(dtoList, cashBalance, totalInvestedAmount);
 

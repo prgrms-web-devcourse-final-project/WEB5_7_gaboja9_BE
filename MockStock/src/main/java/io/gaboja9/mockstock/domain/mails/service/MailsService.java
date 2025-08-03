@@ -2,6 +2,7 @@ package io.gaboja9.mockstock.domain.mails.service;
 
 import io.gaboja9.mockstock.domain.mails.dto.response.MailsResponseDto;
 import io.gaboja9.mockstock.domain.mails.entity.Mails;
+import io.gaboja9.mockstock.domain.mails.exception.NotFoundMailException;
 import io.gaboja9.mockstock.domain.mails.mapper.MailsMapper;
 import io.gaboja9.mockstock.domain.mails.repository.MailsRepository;
 import io.gaboja9.mockstock.domain.members.entity.Members;
@@ -51,5 +52,14 @@ public class MailsService {
                 mailsRepository.findByMembersIdAndUnread(findMember.getId(), unread, pageable);
 
         return mailsPage.map(mailsMapper::toDto);
+    }
+
+    @Transactional
+    public void changeUnreadStatus(Long memberId, Long mailId) {
+        Mails mail =
+                mailsRepository
+                        .findByIdAndMembersId(mailId, memberId)
+                        .orElseThrow(NotFoundMailException::new);
+        mail.setUnread(false);
     }
 }
