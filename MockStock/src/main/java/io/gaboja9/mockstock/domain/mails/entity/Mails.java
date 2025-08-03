@@ -27,8 +27,7 @@ public class Mails extends BaseEntity {
 
     private String content;
 
-    @Setter
-    private boolean unread = true;
+    @Setter private boolean unread = true;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "members_id")

@@ -152,7 +152,8 @@ public class MembersController implements MembersControllerSpec {
     }
 
     @PatchMapping("/mails")
-    public ResponseEntity<Page<MailsResponseDto>> changedMails(@AuthenticationPrincipal MembersDetails membersDetails, MailsRequestDto dto) {
+    public ResponseEntity<Page<MailsResponseDto>> changedMails(
+            @AuthenticationPrincipal MembersDetails membersDetails, MailsRequestDto dto) {
         Long currentId = membersDetails.getId();
         mailsService.changeUnreadStatus(currentId, dto.getMailId());
         return ResponseEntity.noContent().build();

@@ -56,8 +56,10 @@ public class MailsService {
 
     @Transactional
     public void changeUnreadStatus(Long memberId, Long mailId) {
-        Mails mail = mailsRepository.findByIdAndMembersId(mailId, memberId)
-                .orElseThrow(NotFoundMailException::new);
+        Mails mail =
+                mailsRepository
+                        .findByIdAndMembersId(mailId, memberId)
+                        .orElseThrow(NotFoundMailException::new);
         mail.setUnread(false);
     }
 }

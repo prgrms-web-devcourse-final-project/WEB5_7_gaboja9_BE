@@ -172,11 +172,11 @@ public interface MembersControllerSpec {
             summary = "메일을 읽음 상태로 변경합니다.",
             description = "메일을 읽음 상태로 변경합니다.",
             responses =
-            @ApiResponse(
-                    responseCode = "204",
-                    description = "성공적으로 읽음 처리가 되었습니다.",
-                    content = @Content(schema = @Schema(hidden = true))))
+                    @ApiResponse(
+                            responseCode = "204",
+                            description = "성공적으로 읽음 처리가 되었습니다.",
+                            content = @Content(schema = @Schema(hidden = true))))
     @PatchMapping("/mails")
-    public ResponseEntity<Page<MailsResponseDto>> changedMails(@AuthenticationPrincipal MembersDetails membersDetails, MailsRequestDto dto);
-
+    public ResponseEntity<Page<MailsResponseDto>> changedMails(
+            @AuthenticationPrincipal MembersDetails membersDetails, MailsRequestDto dto);
 }
