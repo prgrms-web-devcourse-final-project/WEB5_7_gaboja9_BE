@@ -12,6 +12,7 @@ import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
+import org.springframework.web.socket.config.annotation.WebSocketTransportRegistration;
 import org.springframework.web.socket.handler.WebSocketHandlerDecoratorFactory;
 
 @Configuration
@@ -50,5 +51,12 @@ public class StompWebSocketConfig implements WebSocketMessageBrokerConfigurer {
     public WebSocketHandlerDecoratorFactory webSocketHandlerDecoratorFactory(
             WebSocketSessionManager sessionManager) {
         return delegate -> new CustomWebSocketHandlerDecorator(delegate, sessionManager);
+    }
+
+    @Override
+    public void configureWebSocketTransport(WebSocketTransportRegistration registry) {
+        registry.setMessageSizeLimit(5 * 1024 * 1024); // 5MB
+        registry.setSendBufferSizeLimit(5 * 1024 * 1024); // 5MB
+        registry.setSendTimeLimit(60 * 1000); // 60초
     }
 }
