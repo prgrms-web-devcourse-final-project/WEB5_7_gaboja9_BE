@@ -93,7 +93,7 @@ public class FiveMinuteTaskInitializer {
         // 1. 월봉/주봉 스크립트와 동일한 구조를 위해 시간 범위를 계산합니다.
         range_stop = date.truncate(t: now(), unit: 5m)   // 예: 12:10:00
         range_start = date.sub(d: 5m, from: range_stop)    // 예: 12:05:00
-        // 2. 원본 데이터를 조회합니다. (12:05:00 <= t < 12:10:00)
+
         base = from(bucket: "%s")
           |> range(start: range_start, stop: range_stop)
           |> filter(fn: (r) => r._measurement == "stock_minute")
@@ -103,6 +103,7 @@ public class FiveMinuteTaskInitializer {
               m = date.minute(t: kst)
               return (h >= 9 and h < 15) or (h == 15 and m <= 30)
           })
+        
         // 3. 각 필드별로 5분봉을 집계합니다.
         // timeSrc를 생략하면 윈도우의 종료 시점(range_stop)이 타임스탬프가 됩니다.
         open = base |> filter(fn: (r) => r._field == "openPrice") |> aggregateWindow(every: 5m, fn: first)
@@ -110,6 +111,7 @@ public class FiveMinuteTaskInitializer {
         low = base |> filter(fn: (r) => r._field == "minPrice") |> aggregateWindow(every: 5m, fn: min)
         close = base |> filter(fn: (r) => r._field == "closePrice") |> aggregateWindow(every: 5m, fn: last)
         volume = base |> filter(fn: (r) => r._field == "accumTrans") |> aggregateWindow(every: 5m, fn: sum)
+        
         // 4. 집계된 데이터들을 하나로 합치고 "stock_5minute"으로 이름을 바꿔 저장합니다.
         union(tables: [open, high, low, close, volume])
           |> map(fn: (r) => ({ r with _measurement: "stock_5minute" }))
