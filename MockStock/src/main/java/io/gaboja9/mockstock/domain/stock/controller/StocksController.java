@@ -1,6 +1,7 @@
 package io.gaboja9.mockstock.domain.stock.controller;
 
 import io.gaboja9.mockstock.domain.stock.dto.StockResponse;
+import io.gaboja9.mockstock.domain.stock.service.FiveMinuteAggregationService;
 import io.gaboja9.mockstock.domain.stock.service.StocksBulkService;
 import io.gaboja9.mockstock.domain.stock.service.StocksDataService;
 import io.gaboja9.mockstock.domain.stock.service.StocksMinuteService;
@@ -31,6 +32,7 @@ public class StocksController implements StocksControllerSpec {
     private final TodayMinuteStockService todayMinuteStockService;
     private final StocksService stocksService;
     private final StocksBulkService stocksBulkService;
+    private final FiveMinuteAggregationService fiveMinuteAggregationService;
 
     @GetMapping("/long-term-daily")
     public ResponseEntity<?> fetchLongTermDailyStockData(
@@ -146,6 +148,21 @@ public class StocksController implements StocksControllerSpec {
         } catch (Exception e) {
             log.error("데이터 수집 시작 실패", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("데이터 수집 시작 실패");
+        }
+    }
+
+    @GetMapping("/five-minute/all")
+    public ResponseEntity<String> aggregateAllStocksToFiveMinute() {
+
+        log.info("전체 종목 5분봉 집계 요청 시작");
+
+        try {
+            fiveMinuteAggregationService.aggregateAllStocksToFiveMinute();
+            return ResponseEntity.status(HttpStatus.CREATED).body("5분봉 집계 작업 시작됨");
+
+        } catch (Exception e) {
+            log.error("5분봉 집계 시작 실패", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("5분봉 집계 시작 실패");
         }
     }
 }
