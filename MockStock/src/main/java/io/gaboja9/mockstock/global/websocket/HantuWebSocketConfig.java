@@ -1,5 +1,7 @@
 package io.gaboja9.mockstock.global.websocket;
 
+import jakarta.websocket.ContainerProvider;
+import jakarta.websocket.WebSocketContainer;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationListener;
@@ -23,14 +25,11 @@ public class HantuWebSocketConfig implements WebSocketConfigurer {
 
     @Bean
     public WebSocketClient webSocketClient() {
-        StandardWebSocketClient client = new StandardWebSocketClient();
+        WebSocketContainer container = ContainerProvider.getWebSocketContainer();
+        container.setDefaultMaxTextMessageBufferSize(2 * 1024 * 1024);   // 2MB
+        container.setDefaultMaxBinaryMessageBufferSize(2 * 1024 * 1024);
 
-        // 메세지가 버퍼보다 커 웹소켓이 종료되는 문제가 존재하여 버퍼의 크기르 설정하였습니다.
-        client.getUserProperties()
-                .put("org.apache.tomcat.websocket.textBufferSize", 5 * 1024 * 1024);
-        client.getUserProperties()
-                .put("org.apache.tomcat.websocket.binaryBufferSize", 5 * 1024 * 1024);
-        // 타임아웃 설정 (60초)
+        StandardWebSocketClient client = new StandardWebSocketClient(container);
         client.getUserProperties().put("org.apache.tomcat.websocket.IO_TIMEOUT_MS", "60000");
         return client;
     }
